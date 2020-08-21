@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Description_is_Required</fullName>
+    <active>true</active>
+    <description>You must enter a description for this Trigger Action.</description>
+    <errorConditionFormula>ISBLANK(Description__c)</errorConditionFormula>
+    <errorDisplayField>Description__c</errorDisplayField>
+    <errorMessage>You must enter a description for this Trigger Action.</errorMessage>
+</ValidationRule>

@@ -1,0 +1,15 @@
+{
+  "packageDirectories": [
+    {
+      "path": "application/base",
+      "default": true
+    },
+    {
+      "path": "application/opportunity-automation",
+      "default": false
+    }
+  ],
+  "namespace": "",
+  "sfdcLoginUrl": "https://login.salesforce.com",
+  "sourceApiVersion": "48.0"
+}

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Bypass_Execution__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Set this to true to bypass this Trigger Action from being called</description>
+    <externalId>false</externalId>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <inlineHelpText>Set this to true to bypass this Trigger Action from being called</inlineHelpText>
+    <label>Bypass Execution</label>
+    <type>Checkbox</type>
+</CustomField>

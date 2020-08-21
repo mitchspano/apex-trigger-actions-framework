@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>After_Undelete__c</fullName>
+    <description>Enter the name of the sObject you want to have this action execute on during the after undelete context</description>
+    <externalId>false</externalId>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <inlineHelpText>Enter the name of the sObject you want to have this action execute on during the after undelete context</inlineHelpText>
+    <label>After Undelete</label>
+    <referenceTo>sObject_Trigger_Setting__mdt</referenceTo>
+    <relationshipLabel>After Undelete</relationshipLabel>
+    <relationshipName>After_Undelete_Actions</relationshipName>
+    <required>false</required>
+    <type>MetadataRelationship</type>
+    <unique>false</unique>
+</CustomField>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Before_Update__c</fullName>
+    <description>Enter the name of the sObject you want to have this action execute on during the before update context</description>
+    <externalId>false</externalId>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <inlineHelpText>Enter the name of the sObject you want to have this action execute on during the before update context</inlineHelpText>
+    <label>Before Update</label>
+    <referenceTo>sObject_Trigger_Setting__mdt</referenceTo>
+    <relationshipLabel>Before Update</relationshipLabel>
+    <relationshipName>Before_Update_Actions</relationshipName>
+    <required>false</required>
+    <type>MetadataRelationship</type>
+    <unique>false</unique>
+</CustomField>

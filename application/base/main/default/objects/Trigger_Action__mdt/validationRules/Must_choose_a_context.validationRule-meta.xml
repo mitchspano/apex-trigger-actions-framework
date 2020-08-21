@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Must_choose_a_context</fullName>
+    <active>true</active>
+    <description>Throws an error if the user does not choose at least one context</description>
+    <errorConditionFormula>ISBLANK(Before_Insert__c)
+&amp;&amp;
+ISBLANK(After_Insert__c)
+&amp;&amp;
+ISBLANK(Before_Update__c)
+&amp;&amp;
+ISBLANK(After_Update__c)
+&amp;&amp;
+ISBLANK(Before_Delete__c)
+&amp;&amp;
+ISBLANK(After_Delete__c)
+&amp;&amp;
+ISBLANK(After_Delete__c)</errorConditionFormula>
+    <errorMessage>You must select at least one context</errorMessage>
+</ValidationRule>

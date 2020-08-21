@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Before_Insert__c</fullName>
+    <description>Enter the name of the sObject you want to have this action execute on during the before insert context</description>
+    <externalId>false</externalId>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <inlineHelpText>Enter the name of the sObject you want to have this action execute on during the before insert context</inlineHelpText>
+    <label>Before Insert</label>
+    <referenceTo>sObject_Trigger_Setting__mdt</referenceTo>
+    <relationshipLabel>Before Insert</relationshipLabel>
+    <relationshipName>Before_Insert_Actions</relationshipName>
+    <required>false</required>
+    <type>MetadataRelationship</type>
+    <unique>false</unique>
+</CustomField>
