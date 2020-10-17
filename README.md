@@ -250,7 +250,7 @@ public class TestUtility {
 
 }
 ```
-We can also use `ApexPages.getMessages()` to test the `addError(errorMsg)` method of the `SObject` class.
+We can also use `getErrors()` method to test the `addError(errorMsg)` method of the `SObject` class.
 
 Take a look at how both of these are used in the `ta_Opportunity_StageChangeRulesTest` class:
 
@@ -266,10 +266,10 @@ private static void beforeUpdate_test() {
 	Test.startTest();
 	new ta_Opportunity_StageChangeRules().beforeUpdate(newList, oldList);
 	Test.stopTest();
-	//Use Apex Pages Messages to get errors from AddError without performing DML
-	System.assertEquals(true, ApexPages.hasMessages());
-	System.assertEquals(1, ApexPages.getMessages().size());
-	System.assertEquals(true, ApexPages.getMessages()[0].getDetail().contains(String.format(ta_Opportunity_StageChangeRules.INVALID_STAGE_CHANGE_ERROR, new String[] {Constants.OPPORTUNITY_STAGENAME_QUALIFICATION, Constants.OPPORTUNITY_STAGENAME_CLOSED_WON})));
+	//Use getErrors() SObject method to get errors from addError without performing DML
+		System.assertEquals(true, newList[0].hasErrors());
+		System.assertEquals(1, newList[0].getErrors()).size());
+		System.assertEquals(true, newList[0].getErrors()[0].getMessage().contains(String.format(ta_Opportunity_StageChangeRules.INVALID_STAGE_CHANGE_ERROR, new String[] {Constants.OPPORTUNITY_STAGENAME_QUALIFICATION, Constants.OPPORTUNITY_STAGENAME_CLOSED_WON})));
 }
 ```
 

@@ -33,8 +33,8 @@ private class ta_Opportunity_StageInsertRulesTest {
 		new ta_Opportunity_StageInsertRules().beforeInsert(newList);
 		Test.stopTest();
 		//Use Apex Pages Messages to get errors from AddError without performing DML
-		System.assertEquals(true, ApexPages.hasMessages());
-		System.assertEquals(1, ApexPages.getMessages().size());
-		System.assertEquals(true, ApexPages.getMessages()[0].getDetail().contains(ta_Opportunity_StageInsertRules.INVALID_STAGE_INSERT_ERROR));
+		System.assertEquals(true, newList[0].hasErrors());
+		System.assertEquals(1, newList[0].getErrors().size());
+		System.assertEquals(true, newList[0].getErrors()[0].getMessage().contains(ta_Opportunity_StageInsertRules.INVALID_STAGE_INSERT_ERROR));
 	}
 }
