@@ -156,12 +156,7 @@ private class MetadataTriggerHandlerTest {
 		);
 		MetadataTriggerHandler handler = new MetadataTriggerHandler();
 		handler.sObjectName = ACCOUNT;
-		handler.triggerNew = new List<Account> {
-			new Account(
-				Name = MY_ACCOUNT,
-				Id = TestUtility.getFakeId(Schema.Account.SObjectType)
-			)
-		};
+		handler.triggerNew = new List<Account> {myAccount};
 		List<Trigger_Action__mdt> response;
 		sObject_Trigger_Setting__mdt setting = new sObject_Trigger_Setting__mdt(
 			SObject__c = ACCOUNT,
