@@ -268,7 +268,7 @@ private static void beforeUpdate_test() {
 	Test.stopTest();
 	//Use getErrors() SObject method to get errors from addError without performing DML
 		System.assertEquals(true, newList[0].hasErrors());
-		System.assertEquals(1, newList[0].getErrors()).size());
+		System.assertEquals(1, newList[0].getErrors().size());
 		System.assertEquals(true, newList[0].getErrors()[0].getMessage().contains(String.format(ta_Opportunity_StageChangeRules.INVALID_STAGE_CHANGE_ERROR, new String[] {Constants.OPPORTUNITY_STAGENAME_QUALIFICATION, Constants.OPPORTUNITY_STAGENAME_CLOSED_WON})));
 }
 ```
