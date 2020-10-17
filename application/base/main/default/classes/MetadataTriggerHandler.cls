@@ -105,181 +105,289 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 			}
 		}
 	}
+
+	@TestVisible
+	private List<Trigger_Action__mdt> beforeInsertActionMetadata {
+		get {
+			if (beforeInsertActionMetadata == null) {
+				beforeInsertActionMetadata = new List<Trigger_Action__mdt>();
+				for (Trigger_Action__mdt actionMetadata : [
+					SELECT
+						Apex_Class_Name__c
+					FROM
+						Trigger_Action__mdt
+					WHERE 
+					Apex_Class_Name__c NOT IN: MetadataTriggerHandler.bypassedActions
+						AND Before_Insert__c != null
+						AND Before_Insert__r.SObject__r.DeveloperName =: this.sObjectName
+						AND Before_Insert__r.Bypass_Execution__c = false
+					ORDER BY
+						Order__c ASC
+				]) {
+					beforeInsertActionMetadata.add(actionMetadata);
+				}
+			}
+			return beforeInsertActionMetadata;
+		}
+		set;
+	}
 	
 	private List<TriggerAction.BeforeInsert> beforeInsertActions {
 		get {
 			List<TriggerAction.BeforeInsert> returnValue = new List<TriggerAction.BeforeInsert>();
-			for (Trigger_Action__mdt triggerMetadata : triggerActionsForThisObject) {
-				if (triggerMetadata.Before_Insert__c != null) {
-					try {
-						returnValue.add((TriggerAction.BeforeInsert)(Type.forName(triggerMetadata.Apex_Class_Name__c).newInstance()));
-					} catch (System.TypeException e) {
-						throw new CustomMetadataTriggerHandlerException(String.format(INVALID_TYPE_ERROR, new List<String> {triggerMetadata.Apex_Class_Name__c, String.valueOf(System.TriggerOperation.BEFORE_INSERT)}));
-					}
+			for (Trigger_Action__mdt triggerMetadata : this.beforeInsertActionMetadata) {
+				try {
+					returnValue.add((TriggerAction.BeforeInsert)(Type.forName(triggerMetadata.Apex_Class_Name__c).newInstance()));
+				} catch (System.TypeException e) {
+					throw new CustomMetadataTriggerHandlerException(String.format(INVALID_TYPE_ERROR, new List<String> {triggerMetadata.Apex_Class_Name__c, String.valueOf(System.TriggerOperation.BEFORE_INSERT)}));
 				}
 			}
 			return returnValue;
 		}
+	}
+
+	@TestVisible
+	private List<Trigger_Action__mdt> afterInsertActionMetadata {
+		get {
+			if (afterInsertActionMetadata == null) {
+				afterInsertActionMetadata = new List<Trigger_Action__mdt>();
+				for (Trigger_Action__mdt actionMetadata : [
+					SELECT
+						Apex_Class_Name__c
+					FROM
+						Trigger_Action__mdt
+					WHERE 
+					Apex_Class_Name__c NOT IN: MetadataTriggerHandler.bypassedActions
+						AND After_Insert__c != null
+						AND After_Insert__r.SObject__r.DeveloperName =: this.sObjectName
+						AND After_Insert__r.Bypass_Execution__c = false
+					ORDER BY
+						Order__c ASC
+				]) {
+					afterInsertActionMetadata.add(actionMetadata);
+				}
+			}
+			return afterInsertActionMetadata;
+		}
+		set;
 	}
 	
 	private List<TriggerAction.AfterInsert> afterInsertActions {
 		get {
 			List<TriggerAction.AfterInsert> returnValue = new List<TriggerAction.AfterInsert>();
-			for (Trigger_Action__mdt triggerMetadata : triggerActionsForThisObject) {
-				if (triggerMetadata.After_Insert__c != null) {
-					try {
-						returnValue.add((TriggerAction.AfterInsert)(Type.forName(triggerMetadata.Apex_Class_Name__c).newInstance()));
-					} catch (System.TypeException e) {
-						throw new CustomMetadataTriggerHandlerException(String.format(INVALID_TYPE_ERROR, new List<String> {triggerMetadata.Apex_Class_Name__c, String.valueOf(System.TriggerOperation.AFTER_INSERT)}));
-					}
+			for (Trigger_Action__mdt triggerMetadata : afterInsertActionMetadata) {
+				try {
+					returnValue.add((TriggerAction.AfterInsert)(Type.forName(triggerMetadata.Apex_Class_Name__c).newInstance()));
+				} catch (System.TypeException e) {
+					throw new CustomMetadataTriggerHandlerException(String.format(INVALID_TYPE_ERROR, new List<String> {triggerMetadata.Apex_Class_Name__c, String.valueOf(System.TriggerOperation.AFTER_INSERT)}));
 				}
 			}
 			return returnValue;
 		}
 	}
+
+	@TestVisible
+	private List<Trigger_Action__mdt> beforeUpdateActionMetadata {
+		get {
+			if (beforeUpdateActionMetadata == null) {
+				beforeUpdateActionMetadata = new List<Trigger_Action__mdt>();
+				for (Trigger_Action__mdt actionMetadata : [
+					SELECT
+						Apex_Class_Name__c
+					FROM
+						Trigger_Action__mdt
+					WHERE 
+					Apex_Class_Name__c NOT IN: MetadataTriggerHandler.bypassedActions
+						AND Before_Update__c != null
+						AND Before_Update__r.SObject__r.DeveloperName =: this.sObjectName
+						AND Before_Update__r.Bypass_Execution__c = false
+					ORDER BY
+						Order__c ASC
+				]) {
+					beforeUpdateActionMetadata.add(actionMetadata);
+				}
+			}
+			return beforeUpdateActionMetadata;
+		}
+		set;
+	}
+	
 	
 	private List<TriggerAction.BeforeUpdate> beforeUpdateActions {
 		get {
 			List<TriggerAction.BeforeUpdate> returnValue = new List<TriggerAction.BeforeUpdate>();
-			for (Trigger_Action__mdt triggerMetadata : triggerActionsForThisObject) {
-				if (triggerMetadata.Before_Update__c != null) {
-					try {
-						returnValue.add((TriggerAction.BeforeUpdate)(Type.forName(triggerMetadata.Apex_Class_Name__c)).newInstance());
-					} catch (System.TypeException e) {
-						throw new CustomMetadataTriggerHandlerException(String.format(INVALID_TYPE_ERROR, new List<String> {triggerMetadata.Apex_Class_Name__c, String.valueOf(System.TriggerOperation.BEFORE_UPDATE)}));
-					}
+			for (Trigger_Action__mdt triggerMetadata : beforeUpdateActionMetadata) {
+				try {
+					returnValue.add((TriggerAction.BeforeUpdate)(Type.forName(triggerMetadata.Apex_Class_Name__c)).newInstance());
+				} catch (System.TypeException e) {
+					throw new CustomMetadataTriggerHandlerException(String.format(INVALID_TYPE_ERROR, new List<String> {triggerMetadata.Apex_Class_Name__c, String.valueOf(System.TriggerOperation.BEFORE_UPDATE)}));
 				}
 			}
 			return returnValue;
 		}
 	}
+
+	@TestVisible
+	private List<Trigger_Action__mdt> afterUpdateActionMetadata {
+		get {
+			if (afterUpdateActionMetadata == null) {
+				afterUpdateActionMetadata = new List<Trigger_Action__mdt>();
+				for (Trigger_Action__mdt actionMetadata : [
+					SELECT
+						Apex_Class_Name__c
+					FROM
+						Trigger_Action__mdt
+					WHERE 
+					Apex_Class_Name__c NOT IN: MetadataTriggerHandler.bypassedActions
+						AND After_Update__c != null
+						AND After_Update__r.SObject__r.DeveloperName =: this.sObjectName
+						AND After_Update__r.Bypass_Execution__c = false
+					ORDER BY
+						Order__c ASC
+				]) {
+					afterUpdateActionMetadata.add(actionMetadata);
+				}
+			}
+			return afterUpdateActionMetadata;
+		}
+		set;
+	}
+
+
 	private List<TriggerAction.AfterUpdate> afterUpdateActions {
 		get {
 			List<TriggerAction.AfterUpdate> returnValue = new List<TriggerAction.AfterUpdate>();
-			for (Trigger_Action__mdt triggerMetadata : triggerActionsForThisObject) {
-				if (triggerMetadata.After_Update__c != null) {
-					try {
-						returnValue.add((TriggerAction.AfterUpdate)(Type.forName(triggerMetadata.Apex_Class_Name__c)).newInstance());
-					} catch (System.TypeException e) {
-						throw new CustomMetadataTriggerHandlerException(String.format(INVALID_TYPE_ERROR, new List<String> {triggerMetadata.Apex_Class_Name__c, String.valueOf(System.TriggerOperation.AFTER_UPDATE)}));
-					}
+			for (Trigger_Action__mdt triggerMetadata : afterUpdateActionMetadata) {
+				try {
+					returnValue.add((TriggerAction.AfterUpdate)(Type.forName(triggerMetadata.Apex_Class_Name__c)).newInstance());
+				} catch (System.TypeException e) {
+					throw new CustomMetadataTriggerHandlerException(String.format(INVALID_TYPE_ERROR, new List<String> {triggerMetadata.Apex_Class_Name__c, String.valueOf(System.TriggerOperation.AFTER_UPDATE)}));
 				}
 			}
 			return returnValue;
 		}
+	}
+
+	@TestVisible
+	private List<Trigger_Action__mdt> beforeDeleteActionMetadata {
+		get {
+			if (beforeDeleteActionMetadata == null) {
+				beforeDeleteActionMetadata = new List<Trigger_Action__mdt>();
+				for (Trigger_Action__mdt actionMetadata : [
+					SELECT
+						Apex_Class_Name__c
+					FROM
+						Trigger_Action__mdt
+					WHERE 
+					Apex_Class_Name__c NOT IN: MetadataTriggerHandler.bypassedActions
+						AND Before_Delete__c != null
+						AND Before_Delete__r.SObject__r.DeveloperName =: this.sObjectName
+						AND Before_Delete__r.Bypass_Execution__c = false
+					ORDER BY
+						Order__c ASC
+				]) {
+					beforeDeleteActionMetadata.add(actionMetadata);
+				}
+			}
+			return beforeDeleteActionMetadata;
+		}
+		set;
 	}
 	
 	private List<TriggerAction.BeforeDelete> beforeDeleteActions {
 		get {
 			List<TriggerAction.BeforeDelete> returnValue = new List<TriggerAction.BeforeDelete>();
-			for (Trigger_Action__mdt triggerMetadata : triggerActionsForThisObject) {
-				if (triggerMetadata.Before_Delete__c != null) {
-					try {
-						returnValue.add((TriggerAction.BeforeDelete)(Type.forName(triggerMetadata.Apex_Class_Name__c)).newInstance());
-					} catch (System.TypeException e) {
-						throw new CustomMetadataTriggerHandlerException(String.format(INVALID_TYPE_ERROR, new List<String> {triggerMetadata.Apex_Class_Name__c, String.valueOf(System.TriggerOperation.BEFORE_DELETE)}));
-					}
+			for (Trigger_Action__mdt triggerMetadata : beforeDeleteActionMetadata) {
+				try {
+					returnValue.add((TriggerAction.BeforeDelete)(Type.forName(triggerMetadata.Apex_Class_Name__c)).newInstance());
+				} catch (System.TypeException e) {
+					throw new CustomMetadataTriggerHandlerException(String.format(INVALID_TYPE_ERROR, new List<String> {triggerMetadata.Apex_Class_Name__c, String.valueOf(System.TriggerOperation.BEFORE_DELETE)}));
 				}
 			}
 			return returnValue;
 		}
+	}
+
+	@TestVisible
+	private List<Trigger_Action__mdt> afterDeleteActionMetadata {
+		get {
+			if (afterDeleteActionMetadata == null) {
+				afterDeleteActionMetadata = new List<Trigger_Action__mdt>();
+				for (Trigger_Action__mdt actionMetadata : [
+					SELECT
+						Apex_Class_Name__c
+					FROM
+						Trigger_Action__mdt
+					WHERE 
+					Apex_Class_Name__c NOT IN: MetadataTriggerHandler.bypassedActions
+						AND After_Delete__c != null
+						AND After_Delete__r.SObject__r.DeveloperName =: this.sObjectName
+						AND After_Delete__r.Bypass_Execution__c = false
+					ORDER BY
+						Order__c ASC
+				]) {
+					afterDeleteActionMetadata.add(actionMetadata);
+				}
+			}
+			return afterDeleteActionMetadata;
+		}
+		set;
 	}
 	
 	private List<TriggerAction.AfterDelete> afterDeleteActions {
 		get {
 			List<TriggerAction.AfterDelete> returnValue = new List<TriggerAction.AfterDelete>();
-			for (Trigger_Action__mdt triggerMetadata : triggerActionsForThisObject) {
-				if (triggerMetadata.After_Delete__c != null) {
-					try {
-						returnValue.add((TriggerAction.AfterDelete)(Type.forName(triggerMetadata.Apex_Class_Name__c)).newInstance());
-					} catch (System.TypeException e) {
-						throw new CustomMetadataTriggerHandlerException(String.format(INVALID_TYPE_ERROR, new List<String> {triggerMetadata.Apex_Class_Name__c, String.valueOf(System.TriggerOperation.AFTER_DELETE)}));
-					}
+			for (Trigger_Action__mdt triggerMetadata : afterDeleteActionMetadata) {
+				try {
+					returnValue.add((TriggerAction.AfterDelete)(Type.forName(triggerMetadata.Apex_Class_Name__c)).newInstance());
+				} catch (System.TypeException e) {
+					throw new CustomMetadataTriggerHandlerException(String.format(INVALID_TYPE_ERROR, new List<String> {triggerMetadata.Apex_Class_Name__c, String.valueOf(System.TriggerOperation.AFTER_DELETE)}));
 				}
 			}
 			return returnValue;
 		}
+	}
+
+	@TestVisible
+	private List<Trigger_Action__mdt> afterUndeleteActionMetadata {
+		get {
+			if (afterUndeleteActionMetadata == null) {
+				afterUndeleteActionMetadata = new List<Trigger_Action__mdt>();
+				for (Trigger_Action__mdt actionMetadata : [
+					SELECT
+						Apex_Class_Name__c
+					FROM
+						Trigger_Action__mdt
+					WHERE 
+					Apex_Class_Name__c NOT IN: MetadataTriggerHandler.bypassedActions
+						AND After_Delete__c != null
+						AND After_Delete__r.SObject__r.DeveloperName =: this.sObjectName
+						AND After_Delete__r.Bypass_Execution__c = false
+					ORDER BY
+						Order__c ASC
+				]) {
+					afterUndeleteActionMetadata.add(actionMetadata);
+				}
+			}
+			return afterUndeleteActionMetadata;
+		}
+		set;
 	}
 	
 	private List<TriggerAction.AfterUndelete> afterUndeleteActions {
 		get {
 			List<TriggerAction.AfterUndelete> returnValue = new List<TriggerAction.AfterUndelete>();
-			for (Trigger_Action__mdt triggerMetadata : triggerActionsForThisObject) {
-				if (triggerMetadata.After_Undelete__c != null) {
-					try {
-						returnValue.add((TriggerAction.AfterUndelete)(Type.forName(triggerMetadata.Apex_Class_Name__c)).newInstance());
-					} catch (System.TypeException e) {
-						throw new CustomMetadataTriggerHandlerException(String.format(INVALID_TYPE_ERROR, new List<String> {triggerMetadata.Apex_Class_Name__c, String.valueOf(System.TriggerOperation.AFTER_UNDELETE)}));
-					}
+			for (Trigger_Action__mdt triggerMetadata : afterUndeleteActionMetadata) {
+				try {
+					returnValue.add((TriggerAction.AfterUndelete)(Type.forName(triggerMetadata.Apex_Class_Name__c)).newInstance());
+				} catch (System.TypeException e) {
+					throw new CustomMetadataTriggerHandlerException(String.format(INVALID_TYPE_ERROR, new List<String> {triggerMetadata.Apex_Class_Name__c, String.valueOf(System.TriggerOperation.AFTER_UNDELETE)}));
 				}
 			}
 			return returnValue;
 		}
 	}
 	
-	
-	@TestVisible
-	private List<Trigger_Action__mdt> triggerActionsForThisObject {
-		get {
-			if (triggerActionsForThisObject == null) {
-				triggerActionsForThisObject = new List<Trigger_Action__mdt>();
-				List<sObject_Trigger_Setting__mdt> sobjectTriggerSettings = new List<sObject_Trigger_Setting__mdt>(
-					[SELECT
-						 (SELECT Id, Before_Insert__c, After_Insert__c, Before_Update__c, After_Update__c,
-						 Before_Delete__c, After_Delete__c, After_Undelete__c, Apex_Class_Name__c, Order__c
-						 FROM Before_Insert_Actions__r
-						 WHERE Apex_Class_Name__c NOT IN: MetadataTriggerHandler.bypassedActions
-						 ORDER BY Order__c ASC),
-					 (SELECT Id, Before_Insert__c, After_Insert__c, Before_Update__c, After_Update__c,
-					  Before_Delete__c, After_Delete__c, After_Undelete__c, Apex_Class_Name__c, Order__c
-					  FROM After_Insert_Actions__r
-					  WHERE Apex_Class_Name__c NOT IN: MetadataTriggerHandler.bypassedActions
-					  ORDER BY Order__c ASC),
-					 (SELECT Id, Before_Insert__c, After_Insert__c, Before_Update__c, After_Update__c,
-					  Before_Delete__c, After_Delete__c, After_Undelete__c, Apex_Class_Name__c, Order__c
-					  FROM Before_Update_Actions__r
-					  WHERE Apex_Class_Name__c NOT IN: MetadataTriggerHandler.bypassedActions
-					  ORDER BY Order__c ASC),
-					 (SELECT Id, Before_Insert__c, After_Insert__c, Before_Update__c, After_Update__c,
-					  Before_Delete__c, After_Delete__c, After_Undelete__c, Apex_Class_Name__c, Order__c
-					  FROM After_Update_Actions__r
-					  WHERE Apex_Class_Name__c NOT IN: MetadataTriggerHandler.bypassedActions
-					  ORDER BY Order__c ASC),
-					 (SELECT Id, Before_Insert__c, After_Insert__c, Before_Update__c, After_Update__c,
-					  Before_Delete__c, After_Delete__c, After_Undelete__c, Apex_Class_Name__c, Order__c
-					  FROM Before_Delete_Actions__r
-					  WHERE Apex_Class_Name__c NOT IN: MetadataTriggerHandler.bypassedActions
-					  ORDER BY Order__c ASC),
-					 (SELECT Id, Before_Insert__c, After_Insert__c, Before_Update__c, After_Update__c,
-					  Before_Delete__c, After_Delete__c, After_Undelete__c, Apex_Class_Name__c, Order__c
-					  FROM After_Delete_Actions__r
-					  WHERE Apex_Class_Name__c NOT IN: MetadataTriggerHandler.bypassedActions
-					  ORDER BY Order__c ASC),
-					 (SELECT Id, Before_Insert__c, After_Insert__c, Before_Update__c, After_Update__c,
-					  Before_Delete__c, After_Delete__c, After_Undelete__c, Apex_Class_Name__c, Order__c
-					  FROM After_Undelete_Actions__r
-					  WHERE Apex_Class_Name__c NOT IN: MetadataTriggerHandler.bypassedActions
-					  ORDER BY Order__c ASC)
-					 FROM sObject_Trigger_Setting__mdt
-					 WHERE SObject__r.DeveloperName =: this.sObjectName
-									  AND Bypass_Execution__c = false
-												    LIMIT 1
-					]
-					);
-				if (!sobjectTriggerSettings.isEmpty()) {
-					triggerActionsForThisObject.addAll(sobjectTriggerSettings[0].Before_Insert_Actions__r);
-					triggerActionsForThisObject.addAll(sobjectTriggerSettings[0].After_Insert_Actions__r);
-					triggerActionsForThisObject.addAll(sobjectTriggerSettings[0].Before_Update_Actions__r);
-					triggerActionsForThisObject.addAll(sobjectTriggerSettings[0].After_Update_Actions__r);
-					triggerActionsForThisObject.addAll(sobjectTriggerSettings[0].Before_Delete_Actions__r);
-					triggerActionsForThisObject.addAll(sobjectTriggerSettings[0].After_Delete_Actions__r);
-					triggerActionsForThisObject.addAll(sobjectTriggerSettings[0].After_Undelete_Actions__r);
-				}
-			}
-			return triggerActionsForThisObject;
-		}
-		set;
-	}
 	
 	public static void bypass(String actionName) {
 		MetadataTriggerHandler.bypassedActions.add(actionName);
