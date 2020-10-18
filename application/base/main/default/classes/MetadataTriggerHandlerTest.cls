@@ -66,14 +66,13 @@ private class MetadataTriggerHandlerTest {
 	
 	@IsTest
 	private static void beforeInsert_fail () {
+		Account myAccount = new Account(
+			Name = MY_ACCOUNT,
+			Id = TestUtility.getFakeId(Schema.Account.SObjectType)
+		);
 		MetadataTriggerHandler handler = new MetadataTriggerHandler();
 		handler.sObjectName = ACCOUNT;
-		handler.triggerNew = new List<Account> {
-			new Account(
-				Name = MY_ACCOUNT,
-				Id = TestUtility.getFakeId(Schema.Account.SObjectType)
-			)
-		};
+		handler.triggerNew = new List<Account> {myAccount};
 		List<Trigger_Action__mdt> response;
 		sObject_Trigger_Setting__mdt setting = new sObject_Trigger_Setting__mdt(
 			SObject__c = ACCOUNT,
@@ -98,11 +97,11 @@ private class MetadataTriggerHandlerTest {
 		}
 		test.stopTest();
 		System.assertEquals(null, myException);
-		System.assertEquals(true, ApexPages.hasMessages());
-		System.assertEquals(1, ApexPages.getMessages().size());
+		System.assertEquals(true, myAccount.hasErrors());
+		System.assertEquals(1, myAccount.getErrors().size());
 		System.assertEquals(
 			true,
-			ApexPages.getMessages()[0].getDetail().contains(
+			myAccount.getErrors()[0].getMessage().contains(
 				String.format(
 					MetadataTriggerHandler.INVALID_TYPE_ERROR,
 					new String[] {
@@ -151,14 +150,13 @@ private class MetadataTriggerHandlerTest {
 	
 	@IsTest
 	private static void afterInsert_fail () {
+		Account myAccount = new Account(
+			Name = MY_ACCOUNT,
+			Id = TestUtility.getFakeId(Schema.Account.SObjectType)
+		);
 		MetadataTriggerHandler handler = new MetadataTriggerHandler();
 		handler.sObjectName = ACCOUNT;
-		handler.triggerNew = new List<Account> {
-			new Account(
-				Name = MY_ACCOUNT,
-				Id = TestUtility.getFakeId(Schema.Account.SObjectType)
-			)
-		};
+		handler.triggerNew = new List<Account> {myAccount};
 		List<Trigger_Action__mdt> response;
 		sObject_Trigger_Setting__mdt setting = new sObject_Trigger_Setting__mdt(
 			SObject__c = ACCOUNT,
@@ -183,11 +181,11 @@ private class MetadataTriggerHandlerTest {
 		}
 		test.stopTest();
 		System.assertEquals(null, myException);
-		System.assertEquals(true, ApexPages.hasMessages());
-		System.assertEquals(1, ApexPages.getMessages().size());
+		System.assertEquals(true, myAccount.hasErrors());
+		System.assertEquals(1, myAccount.getErrors().size());
 		System.assertEquals(
 			true, 
-			ApexPages.getMessages()[0].getDetail().contains(
+			myAccount.getErrors()[0].getMessage().contains(
 				String.format(
 					MetadataTriggerHandler.INVALID_TYPE_ERROR,
 					new String[] {
@@ -267,11 +265,11 @@ private class MetadataTriggerHandlerTest {
 		}
 		test.stopTest();
 		System.assertEquals(null, myException);
-		System.assertEquals(true, ApexPages.hasMessages());
-		System.assertEquals(1, ApexPages.getMessages().size());
+		System.assertEquals(true, myAccount.hasErrors());
+		System.assertEquals(1, myAccount.getErrors().size());
 		System.assertEquals(
 			true,
-			ApexPages.getMessages()[0].getDetail().contains(
+			myAccount.getErrors()[0].getMessage().contains(
 				String.format(
 					MetadataTriggerHandler.INVALID_TYPE_ERROR,
 					new String[] {
@@ -351,11 +349,11 @@ private class MetadataTriggerHandlerTest {
 		}
 		test.stopTest();
 		System.assertEquals(null, myException);
-		System.assertEquals(true, ApexPages.hasMessages());
-		System.assertEquals(1, ApexPages.getMessages().size());
+		System.assertEquals(true, myAccount.hasErrors());
+		System.assertEquals(1, myAccount.getErrors().size());
 		System.assertEquals(
 			true,
-			ApexPages.getMessages()[0].getDetail().contains(
+			myAccount.getErrors()[0].getMessage().contains(
 				String.format(
 					MetadataTriggerHandler.INVALID_TYPE_ERROR,
 					new String[] {
@@ -433,11 +431,11 @@ private class MetadataTriggerHandlerTest {
 		}
 		test.stopTest();
 		System.assertEquals(null, myException);
-		System.assertEquals(true, ApexPages.hasMessages());
-		System.assertEquals(1, ApexPages.getMessages().size());
+		System.assertEquals(true, myAccount.hasErrors());
+		System.assertEquals(1, myAccount.getErrors().size());
 		System.assertEquals(
 			true,
-			ApexPages.getMessages()[0].getDetail().contains(
+			myAccount.getErrors()[0].getMessage().contains(
 				String.format(
 					MetadataTriggerHandler.INVALID_TYPE_ERROR,
 					new String[] {
@@ -515,11 +513,11 @@ private class MetadataTriggerHandlerTest {
 		}
 		test.stopTest();
 		System.assertEquals(null, myException);
-		System.assertEquals(true, ApexPages.hasMessages());
-		System.assertEquals(1, ApexPages.getMessages().size());
+		System.assertEquals(true, myAccount.hasErrors());
+		System.assertEquals(1, myAccount.getErrors().size());
 		System.assertEquals(
 			true,
-			ApexPages.getMessages()[0].getDetail().contains(
+			myAccount.getErrors()[0].getMessage().contains(
 				String.format(
 					MetadataTriggerHandler.INVALID_TYPE_ERROR,
 					new String[] {
@@ -591,11 +589,11 @@ private class MetadataTriggerHandlerTest {
 		}
 		test.stopTest();
 		System.assertEquals(null, myException);
-		System.assertEquals(true, ApexPages.hasMessages());
-		System.assertEquals(1, ApexPages.getMessages().size());
+		System.assertEquals(true, myAccount.hasErrors());
+		System.assertEquals(1, myAccount.getErrors().size());
 		System.assertEquals(
 			true,
-			ApexPages.getMessages()[0].getDetail().contains(
+			myAccount.getErrors()[0].getMessage().contains(
 				String.format(
 					MetadataTriggerHandler.INVALID_TYPE_ERROR,
 					new String[] {
