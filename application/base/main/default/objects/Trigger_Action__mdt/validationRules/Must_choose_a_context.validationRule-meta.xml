@@ -15,6 +15,6 @@ ISBLANK(Before_Delete__c)
 &amp;&amp;
 ISBLANK(After_Delete__c)
 &amp;&amp;
-ISBLANK(After_Delete__c)</errorConditionFormula>
+ISBLANK(After_Undelete__c)</errorConditionFormula>
     <errorMessage>You must select at least one context</errorMessage>
 </ValidationRule>
