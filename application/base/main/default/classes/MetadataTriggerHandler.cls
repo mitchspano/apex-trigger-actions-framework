@@ -117,10 +117,11 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 					FROM
 						Trigger_Action__mdt
 					WHERE 
-					Apex_Class_Name__c NOT IN: MetadataTriggerHandler.bypassedActions
+						Apex_Class_Name__c NOT IN: MetadataTriggerHandler.bypassedActions
 						AND Before_Insert__c != null
 						AND Before_Insert__r.SObject__r.DeveloperName =: this.sObjectName
 						AND Before_Insert__r.Bypass_Execution__c = false
+						AND Bypass_Execution__c = false
 					ORDER BY
 						Order__c ASC
 				]) {
@@ -157,10 +158,11 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 					FROM
 						Trigger_Action__mdt
 					WHERE 
-					Apex_Class_Name__c NOT IN: MetadataTriggerHandler.bypassedActions
+						Apex_Class_Name__c NOT IN: MetadataTriggerHandler.bypassedActions
 						AND After_Insert__c != null
 						AND After_Insert__r.SObject__r.DeveloperName =: this.sObjectName
 						AND After_Insert__r.Bypass_Execution__c = false
+						AND Bypass_Execution__c = false
 					ORDER BY
 						Order__c ASC
 				]) {
@@ -197,10 +199,11 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 					FROM
 						Trigger_Action__mdt
 					WHERE 
-					Apex_Class_Name__c NOT IN: MetadataTriggerHandler.bypassedActions
+						Apex_Class_Name__c NOT IN: MetadataTriggerHandler.bypassedActions
 						AND Before_Update__c != null
 						AND Before_Update__r.SObject__r.DeveloperName =: this.sObjectName
 						AND Before_Update__r.Bypass_Execution__c = false
+						AND Bypass_Execution__c = false
 					ORDER BY
 						Order__c ASC
 				]) {
@@ -238,10 +241,11 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 					FROM
 						Trigger_Action__mdt
 					WHERE 
-					Apex_Class_Name__c NOT IN: MetadataTriggerHandler.bypassedActions
+						Apex_Class_Name__c NOT IN: MetadataTriggerHandler.bypassedActions
 						AND After_Update__c != null
 						AND After_Update__r.SObject__r.DeveloperName =: this.sObjectName
 						AND After_Update__r.Bypass_Execution__c = false
+						AND Bypass_Execution__c = false
 					ORDER BY
 						Order__c ASC
 				]) {
@@ -279,10 +283,11 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 					FROM
 						Trigger_Action__mdt
 					WHERE 
-					Apex_Class_Name__c NOT IN: MetadataTriggerHandler.bypassedActions
+						Apex_Class_Name__c NOT IN: MetadataTriggerHandler.bypassedActions
 						AND Before_Delete__c != null
 						AND Before_Delete__r.SObject__r.DeveloperName =: this.sObjectName
 						AND Before_Delete__r.Bypass_Execution__c = false
+						AND Bypass_Execution__c = false
 					ORDER BY
 						Order__c ASC
 				]) {
@@ -319,10 +324,11 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 					FROM
 						Trigger_Action__mdt
 					WHERE 
-					Apex_Class_Name__c NOT IN: MetadataTriggerHandler.bypassedActions
+						Apex_Class_Name__c NOT IN: MetadataTriggerHandler.bypassedActions
 						AND After_Delete__c != null
 						AND After_Delete__r.SObject__r.DeveloperName =: this.sObjectName
 						AND After_Delete__r.Bypass_Execution__c = false
+						AND Bypass_Execution__c = false
 					ORDER BY
 						Order__c ASC
 				]) {
@@ -359,10 +365,11 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 					FROM
 						Trigger_Action__mdt
 					WHERE 
-					Apex_Class_Name__c NOT IN: MetadataTriggerHandler.bypassedActions
+						Apex_Class_Name__c NOT IN: MetadataTriggerHandler.bypassedActions
 						AND After_Delete__c != null
 						AND After_Delete__r.SObject__r.DeveloperName =: this.sObjectName
 						AND After_Delete__r.Bypass_Execution__c = false
+						AND Bypass_Execution__c = false
 					ORDER BY
 						Order__c ASC
 				]) {
