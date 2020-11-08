@@ -23,7 +23,7 @@ private class MetadataTriggerHandlerTest {
 	private static final String TEST_BEFORE_INSERT = 'MetadataTriggerHandlerTest.BeforeInsert';
 	private static final String TEST_AFTER_INSERT = 'MetadataTriggerHandlerTest.AfterInsert';
 	private static final String TEST_BEFORE_UPDATE = 'MetadataTriggerHandlerTest.BeforeUpdate';
-	private static final String TEST_AFTER_UPDATE = 'MetadataTriggerHandlerTest.AfterUpdate ';
+	private static final String TEST_AFTER_UPDATE = 'MetadataTriggerHandlerTest.AfterUpdate';
 	private static final String TEST_BEFORE_DELETE = 'MetadataTriggerHandlerTest.BeforeDelete';
 	private static final String TEST_AFTER_DELETE = 'MetadataTriggerHandlerTest.AfterDelete';
 	private static final String TEST_AFTER_UNDELETE = 'MetadataTriggerHandlerTest.AfterUndelete';
@@ -96,19 +96,15 @@ private class MetadataTriggerHandlerTest {
 			myException = e;
 		}
 		test.stopTest();
-		System.assertEquals(null, myException);
-		System.assertEquals(true, myAccount.hasErrors());
-		System.assertEquals(1, myAccount.getErrors().size());
+		System.assertNotEquals(null, myException);
 		System.assertEquals(
-			true,
-			myAccount.getErrors()[0].getMessage().contains(
-				String.format(
-					MetadataTriggerHandler.INVALID_TYPE_ERROR,
-					new String[] {
-						TEST_AFTER_INSERT,
-						String.valueOf(System.TriggerOperation.BEFORE_INSERT)
-					}
-				)
+			myException.getMessage(),
+			String.format(
+				MetadataTriggerHandler.INVALID_TYPE_ERROR,
+				new String[] {
+					TEST_AFTER_INSERT,
+					String.valueOf(System.TriggerOperation.BEFORE_INSERT)
+				}
 			)
 		);
 	}
@@ -180,19 +176,15 @@ private class MetadataTriggerHandlerTest {
 			myException = e;
 		}
 		test.stopTest();
-		System.assertEquals(null, myException);
-		System.assertEquals(true, myAccount.hasErrors());
-		System.assertEquals(1, myAccount.getErrors().size());
+		System.assertNotEquals(null, myException);
 		System.assertEquals(
-			true, 
-			myAccount.getErrors()[0].getMessage().contains(
-				String.format(
-					MetadataTriggerHandler.INVALID_TYPE_ERROR,
-					new String[] {
-						TEST_BEFORE_INSERT,
-						String.valueOf(System.TriggerOperation.AFTER_INSERT)
-					}
-				)
+			myException.getMessage(),
+			String.format(
+				MetadataTriggerHandler.INVALID_TYPE_ERROR,
+				new String[] {
+					TEST_BEFORE_INSERT,
+					String.valueOf(System.TriggerOperation.AFTER_INSERT)
+				}
 			)
 		);
 	}
@@ -264,19 +256,15 @@ private class MetadataTriggerHandlerTest {
 			myException = e;
 		}
 		test.stopTest();
-		System.assertEquals(null, myException);
-		System.assertEquals(true, myAccount.hasErrors());
-		System.assertEquals(1, myAccount.getErrors().size());
+		System.assertNotEquals(null, myException);
 		System.assertEquals(
-			true,
-			myAccount.getErrors()[0].getMessage().contains(
-				String.format(
-					MetadataTriggerHandler.INVALID_TYPE_ERROR,
-					new String[] {
-						TEST_BEFORE_INSERT,
-						String.valueOf(System.TriggerOperation.BEFORE_UPDATE)
-					}
-				)
+			myException.getMessage(),
+			String.format(
+				MetadataTriggerHandler.INVALID_TYPE_ERROR,
+				new String[] {
+					TEST_BEFORE_INSERT,
+					String.valueOf(System.TriggerOperation.BEFORE_UPDATE)
+				}
 			)
 		);
 	}
@@ -307,11 +295,11 @@ private class MetadataTriggerHandlerTest {
 		};
 		Exception myException;
 		test.startTest();
-		try {
+		//try {
 			handler.afterUpdate(handler.triggerNew, handler.triggerOld);
-		} catch (Exception e) {
-			myException = e;
-		}
+		// } catch (Exception e) {
+		// 	myException = e;
+		// }
 		test.stopTest();
 		System.assertEquals(null, myException);
 	}
@@ -348,19 +336,15 @@ private class MetadataTriggerHandlerTest {
 			myException = e;
 		}
 		test.stopTest();
-		System.assertEquals(null, myException);
-		System.assertEquals(true, myAccount.hasErrors());
-		System.assertEquals(1, myAccount.getErrors().size());
+		System.assertNotEquals(null, myException);
 		System.assertEquals(
-			true,
-			myAccount.getErrors()[0].getMessage().contains(
-				String.format(
-					MetadataTriggerHandler.INVALID_TYPE_ERROR,
-					new String[] {
-						TEST_BEFORE_INSERT,
-						String.valueOf(System.TriggerOperation.AFTER_UPDATE)
-					}
-				)
+			myException.getMessage(),
+			String.format(
+				MetadataTriggerHandler.INVALID_TYPE_ERROR,
+				new String[] {
+					TEST_BEFORE_INSERT,
+					String.valueOf(System.TriggerOperation.AFTER_UPDATE)
+				}
 			)
 		);
 	}
@@ -430,19 +414,15 @@ private class MetadataTriggerHandlerTest {
 			myException = e;
 		}
 		test.stopTest();
-		System.assertEquals(null, myException);
-		System.assertEquals(true, myAccount.hasErrors());
-		System.assertEquals(1, myAccount.getErrors().size());
+		System.assertNotEquals(null, myException);
 		System.assertEquals(
-			true,
-			myAccount.getErrors()[0].getMessage().contains(
-				String.format(
-					MetadataTriggerHandler.INVALID_TYPE_ERROR,
-					new String[] {
-						TEST_BEFORE_INSERT,
-						String.valueOf(System.TriggerOperation.BEFORE_DELETE)
-					}
-				)
+			myException.getMessage(),
+			String.format(
+				MetadataTriggerHandler.INVALID_TYPE_ERROR,
+				new String[] {
+					TEST_BEFORE_INSERT,
+					String.valueOf(System.TriggerOperation.BEFORE_DELETE)
+				}
 			)
 		);
 	}
@@ -512,19 +492,15 @@ private class MetadataTriggerHandlerTest {
 			myException = e;
 		}
 		test.stopTest();
-		System.assertEquals(null, myException);
-		System.assertEquals(true, myAccount.hasErrors());
-		System.assertEquals(1, myAccount.getErrors().size());
+		System.assertNotEquals(null, myException);
 		System.assertEquals(
-			true,
-			myAccount.getErrors()[0].getMessage().contains(
-				String.format(
-					MetadataTriggerHandler.INVALID_TYPE_ERROR,
-					new String[] {
-						TEST_BEFORE_INSERT,
-						String.valueOf(System.TriggerOperation.AFTER_DELETE)
-					}
-				)
+			myException.getMessage(),
+			String.format(
+				MetadataTriggerHandler.INVALID_TYPE_ERROR,
+				new String[] {
+					TEST_BEFORE_INSERT,
+					String.valueOf(System.TriggerOperation.AFTER_DELETE)
+				}
 			)
 		);
 	}
@@ -588,19 +564,15 @@ private class MetadataTriggerHandlerTest {
 			myException = e;
 		}
 		test.stopTest();
-		System.assertEquals(null, myException);
-		System.assertEquals(true, myAccount.hasErrors());
-		System.assertEquals(1, myAccount.getErrors().size());
+		System.assertNotEquals(null, myException);
 		System.assertEquals(
-			true,
-			myAccount.getErrors()[0].getMessage().contains(
-				String.format(
-					MetadataTriggerHandler.INVALID_TYPE_ERROR,
-					new String[] {
-						TEST_BEFORE_INSERT,
-						String.valueOf(System.TriggerOperation.AFTER_UNDELETE)
-					}
-				)
+			myException.getMessage(),
+			String.format(
+				MetadataTriggerHandler.INVALID_TYPE_ERROR,
+				new String[] {
+					TEST_BEFORE_INSERT,
+					String.valueOf(System.TriggerOperation.AFTER_UNDELETE)
+				}
 			)
 		);
 	}

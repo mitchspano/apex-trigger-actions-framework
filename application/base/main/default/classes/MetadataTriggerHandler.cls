@@ -23,86 +23,44 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 	}
 	
 	public void beforeInsert(List<SObject> newList) {
-		try {
-			for (TriggerAction.BeforeInsert action : beforeInsertActions) {
-				action.beforeInsert(newList);
-			}
-		} catch (Exception e) {
-			for (SObject obj : newList) {
-				obj.addError(e.getMessage());
-			}
+		for (TriggerAction.BeforeInsert action : beforeInsertActions) {
+			action.beforeInsert(newList);
 		}
 	}
 
 	public void afterInsert(List<SObject> newList) {
-		try {
-			for (TriggerAction.AfterInsert action : afterInsertActions) {
-				action.AfterInsert(newList);
-			}
-		} catch (Exception e) {
-			for (SObject obj : newList) {
-				obj.addError(e.getMessage());
-			}
+		for (TriggerAction.AfterInsert action : afterInsertActions) {
+			action.AfterInsert(newList);
 		}
 	}
 
 	public void beforeUpdate(List<SObject> newList, List<SObject> oldList) {
-		try {
-			for (TriggerAction.BeforeUpdate action : beforeUpdateActions) {
-				action.BeforeUpdate(newList, oldList);
-			}
-		} catch (Exception e) {
-			for (SObject obj : newList) {
-				obj.addError(e.getMessage());
-			}
+		for (TriggerAction.BeforeUpdate action : beforeUpdateActions) {
+			action.BeforeUpdate(newList, oldList);
 		}
 	}
 
 	public void afterUpdate(List<SObject> newList, List<SObject> oldList) {
-		try {
-			for (TriggerAction.AfterUpdate action : AfterUpdateActions) {
-				action.AfterUpdate(newList, oldList);
-			}
-		} catch (Exception e) {
-			for (SObject obj : newList) {
-				obj.addError(e.getMessage());
-			}
+		for (TriggerAction.AfterUpdate action : AfterUpdateActions) {
+			action.AfterUpdate(newList, oldList);
 		}
 	}
 
 	public void beforeDelete(List<SObject> oldList) {
-		try {
-			for (TriggerAction.BeforeDelete action : beforeDeleteActions) {
-				action.BeforeDelete(oldList);
-			}
-		} catch (Exception e) {
-			for (SObject obj : oldList) {
-				obj.addError(e.getMessage());
-			}
+		for (TriggerAction.BeforeDelete action : beforeDeleteActions) {
+			action.BeforeDelete(oldList);
 		}
 	}
 
 	public void afterDelete(List<SObject> oldList) {
-		try {
-			for (TriggerAction.AfterDelete action : afterDeleteActions) {
-				action.AfterDelete(oldList);
-			}
-		} catch (Exception e) {
-			for (SObject obj : oldList) {
-				obj.addError(e.getMessage());
-			}
+		for (TriggerAction.AfterDelete action : afterDeleteActions) {
+			action.AfterDelete(oldList);
 		}
 	}
 
 	public void afterUndelete(List<SObject> newList) {
-		try {
-			for (TriggerAction.AfterUndelete action : afterUndeleteActions) {
-				action.AfterUndelete(newList);
-			}
-		} catch (Exception e) {
-			for (SObject obj : newList) {
-				obj.addError(e.getMessage());
-			}
+		for (TriggerAction.AfterUndelete action : afterUndeleteActions) {
+			action.AfterUndelete(newList);
 		}
 	}
 
