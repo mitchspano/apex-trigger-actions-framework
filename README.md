@@ -61,7 +61,7 @@ Now that the foundations are set, we can take a closer look into the `run()` met
 
 ```java
 public void run() {
-	
+
   ...
 
   if (this.context == System.TriggerOperation.BEFORE_UPDATE && this instanceof TriggerAction.BeforeUpdate) {
@@ -291,7 +291,7 @@ public class TestUtility {
 
   public static Id getFakeId(Schema.SObjectType sObjectType)  {
     String result = String.valueOf(myNumber++);
-	return (Id)(sObjectType.getDescribe().getKeyPrefix() + '0'.repeat(12-result.length()) + String.valueOf(myNumber++));
+    return (Id)(sObjectType.getDescribe().getKeyPrefix() + '0'.repeat(12-result.length()) + String.valueOf(myNumber++));
   }
 
 }
