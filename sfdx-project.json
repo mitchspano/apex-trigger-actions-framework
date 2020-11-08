@@ -10,6 +10,14 @@
     },
     {
       "path": "application/presentation",
+      "default": false
+    },
+    {
+      "path": "application/retail",
+      "default": false
+    },
+    {
+      "path": "application/wholesale",
       "default": true
     }
   ],
