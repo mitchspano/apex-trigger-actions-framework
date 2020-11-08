@@ -43,15 +43,15 @@ Developers are familiar with having a method named `beforeUpdate` for example. T
 ```java
 public class TriggerAction {
 
-	public interface BeforeInsert {
-		void beforeInsert(List<SObject> newList);
-	}
+  public interface BeforeInsert {
+    void beforeInsert(List<SObject> newList);
+  }
 
-	public interface BeforeUpdate {
-		void beforeUpdate(List<SObject> newList, List<SObject> oldList);
-	}
+  public interface BeforeUpdate {
+    void beforeUpdate(List<SObject> newList, List<SObject> oldList);
+  }
 
-	...
+  ...
 
 }
 
@@ -61,25 +61,25 @@ Now that the foundations are set, we can take a closer look into the `run()` met
 
 ```java
 public void run() {
+	
+  ...
 
-	...
+  if (this.context == System.TriggerOperation.BEFORE_UPDATE && this instanceof TriggerAction.BeforeUpdate) {
+    try {
+      ((TriggerAction.BeforeUpdate)this).beforeUpdate(triggerNew, triggerOld);
+    } catch (Exception e) {
+      for (SObject obj : triggerNew) {
+        obj.addError(e.getMessage());
+      }
+    }
+    for (SObject obj : triggerNew) {
+      TriggerBase.idsProcessedBeforeUpdate.add(obj.Id);
+    }
+  }
 
-	if (this.context == System.TriggerOperation.BEFORE_UPDATE && this instanceof TriggerAction.BeforeUpdate) {
-		try {
-			((TriggerAction.BeforeUpdate)this).beforeUpdate(triggerNew, triggerOld);
-		} catch (Exception e) {
-			for (SObject obj : triggerNew) {
-				obj.addError(e.getMessage());
-			}
-		}
-		for (SObject obj : triggerNew) {
-			TriggerBase.idsProcessedBeforeUpdate.add(obj.Id);
-		}
-	}
+  ...
 
-    ...
-
-	}
+}
 ```
 
 The check to see if `this` is an instance of any of those `TriggerAction` interfaces we specified earlier, in addition to the check of the context, allows us to specify the implementation context completely within the handler class definition. For example:
@@ -87,14 +87,14 @@ The check to see if `this` is an instance of any of those `TriggerAction` interf
 ```java
 public class OpportunityTriggerHandler extends TriggerBase implements TriggerAction.BeforeInsert {
 
-	@TestVisible
-  	private static final String YUGE_DEAL = 'Yuuuuuge Deal';
-
-    public void beforeInsert(List<Opportunity> newList){
-      	for (Opportunity opp : newList) {
-			opp.Name = YUGE_DEAL;
-      	}
+  @TestVisible
+  private static final String YUGE_DEAL = 'Yuuuuuge Deal';
+  
+  public void beforeInsert(List<Opportunity> newList){
+    for (Opportunity opp : newList) {
+      opp.Name = YUGE_DEAL;
     }
+  }
 }
 
 ```
@@ -119,7 +119,7 @@ We can achieve our goal of adhering to **SOLID** principles for our trigger fram
 
 ```java
 Trigger OppportunityTrigger on Opportunity (before insert, after insert, before update, after update, before delete, after delete, after undelete) {
-    new MetadataTriggerHandler().run();
+  new MetadataTriggerHandler().run();
 }
 ```
 
@@ -137,53 +137,53 @@ The `MetadataTriggerHandler` class fetches all Trigger Action metadata that is c
 
 ```java
 public void beforeInsert(List<SObject> newList) {
-	for (TriggerAction.BeforeInsert action : beforeInsertActions) {
-		action.beforeInsert(newList);
-	}
+  for (TriggerAction.BeforeInsert action : beforeInsertActions) {
+    action.beforeInsert(newList);
+  }
 }
 
 @TestVisible
 private List<Trigger_Action__mdt> beforeInsertActionMetadata {
-	get {
-		if (beforeInsertActionMetadata == null) {
-			beforeInsertActionMetadata = new List<Trigger_Action__mdt>();
-			for (Trigger_Action__mdt actionMetadata : [
-				SELECT
-					Apex_Class_Name__c
-				FROM
-					Trigger_Action__mdt
-				WHERE 
-					Apex_Class_Name__c NOT IN: MetadataTriggerHandler.bypassedActions
-					AND Before_Insert__c != null
-					AND Before_Insert__r.SObject__r.DeveloperName =: this.sObjectName
-					AND Before_Insert__r.Bypass_Execution__c = false
-					AND Bypass_Execution__c = false
-				ORDER BY
-					Order__c ASC
-			]) {
-				beforeInsertActionMetadata.add(actionMetadata);
-			}
-		}
-		return beforeInsertActionMetadata;
-	}
-	set;
+  get {
+    if (beforeInsertActionMetadata == null) {
+      beforeInsertActionMetadata = new List<Trigger_Action__mdt>();
+      for (Trigger_Action__mdt actionMetadata : [
+        SELECT
+          Apex_Class_Name__c
+        FROM
+          Trigger_Action__mdt
+        WHERE 
+          Apex_Class_Name__c NOT IN: MetadataTriggerHandler.bypassedActions
+          AND Before_Insert__c != null
+          AND Before_Insert__r.SObject__r.DeveloperName =: this.sObjectName
+          AND Before_Insert__r.Bypass_Execution__c = false
+          AND Bypass_Execution__c = false
+        ORDER BY
+          Order__c ASC
+      ]) {
+        beforeInsertActionMetadata.add(actionMetadata);
+      }
+    }
+    return beforeInsertActionMetadata;
+  }
+  set;
 }
 
 private List<TriggerAction.BeforeInsert> beforeInsertActions {
-	get {
-		List<TriggerAction.BeforeInsert> returnValue = new List<TriggerAction.BeforeInsert>();
-		for (Trigger_Action__mdt triggerMetadata : this.beforeInsertActionMetadata) {
-			try {
-				returnValue.add((TriggerAction.BeforeInsert)(Type.forName(triggerMetadata.pex_Class_Name__c).newInstance()));
-			} catch (System.TypeException e) {
-				handleTypeException(
-					triggerMetadata.Apex_Class_Name__c,
-					System.TriggerOperation.BEFORE_INSERT
-				);
-			}
-		}
-		return returnValue;
-	}
+  get {
+    List<TriggerAction.BeforeInsert> returnValue = new List<TriggerAction.BeforeInsert>();
+    for (Trigger_Action__mdt triggerMetadata : this.beforeInsertActionMetadata) {
+      try {
+        returnValue.add((TriggerAction.BeforeInsert)(Type.forName(triggerMetadata.pex_Class_Name__c).newInstance()));
+      } catch (System.TypeException e) {
+        handleTypeException(
+          triggerMetadata.Apex_Class_Name__c,
+          System.TriggerOperation.BEFORE_INSERT
+        );
+      }
+    }
+    return returnValue;
+  }
 }
 ```
 
@@ -194,16 +194,16 @@ This allows for extra freedom and configuration from the setup menu, but it also
 ```java
 public class ta_Opportunity_StageInsertRules implements TriggerAction.BeforeInsert {
 
-    @TestVisible
-    private static final String INVALID_STAGE_INSERT_ERROR = 'The Stage must be \'' +  Constants.OPPORTUNITY_STAGENAME_PROSPECTING + '\' when an Opportunity is created';
-
-    public void beforeInsert(List<Opportunity> newList){
-	for (Opportunity opp : newList) {
-            if (opp.StageName != Constants.OPPORTUNITY_STAGENAME_PROSPECTING) {
-                opp.addError(INVALID_STAGE_INSERT_ERROR);
-            }
-        }
+  @TestVisible
+  private static final String INVALID_STAGE_INSERT_ERROR = 'The Stage must be \'' +  Constants.  OPPORTUNITY_STAGENAME_PROSPECTING + '\' when an Opportunity is created';
+  
+  public void beforeInsert(List<Opportunity> newList){
+    for (Opportunity opp : newList) {
+      if (opp.StageName != Constants.OPPORTUNITY_STAGENAME_PROSPECTING) {
+        opp.addError(INVALID_STAGE_INSERT_ERROR);
+      }
     }
+  }
 }
 
 ```
@@ -238,7 +238,7 @@ You may have noticed that the defined interfaces within the `TriggerAction` clas
 
 ```java
 private void someMethod(Map<Id,sObject> sobjectMap) {
-	Map<Id,Opportunity> opportunityMap = (Map<Id,Opportunity>)sobjectMap;
+  Map<Id,Opportunity> opportunityMap = (Map<Id,Opportunity>)sobjectMap;
 }
 ```
 
@@ -247,9 +247,9 @@ To avoid this scenario, we can simply construct a new map out of our `newList` o
 
 ```java
 public void beforeUpdate(List<Opportunity> newList, List<Opportunity> oldList) {
-	Map<Id,Opportunity> newMap = new Map<Id,Opportunity>(newList);
-	Map<Id,Opportunity> oldMap = new Map<Id,Opportunity>(oldList);
-	...
+  Map<Id,Opportunity> newMap = new Map<Id,Opportunity>(newList);
+  Map<Id,Opportunity> oldMap = new Map<Id,Opportunity>(oldList);
+  ...
 }
 ```
 
@@ -287,12 +287,12 @@ Peforming DML operations is extremely computationally intensive and can really s
 @IsTest
 public class TestUtility {
 
-   static Integer myNumber = 1;
+  static Integer myNumber = 1;
 
-   public static Id getFakeId(Schema.SObjectType sObjectType)  {
-    	String result = String.valueOf(myNumber++);
-    	return (Id)(sObjectType.getDescribe().getKeyPrefix() + '0'.repeat(12-result.length()) + String.valueOf(myNumber++));
-	}
+  public static Id getFakeId(Schema.SObjectType sObjectType)  {
+    String result = String.valueOf(myNumber++);
+	return (Id)(sObjectType.getDescribe().getKeyPrefix() + '0'.repeat(12-result.length()) + String.valueOf(myNumber++));
+  }
 
 }
 ```
@@ -304,28 +304,28 @@ Take a look at how both of these are used in the `ta_Opportunity_StageChangeRule
 ```java
 @IsTest
 private static void beforeUpdate_test() {
-	List<Opportunity> newList = new List<Opportunity>();
-	List<Opportunity> oldList = new List<Opportunity>();
-	//generate fake Id
-	Id myRecordId = TestUtility.getFakeId(Opportunity.SObjectType);
-	newList.add(new Opportunity(Id = myRecordId, StageName = Constants.OPPORTUNITY_STAGENAME_CLOSED_WON));
-	oldList.add(new Opportunity(Id = myRecordId, StageName = Constants.OPPORTUNITY_STAGENAME_QUALIFICATION));
-	Test.startTest();
-	new ta_Opportunity_StageChangeRules().beforeUpdate(newList, oldList);
-	Test.stopTest();
-	//Use getErrors() SObject method to get errors from addError without performing DML
-	System.assertEquals(true, newList[0].hasErrors());
-	System.assertEquals(1, newList[0].getErrors().size());
-	System.assertEquals(
-		newList[0].getErrors()[0].getMessage(),
-		String.format(
-			ta_Opportunity_StageChangeRules.INVALID_STAGE_CHANGE_ERROR,
-			new String[] {
-				Constants.OPPORTUNITY_STAGENAME_QUALIFICATION,
-				Constants.OPPORTUNITY_STAGENAME_CLOSED_WON
-			}
-		)
-	);
+  List<Opportunity> newList = new List<Opportunity>();
+  List<Opportunity> oldList = new List<Opportunity>();
+  //generate fake Id
+  Id myRecordId = TestUtility.getFakeId(Opportunity.SObjectType);
+  newList.add(new Opportunity(Id = myRecordId, StageName = Constants.OPPORTUNITY_STAGENAME_CLOSED_WON));
+  oldList.add(new Opportunity(Id = myRecordId, StageName = Constants.OPPORTUNITY_STAGENAME_QUALIFICATION));
+  Test.startTest();
+  new ta_Opportunity_StageChangeRules().beforeUpdate(newList, oldList);
+  Test.stopTest();
+  //Use getErrors() SObject method to get errors from addError without performing DML
+  System.assertEquals(true, newList[0].hasErrors());
+  System.assertEquals(1, newList[0].getErrors().size());
+  System.assertEquals(
+    newList[0].getErrors()[0].getMessage(),
+    String.format(
+      ta_Opportunity_StageChangeRules.INVALID_STAGE_CHANGE_ERROR,
+      new String[] {
+        Constants.OPPORTUNITY_STAGENAME_QUALIFICATION,
+        Constants.OPPORTUNITY_STAGENAME_CLOSED_WON
+      }
+    )
+  );
 }
 ```
 
