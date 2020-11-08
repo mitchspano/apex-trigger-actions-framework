@@ -10,7 +10,6 @@ This project is meant to demonstrate an Apex Trigger Framework which is built wi
 6. Configuration from Setup Menu
 7. Adherance to SOLID Principles
 
-
 ## Build a Solid Base
 
 This one is a no brainer, but there should only be one Apex Trigger written in your Salesforce org per sObject.
@@ -65,12 +64,17 @@ public void run() {
 
 	...
 
-	if (this.context == System.TriggerOperation.BEFORE_INSERT && this instanceof TriggerAction.BeforeInsert ) {
-		((TriggerAction.BeforeInsert)this).beforeInsert(triggerNew);
-	}
-	...
-	else if (this.context == System.TriggerOperation.BEFORE_UPDATE && this instanceof TriggerAction.BeforeUpdate) {
-		((TriggerAction.BeforeUpdate)this).beforeUpdate(triggerNew, triggerOld);
+	if (this.context == System.TriggerOperation.BEFORE_UPDATE && this instanceof TriggerAction.BeforeUpdate) {
+		try {
+			((TriggerAction.BeforeUpdate)this).beforeUpdate(triggerNew, triggerOld);
+		} catch (Exception e) {
+			for (SObject obj : triggerNew) {
+				obj.addError(e.getMessage());
+			}
+		}
+		for (SObject obj : triggerNew) {
+			TriggerBase.idsProcessedBeforeUpdate.add(obj.Id);
+		}
 	}
 
     ...
@@ -97,19 +101,17 @@ public class OpportunityTriggerHandler extends TriggerBase implements TriggerAct
 
 Note that our beforeInsert method accepts `List<Opportunity>` instead of a `List<SObject>` - this is made possible by the `TriggerAction` interfaces. This is nice because there is no need to downcast `Trigger.new` in this framework as was the case in so many which came before it.
 
-This is great. We have successfully partitioned the Trigger framework from the logic in a repeatable way. This has been the place where the abstraction stops for writing triggers on the Salesforce platform for years, but it does not to adhere to all **SOLID**  principles:
+This is great. We have successfully partitioned the Trigger framework from the logic in a repeatable way. This has been the place where the abstraction stops for writing triggers on the Salesforce platform for years, but it does not to adhere to all **SOLID** principles:
 
+|     | Principle                       | Definition                                                                                |
+| --- | ------------------------------- | ----------------------------------------------------------------------------------------- |
+| S   | Single Responsibility principle | A class should have a single responsibility                                               |
+| O   | Open-Closed principle           | Classes should be open for extension but closed for modification                          |
+| L   | Liskov Substitution principle   | An instance of a class should be able to be interchanged with an instance of its subclass |
+| I   | Interface Segregation principle | Many client-specific interfaces are better than one general purpose interface             |
+| D   | Dependency Inversion principle  | It is better to depend upon abstractions (interfaces) rather than concretions             |
 
-|   | Principle                       | Definition                                                                                |
-|---|---------------------------------|-------------------------------------------------------------------------------------------|
-| S | Single Responsibility principle | A class should have a single responsibility                                               |
-| O | Open-Closed principle           | Classes should be open for extension but closed for modification                          |
-| L | Liskov Substitution principle   | An instance of a class should be able to be interchanged with an instance of its subclass |
-| I | Interface Segregation principle | Many client-specific interfaces are better than one general purpose interface             |
-| D | Dependency Inversion principle  | It is better to depend upon abstractions (interfaces) rather than concretions             |
-
-The `OpportunityTriggerHandler` class is responsible for *all* trigger logic on the Opportunity sObject and reqires modification for every new piece of triggered functionality which violates the **Single Responsibility principle** and the **Open-Closed principle**. Oftentimes the `OpportunityTriggerHandler` class becomes so large it gets unmaintainable and difficult to work on across multiple teams. We want to create a framework which allows for *extension* rather than *modification* of our trigger handler classes. Additionally, we want to author classes which have a single responsibility.
-
+The `OpportunityTriggerHandler` class is responsible for _all_ trigger logic on the Opportunity sObject and reqires modification for every new piece of triggered functionality which violates the **Single Responsibility principle** and the **Open-Closed principle**. Oftentimes the `OpportunityTriggerHandler` class becomes so large it gets unmaintainable and difficult to work on across multiple teams. We want to create a framework which allows for _extension_ rather than _modification_ of our trigger handler classes. Additionally, we want to author classes which have a single responsibility.
 
 ## Metadata Driven Trigger Actions
 
@@ -134,15 +136,57 @@ The setup menu gives you a nice view of all of the actions that are executed whe
 The `MetadataTriggerHandler` class fetches all Trigger Action metadata that is configured in the org, and dynamically create an instance of an object which implements a `TriggerAction` interface and casts it to the appropriate interface as specified in the metadata, then calls their respective context methods in the order specified.
 
 ```java
-...
-TriggerAction.BeforeInsert action = (TriggerAction.BeforeInsert)(Type.forName(triggerMetadata.Apex_Class_Name__c).newInstance()));
-...
-
-for (TriggerAction.BeforeInsert action : beforeInsertActions) {
-    action.BeforeInsert(newList);
+public void beforeInsert(List<SObject> newList) {
+	for (TriggerAction.BeforeInsert action : beforeInsertActions) {
+		action.beforeInsert(newList);
+	}
 }
-...
+
+@TestVisible
+private List<Trigger_Action__mdt> beforeInsertActionMetadata {
+	get {
+		if (beforeInsertActionMetadata == null) {
+			beforeInsertActionMetadata = new List<Trigger_Action__mdt>();
+			for (Trigger_Action__mdt actionMetadata : [
+				SELECT
+					Apex_Class_Name__c
+				FROM
+					Trigger_Action__mdt
+				WHERE 
+					Apex_Class_Name__c NOT IN: MetadataTriggerHandler.bypassedActions
+					AND Before_Insert__c != null
+					AND Before_Insert__r.SObject__r.DeveloperName =: this.sObjectName
+					AND Before_Insert__r.Bypass_Execution__c = false
+					AND Bypass_Execution__c = false
+				ORDER BY
+					Order__c ASC
+			]) {
+				beforeInsertActionMetadata.add(actionMetadata);
+			}
+		}
+		return beforeInsertActionMetadata;
+	}
+	set;
+}
+
+private List<TriggerAction.BeforeInsert> beforeInsertActions {
+	get {
+		List<TriggerAction.BeforeInsert> returnValue = new List<TriggerAction.BeforeInsert>();
+		for (Trigger_Action__mdt triggerMetadata : this.beforeInsertActionMetadata) {
+			try {
+				returnValue.add((TriggerAction.BeforeInsert)(Type.forName(triggerMetadata.pex_Class_Name__c).newInstance()));
+			} catch (System.TypeException e) {
+				handleTypeException(
+					triggerMetadata.Apex_Class_Name__c,
+					System.TriggerOperation.BEFORE_INSERT
+				);
+			}
+		}
+		return returnValue;
+	}
+}
 ```
+
 Note that if an Apex class is specified in metadata and it does not exist or does not implement the correct interface, a runtime error will occur.
 
 This allows for extra freedom and configuration from the setup menu, but it also allows us to do something which I think is pretty amazing: we can now define a class for each specific trigger action that we want to implement.
@@ -214,10 +258,12 @@ This will help the transition process if you are migrating an existing Salesforc
 ## Bypass Mechanisms
 
 Sometimes, you want to bypass trigger execution. It could be for a bulk data load during off-peak hours, but it could be that you have a newly found exception in your business use case that is not supposed to execute code that otherwise would be. There are two types of bypasses built into this Apex Trigger Actions framework:
+
 1. Bypassing from the setup menu
 2. Bypassing from Apex
 
 You can also bypass two different things:
+
 1. Bypass all trigger execution on an sObject
 2. Bypass a specific action from executing.
 
@@ -244,12 +290,13 @@ public class TestUtility {
    static Integer myNumber = 1;
 
    public static Id getFakeId(Schema.SObjectType sObjectType)  {
-      String result = String.valueOf(myNumber++);
-      return (Id)(sObjectType.getDescribe().getKeyPrefix() + '0'.repeat(12-result.length()) + String.valueOf(myNumber++));
-   }
+    	String result = String.valueOf(myNumber++);
+    	return (Id)(sObjectType.getDescribe().getKeyPrefix() + '0'.repeat(12-result.length()) + String.valueOf(myNumber++));
+	}
 
 }
 ```
+
 We can also use `getErrors()` method to test the `addError(errorMsg)` method of the `SObject` class.
 
 Take a look at how both of these are used in the `ta_Opportunity_StageChangeRulesTest` class:
@@ -267,10 +314,19 @@ private static void beforeUpdate_test() {
 	new ta_Opportunity_StageChangeRules().beforeUpdate(newList, oldList);
 	Test.stopTest();
 	//Use getErrors() SObject method to get errors from addError without performing DML
-		System.assertEquals(true, newList[0].hasErrors());
-		System.assertEquals(1, newList[0].getErrors().size());
-		System.assertEquals(true, newList[0].getErrors()[0].getMessage().contains(String.format(ta_Opportunity_StageChangeRules.INVALID_STAGE_CHANGE_ERROR, new String[] {Constants.OPPORTUNITY_STAGENAME_QUALIFICATION, Constants.OPPORTUNITY_STAGENAME_CLOSED_WON})));
+	System.assertEquals(true, newList[0].hasErrors());
+	System.assertEquals(1, newList[0].getErrors().size());
+	System.assertEquals(
+		newList[0].getErrors()[0].getMessage(),
+		String.format(
+			ta_Opportunity_StageChangeRules.INVALID_STAGE_CHANGE_ERROR,
+			new String[] {
+				Constants.OPPORTUNITY_STAGENAME_QUALIFICATION,
+				Constants.OPPORTUNITY_STAGENAME_CLOSED_WON
+			}
+		)
+	);
 }
 ```
 
-Notice how we performed *zero* DML operations yet we were able to cover all of the logic of our class in this particular test. This can help save a lot of computational time and allow for much faster execution of Apex tests.
+Notice how we performed _zero_ DML operations yet we were able to cover all of the logic of our class in this particular test. This can help save a lot of computational time and allow for much faster execution of Apex tests.
