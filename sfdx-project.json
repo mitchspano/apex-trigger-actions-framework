@@ -2,11 +2,15 @@
   "packageDirectories": [
     {
       "path": "application/base",
-      "default": true
+      "default": false
     },
     {
       "path": "application/opportunity-automation",
       "default": false
+    },
+    {
+      "path": "application/presentation",
+      "default": true
     }
   ],
   "namespace": "",
