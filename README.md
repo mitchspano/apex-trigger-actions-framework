@@ -174,9 +174,14 @@ private List<TriggerAction.BeforeInsert> beforeInsertActions {
     List<TriggerAction.BeforeInsert> returnValue = new List<TriggerAction.BeforeInsert>();
     for (Trigger_Action__mdt triggerMetadata : this.beforeInsertActionMetadata) {
       try {
-        returnValue.add((TriggerAction.BeforeInsert)(Type.forName(triggerMetadata.pex_Class_Name__c).newInstance()));
+        returnValue.add((TriggerAction.BeforeInsert)(Type.forName(triggerMetadata.Apex_Class_Name__c).newInstance()));
       } catch (System.TypeException e) {
         handleTypeException(
+          triggerMetadata.Apex_Class_Name__c,
+          System.TriggerOperation.BEFORE_INSERT
+        );
+      } catch (System.NullPointerException e) {
+        handleClassException(
           triggerMetadata.Apex_Class_Name__c,
           System.TriggerOperation.BEFORE_INSERT
         );
