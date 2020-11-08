@@ -14,26 +14,12 @@
    limitations under the License.
  */
 
-@isTest
-private class AccountTriggerTest {
-
-	@isTest
-	private void AccountTriggerTest() {
-		Account myAccount = new Account();
-		Test.startTest();
-		insert myAccount;
-		Test.stopTest();
-		String accountName = [
-			SELECT
-				Name
-			FROM
-				Account
-			WHERE
-				Id = :myAccount.Id
-		].Name;
-		System.assertEquals('Foo', accountName);
-		//??
-		System.assertEquals('Bar', accountName);
-		//??
+public class ContactTriggerHandler {
+	
+	public static void beforeInsert(List<Contact> newList) {
+		for (Contact contact : newList) {
+			contact.FirstName = 'Bugs';
+			contact.LastName = 'Bunny';
+		}
 	}
 }

@@ -15,25 +15,16 @@
  */
 
 @isTest
-private class AccountTriggerTest {
-
+private class ContactTriggerTest {
+	
 	@isTest
-	private void AccountTriggerTest() {
-		Account myAccount = new Account();
+	private void beforeInsertTest() {
+        List<Contact> myContacts = new List<Contact>();
+        myContacts.add(new Contact());
 		Test.startTest();
-		insert myAccount;
+		ContactTriggerHandler.beforeInsert(myContacts);
 		Test.stopTest();
-		String accountName = [
-			SELECT
-				Name
-			FROM
-				Account
-			WHERE
-				Id = :myAccount.Id
-		].Name;
-		System.assertEquals('Foo', accountName);
-		//??
-		System.assertEquals('Bar', accountName);
-		//??
+        System.assertEquals('Bugs', myContacts[0].FirstName);
+        System.assertEquals('Bunny', myContacts[0].LastName);
 	}
 }

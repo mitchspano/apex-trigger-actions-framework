@@ -14,26 +14,10 @@
    limitations under the License.
  */
 
-@isTest
-private class AccountTriggerTest {
+trigger ContactTrigger on Contact (before insert) {
 
-	@isTest
-	private void AccountTriggerTest() {
-		Account myAccount = new Account();
-		Test.startTest();
-		insert myAccount;
-		Test.stopTest();
-		String accountName = [
-			SELECT
-				Name
-			FROM
-				Account
-			WHERE
-				Id = :myAccount.Id
-		].Name;
-		System.assertEquals('Foo', accountName);
-		//??
-		System.assertEquals('Bar', accountName);
-		//??
+	if (Trigger.isBefore && Trigger.isInsert()){
+		ContactTriggerHandler.beforeInsert(Trigger.new);
 	}
+
 }
