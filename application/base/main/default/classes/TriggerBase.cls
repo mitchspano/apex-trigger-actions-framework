@@ -36,7 +36,13 @@ public virtual class TriggerBase {
 		if (!validateRun()) return;
 		
 		if (this.context == System.TriggerOperation.BEFORE_INSERT && this instanceof TriggerAction.BeforeInsert ) {
-			((TriggerAction.BeforeInsert)this).beforeInsert(triggerNew);
+            try {
+                ((TriggerAction.BeforeInsert)this).beforeInsert(triggerNew);
+            } catch (Exception e) {
+				for (SObject obj : triggerNew) {
+					obj.addError(e.getMessage());
+				}
+			}
 		} else if (this.context == System.TriggerOperation.AFTER_INSERT && this instanceof TriggerAction.AfterInsert) {
 			try {
 				((TriggerAction.AfterInsert)this).afterInsert(triggerNew);
