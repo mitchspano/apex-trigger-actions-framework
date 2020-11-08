@@ -6,7 +6,7 @@
     <label>Order</label>
     <precision>18</precision>
     <required>true</required>
-    <scale>0</scale>
+    <scale>3</scale>
     <type>Number</type>
     <unique>false</unique>
 </CustomField>
