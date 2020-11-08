@@ -5,7 +5,7 @@
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
 
-    https://www.apache.org/licenses/LICENSE-2.0
+	https://www.apache.org/licenses/LICENSE-2.0
 
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
@@ -23,86 +23,44 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 	}
 	
 	public void beforeInsert(List<SObject> newList) {
-		try {
-			for (TriggerAction.BeforeInsert action : beforeInsertActions) {
-				action.beforeInsert(newList);
-			}
-		} catch (Exception e) {
-			for (SObject obj : newList) {
-				obj.addError(e.getMessage());
-			}
+		for (TriggerAction.BeforeInsert action : beforeInsertActions) {
+			action.beforeInsert(newList);
 		}
 	}
 
 	public void afterInsert(List<SObject> newList) {
-		try {
-			for (TriggerAction.AfterInsert action : afterInsertActions) {
-				action.AfterInsert(newList);
-			}
-		} catch (Exception e) {
-			for (SObject obj : newList) {
-				obj.addError(e.getMessage());
-			}
+		for (TriggerAction.AfterInsert action : afterInsertActions) {
+			action.AfterInsert(newList);
 		}
 	}
 
 	public void beforeUpdate(List<SObject> newList, List<SObject> oldList) {
-		try {
-			for (TriggerAction.BeforeUpdate action : beforeUpdateActions) {
-				action.BeforeUpdate(newList, oldList);
-			}
-		} catch (Exception e) {
-			for (SObject obj : newList) {
-				obj.addError(e.getMessage());
-			}
+		for (TriggerAction.BeforeUpdate action : beforeUpdateActions) {
+			action.BeforeUpdate(newList, oldList);
 		}
 	}
 
 	public void afterUpdate(List<SObject> newList, List<SObject> oldList) {
-		try {
-			for (TriggerAction.AfterUpdate action : AfterUpdateActions) {
-				action.AfterUpdate(newList, oldList);
-			}
-		} catch (Exception e) {
-			for (SObject obj : newList) {
-				obj.addError(e.getMessage());
-			}
+		for (TriggerAction.AfterUpdate action : AfterUpdateActions) {
+			action.AfterUpdate(newList, oldList);
 		}
 	}
 
 	public void beforeDelete(List<SObject> oldList) {
-		try {
-			for (TriggerAction.BeforeDelete action : beforeDeleteActions) {
-				action.BeforeDelete(oldList);
-			}
-		} catch (Exception e) {
-			for (SObject obj : oldList) {
-				obj.addError(e.getMessage());
-			}
+		for (TriggerAction.BeforeDelete action : beforeDeleteActions) {
+			action.BeforeDelete(oldList);
 		}
 	}
 
 	public void afterDelete(List<SObject> oldList) {
-		try {
-			for (TriggerAction.AfterDelete action : afterDeleteActions) {
-				action.AfterDelete(oldList);
-			}
-		} catch (Exception e) {
-			for (SObject obj : oldList) {
-				obj.addError(e.getMessage());
-			}
+		for (TriggerAction.AfterDelete action : afterDeleteActions) {
+			action.AfterDelete(oldList);
 		}
 	}
 
 	public void afterUndelete(List<SObject> newList) {
-		try {
-			for (TriggerAction.AfterUndelete action : afterUndeleteActions) {
-				action.AfterUndelete(newList);
-			}
-		} catch (Exception e) {
-			for (SObject obj : newList) {
-				obj.addError(e.getMessage());
-			}
+		for (TriggerAction.AfterUndelete action : afterUndeleteActions) {
+			action.AfterUndelete(newList);
 		}
 	}
 
@@ -140,7 +98,10 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 				try {
 					returnValue.add((TriggerAction.BeforeInsert)(Type.forName(triggerMetadata.Apex_Class_Name__c).newInstance()));
 				} catch (System.TypeException e) {
-					throw new CustomMetadataTriggerHandlerException(String.format(INVALID_TYPE_ERROR, new List<String> {triggerMetadata.Apex_Class_Name__c, String.valueOf(System.TriggerOperation.BEFORE_INSERT)}));
+					handleTypeException(
+						triggerMetadata.Apex_Class_Name__c,
+						System.TriggerOperation.BEFORE_INSERT
+					);
 				}
 			}
 			return returnValue;
@@ -181,7 +142,10 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 				try {
 					returnValue.add((TriggerAction.AfterInsert)(Type.forName(triggerMetadata.Apex_Class_Name__c).newInstance()));
 				} catch (System.TypeException e) {
-					throw new CustomMetadataTriggerHandlerException(String.format(INVALID_TYPE_ERROR, new List<String> {triggerMetadata.Apex_Class_Name__c, String.valueOf(System.TriggerOperation.AFTER_INSERT)}));
+					handleTypeException(
+						triggerMetadata.Apex_Class_Name__c,
+						System.TriggerOperation.AFTER_INSERT
+					);
 				}
 			}
 			return returnValue;
@@ -223,7 +187,10 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 				try {
 					returnValue.add((TriggerAction.BeforeUpdate)(Type.forName(triggerMetadata.Apex_Class_Name__c)).newInstance());
 				} catch (System.TypeException e) {
-					throw new CustomMetadataTriggerHandlerException(String.format(INVALID_TYPE_ERROR, new List<String> {triggerMetadata.Apex_Class_Name__c, String.valueOf(System.TriggerOperation.BEFORE_UPDATE)}));
+					handleTypeException(
+						triggerMetadata.Apex_Class_Name__c,
+						System.TriggerOperation.BEFORE_UPDATE
+					);
 				}
 			}
 			return returnValue;
@@ -265,7 +232,10 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 				try {
 					returnValue.add((TriggerAction.AfterUpdate)(Type.forName(triggerMetadata.Apex_Class_Name__c)).newInstance());
 				} catch (System.TypeException e) {
-					throw new CustomMetadataTriggerHandlerException(String.format(INVALID_TYPE_ERROR, new List<String> {triggerMetadata.Apex_Class_Name__c, String.valueOf(System.TriggerOperation.AFTER_UPDATE)}));
+					handleTypeException(
+						triggerMetadata.Apex_Class_Name__c,
+						System.TriggerOperation.AFTER_UPDATE
+					);
 				}
 			}
 			return returnValue;
@@ -306,7 +276,10 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 				try {
 					returnValue.add((TriggerAction.BeforeDelete)(Type.forName(triggerMetadata.Apex_Class_Name__c)).newInstance());
 				} catch (System.TypeException e) {
-					throw new CustomMetadataTriggerHandlerException(String.format(INVALID_TYPE_ERROR, new List<String> {triggerMetadata.Apex_Class_Name__c, String.valueOf(System.TriggerOperation.BEFORE_DELETE)}));
+					handleTypeException(
+						triggerMetadata.Apex_Class_Name__c,
+						System.TriggerOperation.BEFORE_DELETE
+					);
 				}
 			}
 			return returnValue;
@@ -347,7 +320,10 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 				try {
 					returnValue.add((TriggerAction.AfterDelete)(Type.forName(triggerMetadata.Apex_Class_Name__c)).newInstance());
 				} catch (System.TypeException e) {
-					throw new CustomMetadataTriggerHandlerException(String.format(INVALID_TYPE_ERROR, new List<String> {triggerMetadata.Apex_Class_Name__c, String.valueOf(System.TriggerOperation.AFTER_DELETE)}));
+					handleTypeException(
+						triggerMetadata.Apex_Class_Name__c,
+						System.TriggerOperation.AFTER_DELETE
+					);
 				}
 			}
 			return returnValue;
@@ -388,11 +364,26 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 				try {
 					returnValue.add((TriggerAction.AfterUndelete)(Type.forName(triggerMetadata.Apex_Class_Name__c)).newInstance());
 				} catch (System.TypeException e) {
-					throw new CustomMetadataTriggerHandlerException(String.format(INVALID_TYPE_ERROR, new List<String> {triggerMetadata.Apex_Class_Name__c, String.valueOf(System.TriggerOperation.AFTER_UNDELETE)}));
+					handleTypeException(
+						triggerMetadata.Apex_Class_Name__c,
+						System.TriggerOperation.AFTER_UNDELETE
+					);
 				}
 			}
 			return returnValue;
 		}
+	}
+
+	private void handleTypeException(String className, System.TriggerOperation triggerOperation) {
+		throw new MetadataTriggerHandlerException(
+			String.format(
+				INVALID_TYPE_ERROR,
+				new List<String>{
+					className,
+					String.valueOf(triggerOperation)
+				}
+			)
+		);
 	}
 	
 	
@@ -415,7 +406,7 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 	@TestVisible
 	private static final String INVALID_TYPE_ERROR = 'Trigger Action Custom Metadata is configured incorrectly for class {0}. Either the class does not exist, or it exists and does not implement the Trigger Action interface specified for the {1} context.';
 	
-	class CustomMetadataTriggerHandlerException extends Exception {}
+	class MetadataTriggerHandlerException extends Exception {}
 	
 	
 }

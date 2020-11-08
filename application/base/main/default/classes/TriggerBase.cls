@@ -5,7 +5,7 @@
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
 
-    https://www.apache.org/licenses/LICENSE-2.0
+	https://www.apache.org/licenses/LICENSE-2.0
 
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
@@ -38,23 +38,59 @@ public virtual class TriggerBase {
 		if (this.context == System.TriggerOperation.BEFORE_INSERT && this instanceof TriggerAction.BeforeInsert ) {
 			((TriggerAction.BeforeInsert)this).beforeInsert(triggerNew);
 		} else if (this.context == System.TriggerOperation.AFTER_INSERT && this instanceof TriggerAction.AfterInsert) {
-			((TriggerAction.AfterInsert)this).afterInsert(triggerNew);
+			try {
+				((TriggerAction.AfterInsert)this).afterInsert(triggerNew);
+			} catch (Exception e) {
+				for (SObject obj : triggerNew) {
+					obj.addError(e.getMessage());
+				}
+			}
 		} else if (this.context == System.TriggerOperation.BEFORE_UPDATE && this instanceof TriggerAction.BeforeUpdate) {
-			((TriggerAction.BeforeUpdate)this).beforeUpdate(triggerNew, triggerOld);
+			try {
+				((TriggerAction.BeforeUpdate)this).beforeUpdate(triggerNew, triggerOld);
+			} catch (Exception e) {
+				for (SObject obj : triggerNew) {
+					obj.addError(e.getMessage());
+				}
+			}
 			for (SObject obj : triggerNew) {
 				TriggerBase.idsProcessedBeforeUpdate.add(obj.Id);
 			}
 		} else if (this.context == System.TriggerOperation.AFTER_UPDATE && this instanceof TriggerAction.AfterUpdate) {
-			((TriggerAction.AfterUpdate)this).afterUpdate(triggerNew, triggerOld);
+			try {
+				((TriggerAction.AfterUpdate)this).afterUpdate(triggerNew, triggerOld);
+			} catch (Exception e) {
+				for (SObject obj : triggerNew) {
+					obj.addError(e.getMessage());
+				}
+			}
 			for (SObject obj : triggerNew) {
 				TriggerBase.idsProcessedAfterUpdate.add(obj.Id);
 			}
 		} else if (this.context == System.TriggerOperation.BEFORE_DELETE && this instanceof TriggerAction.BeforeDelete) {
-			((TriggerAction.BeforeDelete)this).beforeDelete(triggerOld);
+			try {
+				((TriggerAction.BeforeDelete)this).beforeDelete(triggerOld);
+			} catch (Exception e) {
+				for (SObject obj : triggerOld) {
+					obj.addError(e.getMessage());
+				}
+			}
 		} else if (this.context == System.TriggerOperation.AFTER_DELETE && this instanceof TriggerAction.AfterDelete) {
-			((TriggerAction.AfterDelete)this).afterDelete(triggerOld);
+			try {
+				((TriggerAction.AfterDelete)this).afterDelete(triggerOld);
+			} catch (Exception e) {
+				for (SObject obj : triggerOld) {
+					obj.addError(e.getMessage());
+				}
+			}
 		} else if (this.context == System.TriggerOperation.AFTER_UNDELETE && this instanceof TriggerAction.AfterUndelete) {
-			((TriggerAction.AfterUndelete)this).afterUndelete(triggerNew);
+			try {
+				((TriggerAction.AfterUndelete)this).afterUndelete(triggerNew);
+			} catch (Exception e) {
+				for (SObject obj : triggerNew) {
+					obj.addError(e.getMessage());
+				}
+			}
 		}
 	}
 	
