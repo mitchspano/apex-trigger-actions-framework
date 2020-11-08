@@ -102,6 +102,11 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 						triggerMetadata.Apex_Class_Name__c,
 						System.TriggerOperation.BEFORE_INSERT
 					);
+				} catch (System.NullPointerException e) {
+					handleClassException(
+						triggerMetadata.Apex_Class_Name__c,
+						System.TriggerOperation.BEFORE_UPDATE
+					);
 				}
 			}
 			return returnValue;
@@ -146,6 +151,11 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 						triggerMetadata.Apex_Class_Name__c,
 						System.TriggerOperation.AFTER_INSERT
 					);
+				} catch (System.NullPointerException e) {
+					handleClassException(
+						triggerMetadata.Apex_Class_Name__c,
+						System.TriggerOperation.BEFORE_UPDATE
+					);
 				}
 			}
 			return returnValue;
@@ -188,6 +198,11 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 					returnValue.add((TriggerAction.BeforeUpdate)(Type.forName(triggerMetadata.Apex_Class_Name__c)).newInstance());
 				} catch (System.TypeException e) {
 					handleTypeException(
+						triggerMetadata.Apex_Class_Name__c,
+						System.TriggerOperation.BEFORE_UPDATE
+					);
+				} catch (System.NullPointerException e) {
+					handleClassException(
 						triggerMetadata.Apex_Class_Name__c,
 						System.TriggerOperation.BEFORE_UPDATE
 					);
@@ -236,6 +251,11 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 						triggerMetadata.Apex_Class_Name__c,
 						System.TriggerOperation.AFTER_UPDATE
 					);
+				} catch (System.NullPointerException e) {
+					handleClassException(
+						triggerMetadata.Apex_Class_Name__c,
+						System.TriggerOperation.BEFORE_UPDATE
+					);
 				}
 			}
 			return returnValue;
@@ -279,6 +299,11 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 					handleTypeException(
 						triggerMetadata.Apex_Class_Name__c,
 						System.TriggerOperation.BEFORE_DELETE
+					);
+				} catch (System.NullPointerException e) {
+					handleClassException(
+						triggerMetadata.Apex_Class_Name__c,
+						System.TriggerOperation.BEFORE_UPDATE
 					);
 				}
 			}
@@ -324,6 +349,11 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 						triggerMetadata.Apex_Class_Name__c,
 						System.TriggerOperation.AFTER_DELETE
 					);
+				} catch (System.NullPointerException e) {
+					handleClassException(
+						triggerMetadata.Apex_Class_Name__c,
+						System.TriggerOperation.BEFORE_UPDATE
+					);
 				}
 			}
 			return returnValue;
@@ -368,6 +398,11 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 						triggerMetadata.Apex_Class_Name__c,
 						System.TriggerOperation.AFTER_UNDELETE
 					);
+				} catch (System.NullPointerException e) {
+					handleClassException(
+						triggerMetadata.Apex_Class_Name__c,
+						System.TriggerOperation.BEFORE_UPDATE
+					);
 				}
 			}
 			return returnValue;
@@ -381,6 +416,19 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 				new List<String>{
 					className,
 					String.valueOf(triggerOperation)
+				}
+			)
+		);
+	}
+	
+	private void handleClassException(String className, System.TriggerOperation triggerOperation) {
+		throw new MetadataTriggerHandlerException(
+			String.format(
+				INVALID_CLASS_ERROR,
+				new List<String>{
+					className,
+					String.valueOf(triggerOperation),
+					this.sObjectName
 				}
 			)
 		);
@@ -404,8 +452,12 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 	}
 	
 	@TestVisible
-	private static final String INVALID_TYPE_ERROR = 'Trigger Action Custom Metadata is configured incorrectly for class {0}. Either the class does not exist, or it exists and does not implement the Trigger Action interface specified for the {1} context.';
+	private static final String INVALID_TYPE_ERROR = 'Please check the Trigger Action Custom Metadata for the {1} context on the {2} sObject. The {0} class does not implement the Trigger Action interface specified for the {1} context.';
 	
+	@TestVisible
+	private static final String INVALID_CLASS_ERROR = 'Please check the Trigger Action Custom Metadata for the {1} context on the {2} sObject. The {0} class does not exist.';
+	
+
 	class MetadataTriggerHandlerException extends Exception {}
 	
 	
