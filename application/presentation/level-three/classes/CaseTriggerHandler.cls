@@ -18,9 +18,10 @@ public class CaseTriggerHandler extends TriggerBase implements TriggerAction.Bef
     
     public void beforeInsert(List<Case> newList) {
         setDefaultCaseType(newList);
+        setDefaultCaseOrigin(newList);
     }
 
-    private void setDefaultCaseType(List<Case> newList) {
+    private void setDefaultCaseOrigin(List<Case> newList) {
         for (Case myCase : newList) {
             if (myCase.Origin == null) {
                 myCase.Origin = 'Email';

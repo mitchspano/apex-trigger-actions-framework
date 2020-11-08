@@ -18,7 +18,7 @@
 private class AccountTriggerTest {
 
 	@isTest
-	private void AccountTriggerTest() {
+	private static void AccountTriggerTest() {
 		Account myAccount = new Account();
 		Test.startTest();
 		insert myAccount;
