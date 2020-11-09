@@ -103,7 +103,8 @@ private class MetadataTriggerHandlerTest {
 				MetadataTriggerHandler.INVALID_TYPE_ERROR,
 				new String[] {
 					TEST_AFTER_INSERT,
-					String.valueOf(System.TriggerOperation.BEFORE_INSERT)
+					String.valueOf(System.TriggerOperation.BEFORE_INSERT),
+					'Account'
 				}
 			)
 		);
@@ -183,7 +184,8 @@ private class MetadataTriggerHandlerTest {
 				MetadataTriggerHandler.INVALID_TYPE_ERROR,
 				new String[] {
 					TEST_BEFORE_INSERT,
-					String.valueOf(System.TriggerOperation.AFTER_INSERT)
+					String.valueOf(System.TriggerOperation.AFTER_INSERT),
+					'Account'
 				}
 			)
 		);
@@ -263,7 +265,8 @@ private class MetadataTriggerHandlerTest {
 				MetadataTriggerHandler.INVALID_TYPE_ERROR,
 				new String[] {
 					TEST_BEFORE_INSERT,
-					String.valueOf(System.TriggerOperation.BEFORE_UPDATE)
+					String.valueOf(System.TriggerOperation.BEFORE_UPDATE),
+					'Account'
 				}
 			)
 		);
@@ -343,7 +346,8 @@ private class MetadataTriggerHandlerTest {
 				MetadataTriggerHandler.INVALID_TYPE_ERROR,
 				new String[] {
 					TEST_BEFORE_INSERT,
-					String.valueOf(System.TriggerOperation.AFTER_UPDATE)
+					String.valueOf(System.TriggerOperation.AFTER_UPDATE),
+					'Account'
 				}
 			)
 		);
@@ -421,7 +425,8 @@ private class MetadataTriggerHandlerTest {
 				MetadataTriggerHandler.INVALID_TYPE_ERROR,
 				new String[] {
 					TEST_BEFORE_INSERT,
-					String.valueOf(System.TriggerOperation.BEFORE_DELETE)
+					String.valueOf(System.TriggerOperation.BEFORE_DELETE),
+					'Account'
 				}
 			)
 		);
@@ -499,7 +504,8 @@ private class MetadataTriggerHandlerTest {
 				MetadataTriggerHandler.INVALID_TYPE_ERROR,
 				new String[] {
 					TEST_BEFORE_INSERT,
-					String.valueOf(System.TriggerOperation.AFTER_DELETE)
+					String.valueOf(System.TriggerOperation.AFTER_DELETE),
+					'Account'
 				}
 			)
 		);
@@ -571,7 +577,8 @@ private class MetadataTriggerHandlerTest {
 				MetadataTriggerHandler.INVALID_TYPE_ERROR,
 				new String[] {
 					TEST_BEFORE_INSERT,
-					String.valueOf(System.TriggerOperation.AFTER_UNDELETE)
+					String.valueOf(System.TriggerOperation.AFTER_UNDELETE),
+					'Account'
 				}
 			)
 		);
