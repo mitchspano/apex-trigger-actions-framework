@@ -98,12 +98,14 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 				try {
 					returnValue.add((TriggerAction.BeforeInsert)(Type.forName(triggerMetadata.Apex_Class_Name__c).newInstance()));
 				} catch (System.TypeException e) {
-					handleTypeException(
+					handleException(
+						INVALID_TYPE_ERROR,
 						triggerMetadata.Apex_Class_Name__c,
 						System.TriggerOperation.BEFORE_INSERT
 					);
 				} catch (System.NullPointerException e) {
-					handleClassException(
+					handleException(
+						INVALID_CLASS_ERROR,
 						triggerMetadata.Apex_Class_Name__c,
 						System.TriggerOperation.BEFORE_UPDATE
 					);
@@ -147,12 +149,14 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 				try {
 					returnValue.add((TriggerAction.AfterInsert)(Type.forName(triggerMetadata.Apex_Class_Name__c).newInstance()));
 				} catch (System.TypeException e) {
-					handleTypeException(
+					handleException(
+						INVALID_TYPE_ERROR,
 						triggerMetadata.Apex_Class_Name__c,
 						System.TriggerOperation.AFTER_INSERT
 					);
 				} catch (System.NullPointerException e) {
-					handleClassException(
+					handleException(
+						INVALID_CLASS_ERROR,
 						triggerMetadata.Apex_Class_Name__c,
 						System.TriggerOperation.BEFORE_UPDATE
 					);
@@ -197,12 +201,14 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 				try {
 					returnValue.add((TriggerAction.BeforeUpdate)(Type.forName(triggerMetadata.Apex_Class_Name__c)).newInstance());
 				} catch (System.TypeException e) {
-					handleTypeException(
+					handleException(
+						INVALID_TYPE_ERROR,
 						triggerMetadata.Apex_Class_Name__c,
 						System.TriggerOperation.BEFORE_UPDATE
 					);
 				} catch (System.NullPointerException e) {
-					handleClassException(
+					handleException(
+						INVALID_CLASS_ERROR,
 						triggerMetadata.Apex_Class_Name__c,
 						System.TriggerOperation.BEFORE_UPDATE
 					);
@@ -247,12 +253,14 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 				try {
 					returnValue.add((TriggerAction.AfterUpdate)(Type.forName(triggerMetadata.Apex_Class_Name__c)).newInstance());
 				} catch (System.TypeException e) {
-					handleTypeException(
+					handleException(
+						INVALID_TYPE_ERROR,
 						triggerMetadata.Apex_Class_Name__c,
 						System.TriggerOperation.AFTER_UPDATE
 					);
 				} catch (System.NullPointerException e) {
-					handleClassException(
+					handleException(
+						INVALID_CLASS_ERROR,
 						triggerMetadata.Apex_Class_Name__c,
 						System.TriggerOperation.BEFORE_UPDATE
 					);
@@ -296,12 +304,14 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 				try {
 					returnValue.add((TriggerAction.BeforeDelete)(Type.forName(triggerMetadata.Apex_Class_Name__c)).newInstance());
 				} catch (System.TypeException e) {
-					handleTypeException(
+					handleException(
+						INVALID_TYPE_ERROR,
 						triggerMetadata.Apex_Class_Name__c,
 						System.TriggerOperation.BEFORE_DELETE
 					);
 				} catch (System.NullPointerException e) {
-					handleClassException(
+					handleException(
+						INVALID_CLASS_ERROR,
 						triggerMetadata.Apex_Class_Name__c,
 						System.TriggerOperation.BEFORE_UPDATE
 					);
@@ -345,12 +355,14 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 				try {
 					returnValue.add((TriggerAction.AfterDelete)(Type.forName(triggerMetadata.Apex_Class_Name__c)).newInstance());
 				} catch (System.TypeException e) {
-					handleTypeException(
+					handleException(
+						INVALID_TYPE_ERROR,
 						triggerMetadata.Apex_Class_Name__c,
 						System.TriggerOperation.AFTER_DELETE
 					);
 				} catch (System.NullPointerException e) {
-					handleClassException(
+					handleException(
+						INVALID_CLASS_ERROR,
 						triggerMetadata.Apex_Class_Name__c,
 						System.TriggerOperation.BEFORE_UPDATE
 					);
@@ -394,12 +406,14 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 				try {
 					returnValue.add((TriggerAction.AfterUndelete)(Type.forName(triggerMetadata.Apex_Class_Name__c)).newInstance());
 				} catch (System.TypeException e) {
-					handleTypeException(
+					handleException(
+						INVALID_TYPE_ERROR,
 						triggerMetadata.Apex_Class_Name__c,
 						System.TriggerOperation.AFTER_UNDELETE
 					);
 				} catch (System.NullPointerException e) {
-					handleClassException(
+					handleException(
+						INVALID_CLASS_ERROR,
 						triggerMetadata.Apex_Class_Name__c,
 						System.TriggerOperation.BEFORE_UPDATE
 					);
@@ -409,22 +423,10 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 		}
 	}
 
-	private void handleTypeException(String className, System.TriggerOperation triggerOperation) {
+	private void handleException(String error, String className, System.TriggerOperation triggerOperation) {
 		throw new MetadataTriggerHandlerException(
 			String.format(
-				INVALID_TYPE_ERROR,
-				new List<String>{
-					className,
-					String.valueOf(triggerOperation)
-				}
-			)
-		);
-	}
-	
-	private void handleClassException(String className, System.TriggerOperation triggerOperation) {
-		throw new MetadataTriggerHandlerException(
-			String.format(
-				INVALID_CLASS_ERROR,
+				error,
 				new List<String>{
 					className,
 					String.valueOf(triggerOperation),
