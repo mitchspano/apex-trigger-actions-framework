@@ -176,16 +176,18 @@ private List<TriggerAction.BeforeInsert> beforeInsertActions {
       try {
         returnValue.add((TriggerAction.BeforeInsert)(Type.forName(triggerMetadata.Apex_Class_Name__c).newInstance()));
       } catch (System.TypeException e) {
-        handleTypeException(
-          triggerMetadata.Apex_Class_Name__c,
-          System.TriggerOperation.BEFORE_INSERT
-        );
-      } catch (System.NullPointerException e) {
-        handleClassException(
-          triggerMetadata.Apex_Class_Name__c,
-          System.TriggerOperation.BEFORE_INSERT
-        );
-      }
+				handleException(
+					INVALID_TYPE_ERROR,
+					triggerMetadata.Apex_Class_Name__c,
+					System.TriggerOperation.AFTER_INSERT
+				);
+			} catch (System.NullPointerException e) {
+				handleException(
+				INVALID_CLASS_ERROR,
+					triggerMetadata.Apex_Class_Name__c,
+					System.TriggerOperation.BEFORE_UPDATE
+				);
+			}
     }
     return returnValue;
   }
