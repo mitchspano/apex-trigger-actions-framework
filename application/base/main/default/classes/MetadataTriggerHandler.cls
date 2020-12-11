@@ -14,7 +14,17 @@
    limitations under the License.
  */
 
-public class MetadataTriggerHandler extends TriggerBase implements TriggerAction.BeforeInsert, TriggerAction.AfterInsert,  TriggerAction.BeforeUpdate, TriggerAction.AfterUpdate, TriggerAction.BeforeDelete, TriggerAction.AfterDelete, TriggerAction.AfterUndelete {
+public class MetadataTriggerHandler
+extends TriggerBase 
+implements 
+TriggerAction.BeforeInsert,
+TriggerAction.AfterInsert, 
+TriggerAction.BeforeUpdate,
+TriggerAction.AfterUpdate,
+TriggerAction.BeforeDelete,
+TriggerAction.AfterDelete,
+TriggerAction.AfterUndelete
+{
 	@TestVisible
 	private static Set<String> bypassedActions;
 	
@@ -65,31 +75,115 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 	}
 
 	@TestVisible
+	private List<sObject_Trigger_Setting__mdt> actionMetadata {
+		get {
+			if (actionMetadata == null) {
+				actionMetadata = new List<sObject_Trigger_Setting__mdt>([
+					SELECT
+						Id,
+						(
+							SELECT
+								Apex_Class_Name__c
+							FROM
+								Before_Insert_Actions__r
+							WHERE
+								Bypass_Execution__c = false
+								AND Apex_Class_Name__c NOT IN: MetadataTriggerHandler.bypassedActions
+							ORDER BY
+								Order__c ASC
+						),
+						(
+							SELECT
+								Apex_Class_Name__c
+							FROM
+								After_Insert_Actions__r
+							WHERE
+								Bypass_Execution__c = false
+								AND Apex_Class_Name__c NOT IN: MetadataTriggerHandler.bypassedActions
+							ORDER BY
+								Order__c ASC
+						),
+						(
+							SELECT
+								Apex_Class_Name__c
+							FROM
+								Before_Update_Actions__r
+							WHERE
+								Bypass_Execution__c = false
+								AND Apex_Class_Name__c NOT IN: MetadataTriggerHandler.bypassedActions
+							ORDER BY
+								Order__c ASC
+						),
+						(
+							SELECT
+								Apex_Class_Name__c
+							FROM
+								After_Update_Actions__r
+							WHERE
+								Bypass_Execution__c = false
+								AND Apex_Class_Name__c NOT IN: MetadataTriggerHandler.bypassedActions
+							ORDER BY
+								Order__c ASC
+						),
+						(
+							SELECT
+								Apex_Class_Name__c
+							FROM
+								Before_Delete_Actions__r
+							WHERE
+								Bypass_Execution__c = false
+								AND Apex_Class_Name__c NOT IN: MetadataTriggerHandler.bypassedActions
+							ORDER BY
+								Order__c ASC
+						),
+						(
+							SELECT
+								Apex_Class_Name__c
+							FROM
+								After_Delete_Actions__r
+							WHERE
+								Bypass_Execution__c = false
+								AND Apex_Class_Name__c NOT IN: MetadataTriggerHandler.bypassedActions
+							ORDER BY
+								Order__c ASC
+						),
+						(
+							SELECT
+								Apex_Class_Name__c
+							FROM
+								After_Undelete_Actions__r
+							WHERE
+								Bypass_Execution__c = false
+								AND Apex_Class_Name__c NOT IN: MetadataTriggerHandler.bypassedActions
+							ORDER BY
+								Order__c ASC
+						)
+					FROM
+						sObject_Trigger_Setting__mdt
+					WHERE
+						SObject__r.DeveloperName =: this.sObjectName
+						AND Bypass_Execution__c = false
+				]);
+			}
+			return actionMetadata;
+		}
+		set;
+	}
+
+	@TestVisible
 	private List<Trigger_Action__mdt> beforeInsertActionMetadata {
 		get {
 			if (beforeInsertActionMetadata == null) {
-				beforeInsertActionMetadata = new List<Trigger_Action__mdt>();
-				for (Trigger_Action__mdt actionMetadata : [
-					SELECT
-						Apex_Class_Name__c
-					FROM
-						Trigger_Action__mdt
-					WHERE 
-						Apex_Class_Name__c NOT IN: MetadataTriggerHandler.bypassedActions
-						AND Before_Insert__c != null
-						AND Before_Insert__r.SObject__r.DeveloperName =: this.sObjectName
-						AND Before_Insert__r.Bypass_Execution__c = false
-						AND Bypass_Execution__c = false
-					ORDER BY
-						Order__c ASC
-				]) {
-					beforeInsertActionMetadata.add(actionMetadata);
-				}
+				beforeInsertActionMetadata = 
+					this.actionMetadata.isEmpty() ?
+					new List<Trigger_Action__mdt>() :
+					this.actionMetadata[0].Before_Insert_Actions__r;
 			}
 			return beforeInsertActionMetadata;
 		}
 		set;
 	}
+	
 	
 	private List<TriggerAction.BeforeInsert> beforeInsertActions {
 		get {
@@ -107,7 +201,7 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 					handleException(
 						INVALID_CLASS_ERROR,
 						triggerMetadata.Apex_Class_Name__c,
-						System.TriggerOperation.BEFORE_UPDATE
+						System.TriggerOperation.BEFORE_INSERT
 					);
 				}
 			}
@@ -119,23 +213,10 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 	private List<Trigger_Action__mdt> afterInsertActionMetadata {
 		get {
 			if (afterInsertActionMetadata == null) {
-				afterInsertActionMetadata = new List<Trigger_Action__mdt>();
-				for (Trigger_Action__mdt actionMetadata : [
-					SELECT
-						Apex_Class_Name__c
-					FROM
-						Trigger_Action__mdt
-					WHERE 
-						Apex_Class_Name__c NOT IN: MetadataTriggerHandler.bypassedActions
-						AND After_Insert__c != null
-						AND After_Insert__r.SObject__r.DeveloperName =: this.sObjectName
-						AND After_Insert__r.Bypass_Execution__c = false
-						AND Bypass_Execution__c = false
-					ORDER BY
-						Order__c ASC
-				]) {
-					afterInsertActionMetadata.add(actionMetadata);
-				}
+				afterInsertActionMetadata = 
+					this.actionMetadata.isEmpty() ?
+					new List<Trigger_Action__mdt>() :
+					this.actionMetadata[0].After_Insert_Actions__r;
 			}
 			return afterInsertActionMetadata;
 		}
@@ -158,7 +239,7 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 					handleException(
 						INVALID_CLASS_ERROR,
 						triggerMetadata.Apex_Class_Name__c,
-						System.TriggerOperation.BEFORE_UPDATE
+						System.TriggerOperation.AFTER_INSERT
 					);
 				}
 			}
@@ -170,23 +251,10 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 	private List<Trigger_Action__mdt> beforeUpdateActionMetadata {
 		get {
 			if (beforeUpdateActionMetadata == null) {
-				beforeUpdateActionMetadata = new List<Trigger_Action__mdt>();
-				for (Trigger_Action__mdt actionMetadata : [
-					SELECT
-						Apex_Class_Name__c
-					FROM
-						Trigger_Action__mdt
-					WHERE 
-						Apex_Class_Name__c NOT IN: MetadataTriggerHandler.bypassedActions
-						AND Before_Update__c != null
-						AND Before_Update__r.SObject__r.DeveloperName =: this.sObjectName
-						AND Before_Update__r.Bypass_Execution__c = false
-						AND Bypass_Execution__c = false
-					ORDER BY
-						Order__c ASC
-				]) {
-					beforeUpdateActionMetadata.add(actionMetadata);
-				}
+				beforeUpdateActionMetadata = 
+					this.actionMetadata.isEmpty() ?
+					new List<Trigger_Action__mdt>() :
+					this.actionMetadata[0].Before_Update_Actions__r;
 			}
 			return beforeUpdateActionMetadata;
 		}
@@ -222,23 +290,10 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 	private List<Trigger_Action__mdt> afterUpdateActionMetadata {
 		get {
 			if (afterUpdateActionMetadata == null) {
-				afterUpdateActionMetadata = new List<Trigger_Action__mdt>();
-				for (Trigger_Action__mdt actionMetadata : [
-					SELECT
-						Apex_Class_Name__c
-					FROM
-						Trigger_Action__mdt
-					WHERE 
-						Apex_Class_Name__c NOT IN: MetadataTriggerHandler.bypassedActions
-						AND After_Update__c != null
-						AND After_Update__r.SObject__r.DeveloperName =: this.sObjectName
-						AND After_Update__r.Bypass_Execution__c = false
-						AND Bypass_Execution__c = false
-					ORDER BY
-						Order__c ASC
-				]) {
-					afterUpdateActionMetadata.add(actionMetadata);
-				}
+				afterUpdateActionMetadata = 
+					this.actionMetadata.isEmpty() ?
+					new List<Trigger_Action__mdt>() :
+					this.actionMetadata[0].After_Update_Actions__r;
 			}
 			return afterUpdateActionMetadata;
 		}
@@ -262,7 +317,7 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 					handleException(
 						INVALID_CLASS_ERROR,
 						triggerMetadata.Apex_Class_Name__c,
-						System.TriggerOperation.BEFORE_UPDATE
+						System.TriggerOperation.AFTER_UPDATE
 					);
 				}
 			}
@@ -274,23 +329,10 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 	private List<Trigger_Action__mdt> beforeDeleteActionMetadata {
 		get {
 			if (beforeDeleteActionMetadata == null) {
-				beforeDeleteActionMetadata = new List<Trigger_Action__mdt>();
-				for (Trigger_Action__mdt actionMetadata : [
-					SELECT
-						Apex_Class_Name__c
-					FROM
-						Trigger_Action__mdt
-					WHERE 
-						Apex_Class_Name__c NOT IN: MetadataTriggerHandler.bypassedActions
-						AND Before_Delete__c != null
-						AND Before_Delete__r.SObject__r.DeveloperName =: this.sObjectName
-						AND Before_Delete__r.Bypass_Execution__c = false
-						AND Bypass_Execution__c = false
-					ORDER BY
-						Order__c ASC
-				]) {
-					beforeDeleteActionMetadata.add(actionMetadata);
-				}
+				beforeDeleteActionMetadata = 
+					this.actionMetadata.isEmpty() ?
+					new List<Trigger_Action__mdt>() :
+					this.actionMetadata[0].Before_Delete_Actions__r;
 			}
 			return beforeDeleteActionMetadata;
 		}
@@ -313,7 +355,7 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 					handleException(
 						INVALID_CLASS_ERROR,
 						triggerMetadata.Apex_Class_Name__c,
-						System.TriggerOperation.BEFORE_UPDATE
+						System.TriggerOperation.BEFORE_DELETE
 					);
 				}
 			}
@@ -325,23 +367,10 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 	private List<Trigger_Action__mdt> afterDeleteActionMetadata {
 		get {
 			if (afterDeleteActionMetadata == null) {
-				afterDeleteActionMetadata = new List<Trigger_Action__mdt>();
-				for (Trigger_Action__mdt actionMetadata : [
-					SELECT
-						Apex_Class_Name__c
-					FROM
-						Trigger_Action__mdt
-					WHERE 
-						Apex_Class_Name__c NOT IN: MetadataTriggerHandler.bypassedActions
-						AND After_Delete__c != null
-						AND After_Delete__r.SObject__r.DeveloperName =: this.sObjectName
-						AND After_Delete__r.Bypass_Execution__c = false
-						AND Bypass_Execution__c = false
-					ORDER BY
-						Order__c ASC
-				]) {
-					afterDeleteActionMetadata.add(actionMetadata);
-				}
+				afterDeleteActionMetadata = 
+					this.actionMetadata.isEmpty() ?
+					new List<Trigger_Action__mdt>() :
+					this.actionMetadata[0].After_Delete_Actions__r;
 			}
 			return afterDeleteActionMetadata;
 		}
@@ -364,7 +393,7 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 					handleException(
 						INVALID_CLASS_ERROR,
 						triggerMetadata.Apex_Class_Name__c,
-						System.TriggerOperation.BEFORE_UPDATE
+						System.TriggerOperation.AFTER_DELETE
 					);
 				}
 			}
@@ -376,23 +405,10 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 	private List<Trigger_Action__mdt> afterUndeleteActionMetadata {
 		get {
 			if (afterUndeleteActionMetadata == null) {
-				afterUndeleteActionMetadata = new List<Trigger_Action__mdt>();
-				for (Trigger_Action__mdt actionMetadata : [
-					SELECT
-						Apex_Class_Name__c
-					FROM
-						Trigger_Action__mdt
-					WHERE 
-						Apex_Class_Name__c NOT IN: MetadataTriggerHandler.bypassedActions
-						AND After_Delete__c != null
-						AND After_Delete__r.SObject__r.DeveloperName =: this.sObjectName
-						AND After_Delete__r.Bypass_Execution__c = false
-						AND Bypass_Execution__c = false
-					ORDER BY
-						Order__c ASC
-				]) {
-					afterUndeleteActionMetadata.add(actionMetadata);
-				}
+				afterUndeleteActionMetadata = 
+					this.actionMetadata.isEmpty() ?
+					new List<Trigger_Action__mdt>() :
+					this.actionMetadata[0].After_Undelete_Actions__r;
 			}
 			return afterUndeleteActionMetadata;
 		}
@@ -415,7 +431,7 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 					handleException(
 						INVALID_CLASS_ERROR,
 						triggerMetadata.Apex_Class_Name__c,
-						System.TriggerOperation.BEFORE_UPDATE
+						System.TriggerOperation.AFTER_UNDELETE
 					);
 				}
 			}

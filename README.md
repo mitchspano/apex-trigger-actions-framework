@@ -142,27 +142,43 @@ public void beforeInsert(List<SObject> newList) {
   }
 }
 
-@TestVisible
+private List<sObject_Trigger_Setting__mdt> actionMetadata {
+  get {
+    if (actionMetadata == null) {
+      actionMetadata = new List<sObject_Trigger_Setting__mdt>([
+        SELECT
+          Id,
+          (
+            SELECT
+              Apex_Class_Name__c
+            FROM
+              Before_Insert_Actions__r
+            WHERE
+              Bypass_Execution__c = false
+              AND Apex_Class_Name__c NOT IN: MetadataTriggerHandler.bypassedActions
+            ORDER BY
+              Order__c ASC
+          ),
+          ...
+        FROM
+          sObject_Trigger_Setting__mdt
+        WHERE
+          SObject__r.DeveloperName =: this.sObjectName
+          AND Bypass_Execution__c = false
+      ]);
+    }
+    return actionMetadata;
+  }
+  set;
+}
+
 private List<Trigger_Action__mdt> beforeInsertActionMetadata {
   get {
     if (beforeInsertActionMetadata == null) {
-      beforeInsertActionMetadata = new List<Trigger_Action__mdt>();
-      for (Trigger_Action__mdt actionMetadata : [
-        SELECT
-          Apex_Class_Name__c
-        FROM
-          Trigger_Action__mdt
-        WHERE 
-          Apex_Class_Name__c NOT IN: MetadataTriggerHandler.bypassedActions
-          AND Before_Insert__c != null
-          AND Before_Insert__r.SObject__r.DeveloperName =: this.sObjectName
-          AND Before_Insert__r.Bypass_Execution__c = false
-          AND Bypass_Execution__c = false
-        ORDER BY
-          Order__c ASC
-      ]) {
-        beforeInsertActionMetadata.add(actionMetadata);
-      }
+      beforeInsertActionMetadata = 
+        this.actionMetadata.isEmpty() ?
+        new List<Trigger_Action__mdt>() :
+        this.actionMetadata[0].Before_Insert_Actions__r;
     }
     return beforeInsertActionMetadata;
   }
@@ -235,7 +251,7 @@ With this multiplicity of Apex classes, it would be wise to follow a naming conv
   ],
   "namespace": "",
   "sfdcLoginUrl": "https://login.salesforce.com",
-  "sourceApiVersion": "48.0"
+  "sourceApiVersion": "50.0"
 }
 ```
 
@@ -261,6 +277,39 @@ public void beforeUpdate(List<Opportunity> newList, List<Opportunity> oldList) {
 ```
 
 This will help the transition process if you are migrating an existing Salesforce application to this new trigger actions framework.
+
+## Recursion Prevention
+
+Use the `TriggerBase.idsProcessedBeforeUpdate` and `TriggerBase.idsProcessedAfterUpdate` to prevent recursively processing the same record(s).
+
+```java
+public class ta_Opportunity_RecalculateCategory implements TriggerAction.AfterUpdate {
+
+  public void afterUpdate(List<Opportunity> newList, List<Opportunity> oldList) {
+    Map<Id,Opportunity> oldMap = new Map<Id,Opportunity>(oldList);
+    List<Opportunity> oppsToBeUpdated = new List<Opportunity>();
+    for (Opportunity opp : newList) {
+      if (
+        !TriggerBase.idsProcessedAfterUpdate.contains(opp.id) &&
+        opp.StageName != oldMap.get(opp.id).StageName
+      ) {
+        oppsToBeUpdated.add(opp);
+      }
+    }
+    if (!oppsToBeUpdated.isEmpty()) {
+      this.recalculateCategory(oppsToBeUpdated);
+    }
+  }
+
+  private void recalculateCategory(List<Opportunity> opportunities) {
+    //do some stuff
+    update opportunities;
+  }
+
+}
+
+```
+
 
 ## Bypass Mechanisms
 
