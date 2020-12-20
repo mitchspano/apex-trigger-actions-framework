@@ -15,16 +15,17 @@
  */
 
 public class ta_Opportunity_StageInsertRules implements TriggerAction.BeforeInsert {
-	
 	@TestVisible
-	private static final String INVALID_STAGE_INSERT_ERROR = String.format('The Stage must be {0} when an Opportunity is created', new String[] {Constants.OPPORTUNITY_STAGENAME_PROSPECTING});
-	
-	public void beforeInsert(List<Opportunity> newList){
+	private static final String INVALID_STAGE_INSERT_ERROR = String.format(
+		'The Stage must be {0} when an Opportunity is created',
+		new List<String>{ Constants.OPPORTUNITY_STAGENAME_PROSPECTING }
+	);
+
+	public void beforeInsert(List<Opportunity> newList) {
 		for (Opportunity opp : newList) {
 			if (opp.StageName != Constants.OPPORTUNITY_STAGENAME_PROSPECTING) {
 				opp.addError(INVALID_STAGE_INSERT_ERROR);
 			}
 		}
 	}
-	
 }

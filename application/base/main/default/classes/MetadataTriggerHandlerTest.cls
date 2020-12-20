@@ -14,10 +14,8 @@
    limitations under the License.
  */
 
-
 @IsTest
 private class MetadataTriggerHandlerTest {
-
 	private static final String MY_ACCOUNT = 'My Account';
 	private static final String ACCOUNT = 'Account';
 	private static final String TEST_BEFORE_INSERT = 'MetadataTriggerHandlerTest.BeforeInsert';
@@ -27,12 +25,12 @@ private class MetadataTriggerHandlerTest {
 	private static final String TEST_BEFORE_DELETE = 'MetadataTriggerHandlerTest.BeforeDelete';
 	private static final String TEST_AFTER_DELETE = 'MetadataTriggerHandlerTest.AfterDelete';
 	private static final String TEST_AFTER_UNDELETE = 'MetadataTriggerHandlerTest.AfterUndelete';
-	
-	
+	private static final String BOGUS_CLASS_NAME = 'Bogus';
+
 	@IsTest
-	private static void beforeInsert_success () {
+	private static void beforeInsert_success() {
 		MetadataTriggerHandler handler = new MetadataTriggerHandler();
-		handler.triggerNew = new List<Account> {
+		handler.triggerNew = new List<Account>{
 			new Account(
 				Name = MY_ACCOUNT,
 				Id = TestUtility.getFakeId(Schema.Account.SObjectType)
@@ -50,7 +48,7 @@ private class MetadataTriggerHandlerTest {
 			Order__c = 1,
 			Bypass_Execution__c = false
 		);
-		handler.beforeInsertActionMetadata = new List<Trigger_Action__mdt> {
+		handler.beforeInsertActionMetadata = new List<Trigger_Action__mdt>{
 			action
 		};
 		Exception myException;
@@ -63,16 +61,16 @@ private class MetadataTriggerHandlerTest {
 		test.stopTest();
 		System.assertEquals(null, myException);
 	}
-	
+
 	@IsTest
-	private static void beforeInsert_fail () {
+	private static void beforeInsert_fail_incorrect_type() {
 		Account myAccount = new Account(
 			Name = MY_ACCOUNT,
 			Id = TestUtility.getFakeId(Schema.Account.SObjectType)
 		);
 		MetadataTriggerHandler handler = new MetadataTriggerHandler();
 		handler.sObjectName = ACCOUNT;
-		handler.triggerNew = new List<Account> {myAccount};
+		handler.triggerNew = new List<Account>{ myAccount };
 		List<Trigger_Action__mdt> response;
 		sObject_Trigger_Setting__mdt setting = new sObject_Trigger_Setting__mdt(
 			SObject__c = ACCOUNT,
@@ -85,7 +83,7 @@ private class MetadataTriggerHandlerTest {
 			Order__c = 1,
 			Bypass_Execution__c = false
 		);
-		handler.beforeInsertActionMetadata = new List<Trigger_Action__mdt> {
+		handler.beforeInsertActionMetadata = new List<Trigger_Action__mdt>{
 			action
 		};
 		Exception myException;
@@ -101,19 +99,65 @@ private class MetadataTriggerHandlerTest {
 			myException.getMessage(),
 			String.format(
 				MetadataTriggerHandler.INVALID_TYPE_ERROR,
-				new String[] {
+				new List<String>{
 					TEST_AFTER_INSERT,
 					String.valueOf(System.TriggerOperation.BEFORE_INSERT),
-					'Account'
+					ACCOUNT
 				}
 			)
 		);
 	}
-	
+
 	@IsTest
-	private static void afterInsert_success () {
+	private static void beforeInsert_fail_incorrect_class() {
+		Account myAccount = new Account(
+			Name = MY_ACCOUNT,
+			Id = TestUtility.getFakeId(Schema.Account.SObjectType)
+		);
 		MetadataTriggerHandler handler = new MetadataTriggerHandler();
-		handler.triggerNew = new List<Account> {
+		handler.sObjectName = ACCOUNT;
+		handler.triggerNew = new List<Account>{ myAccount };
+		List<Trigger_Action__mdt> response;
+		sObject_Trigger_Setting__mdt setting = new sObject_Trigger_Setting__mdt(
+			SObject__c = ACCOUNT,
+			Id = TestUtility.getFakeId(sObject_Trigger_Setting__mdt.SObjectType)
+		);
+		Trigger_Action__mdt action = new Trigger_Action__mdt(
+			Apex_Class_Name__c = BOGUS_CLASS_NAME,
+			Before_Insert__r = setting,
+			Before_Insert__c = setting.Id,
+			Order__c = 1,
+			Bypass_Execution__c = false
+		);
+		handler.beforeInsertActionMetadata = new List<Trigger_Action__mdt>{
+			action
+		};
+		Exception myException;
+		test.startTest();
+		try {
+			handler.beforeInsert(handler.triggerNew);
+		} catch (Exception e) {
+			myException = e;
+		}
+		test.stopTest();
+		System.assertNotEquals(null, myException);
+		System.assertEquals(
+			myException.getMessage(),
+			String.format(
+				MetadataTriggerHandler.INVALID_CLASS_ERROR,
+				new List<String>{
+					BOGUS_CLASS_NAME,
+					String.valueOf(System.TriggerOperation.BEFORE_INSERT),
+					ACCOUNT
+				}
+			)
+		);
+	}
+
+	@IsTest
+	private static void afterInsert_success() {
+		MetadataTriggerHandler handler = new MetadataTriggerHandler();
+		handler.triggerNew = new List<Account>{
 			new Account(
 				Name = MY_ACCOUNT,
 				Id = TestUtility.getFakeId(Schema.Account.SObjectType)
@@ -131,9 +175,7 @@ private class MetadataTriggerHandlerTest {
 			Order__c = 1,
 			Bypass_Execution__c = false
 		);
-		handler.afterInsertActionMetadata = new List<Trigger_Action__mdt> {
-			action
-		};
+		handler.afterInsertActionMetadata = new List<Trigger_Action__mdt>{ action };
 		Exception myException;
 		test.startTest();
 		try {
@@ -144,16 +186,16 @@ private class MetadataTriggerHandlerTest {
 		test.stopTest();
 		System.assertEquals(null, myException);
 	}
-	
+
 	@IsTest
-	private static void afterInsert_fail () {
+	private static void afterInsert_fail_incorrect_type() {
 		Account myAccount = new Account(
 			Name = MY_ACCOUNT,
 			Id = TestUtility.getFakeId(Schema.Account.SObjectType)
 		);
 		MetadataTriggerHandler handler = new MetadataTriggerHandler();
 		handler.sObjectName = ACCOUNT;
-		handler.triggerNew = new List<Account> {myAccount};
+		handler.triggerNew = new List<Account>{ myAccount };
 		List<Trigger_Action__mdt> response;
 		sObject_Trigger_Setting__mdt setting = new sObject_Trigger_Setting__mdt(
 			SObject__c = ACCOUNT,
@@ -166,9 +208,7 @@ private class MetadataTriggerHandlerTest {
 			Order__c = 1,
 			Bypass_Execution__c = false
 		);
-		handler.afterInsertActionMetadata = new List<Trigger_Action__mdt> {
-			action
-		};
+		handler.afterInsertActionMetadata = new List<Trigger_Action__mdt>{ action };
 		Exception myException;
 		test.startTest();
 		try {
@@ -182,24 +222,68 @@ private class MetadataTriggerHandlerTest {
 			myException.getMessage(),
 			String.format(
 				MetadataTriggerHandler.INVALID_TYPE_ERROR,
-				new String[] {
+				new List<String>{
 					TEST_BEFORE_INSERT,
 					String.valueOf(System.TriggerOperation.AFTER_INSERT),
-					'Account'
+					ACCOUNT
 				}
 			)
 		);
 	}
-	
+
 	@IsTest
-	private static void beforeUpdate_success () {
+	private static void afterInsert_fail_incorrect_class() {
 		Account myAccount = new Account(
 			Name = MY_ACCOUNT,
 			Id = TestUtility.getFakeId(Schema.Account.SObjectType)
 		);
 		MetadataTriggerHandler handler = new MetadataTriggerHandler();
-		handler.triggerNew = new List<Account> {myAccount};
-		handler.triggerOld = new List<Account> {myAccount};
+		handler.sObjectName = ACCOUNT;
+		handler.triggerNew = new List<Account>{ myAccount };
+		List<Trigger_Action__mdt> response;
+		sObject_Trigger_Setting__mdt setting = new sObject_Trigger_Setting__mdt(
+			SObject__c = ACCOUNT,
+			Id = TestUtility.getFakeId(sObject_Trigger_Setting__mdt.SObjectType)
+		);
+		Trigger_Action__mdt action = new Trigger_Action__mdt(
+			Apex_Class_Name__c = BOGUS_CLASS_NAME,
+			After_Insert__r = setting,
+			After_Insert__c = setting.Id,
+			Order__c = 1,
+			Bypass_Execution__c = false
+		);
+		handler.afterInsertActionMetadata = new List<Trigger_Action__mdt>{ action };
+		Exception myException;
+		test.startTest();
+		try {
+			handler.afterInsert(handler.triggerNew);
+		} catch (Exception e) {
+			myException = e;
+		}
+		test.stopTest();
+		System.assertNotEquals(null, myException);
+		System.assertEquals(
+			myException.getMessage(),
+			String.format(
+				MetadataTriggerHandler.INVALID_CLASS_ERROR,
+				new List<String>{
+					BOGUS_CLASS_NAME,
+					String.valueOf(System.TriggerOperation.AFTER_INSERT),
+					ACCOUNT
+				}
+			)
+		);
+	}
+
+	@IsTest
+	private static void beforeUpdate_success() {
+		Account myAccount = new Account(
+			Name = MY_ACCOUNT,
+			Id = TestUtility.getFakeId(Schema.Account.SObjectType)
+		);
+		MetadataTriggerHandler handler = new MetadataTriggerHandler();
+		handler.triggerNew = new List<Account>{ myAccount };
+		handler.triggerOld = new List<Account>{ myAccount };
 		List<Trigger_Action__mdt> response;
 		sObject_Trigger_Setting__mdt setting = new sObject_Trigger_Setting__mdt(
 			SObject__c = ACCOUNT,
@@ -212,7 +296,7 @@ private class MetadataTriggerHandlerTest {
 			Order__c = 1,
 			Bypass_Execution__c = false
 		);
-		handler.beforeUpdateActionMetadata = new List<Trigger_Action__mdt> {
+		handler.beforeUpdateActionMetadata = new List<Trigger_Action__mdt>{
 			action
 		};
 		Exception myException;
@@ -225,16 +309,16 @@ private class MetadataTriggerHandlerTest {
 		test.stopTest();
 		System.assertEquals(null, myException);
 	}
-	
+
 	@IsTest
-	private static void beforeUpdate_fail () {
+	private static void beforeUpdate_fail_incorrect_type() {
 		Account myAccount = new Account(
 			Name = MY_ACCOUNT,
 			Id = TestUtility.getFakeId(Schema.Account.SObjectType)
 		);
 		MetadataTriggerHandler handler = new MetadataTriggerHandler();
-		handler.triggerNew = new List<Account> {myAccount};
-		handler.triggerOld = new List<Account> {myAccount};
+		handler.triggerNew = new List<Account>{ myAccount };
+		handler.triggerOld = new List<Account>{ myAccount };
 		List<Trigger_Action__mdt> response;
 		sObject_Trigger_Setting__mdt setting = new sObject_Trigger_Setting__mdt(
 			SObject__c = ACCOUNT,
@@ -247,7 +331,7 @@ private class MetadataTriggerHandlerTest {
 			Order__c = 1,
 			Bypass_Execution__c = false
 		);
-		handler.beforeUpdateActionMetadata = new List<Trigger_Action__mdt> {
+		handler.beforeUpdateActionMetadata = new List<Trigger_Action__mdt>{
 			action
 		};
 		Exception myException;
@@ -263,24 +347,24 @@ private class MetadataTriggerHandlerTest {
 			myException.getMessage(),
 			String.format(
 				MetadataTriggerHandler.INVALID_TYPE_ERROR,
-				new String[] {
+				new List<String>{
 					TEST_BEFORE_INSERT,
 					String.valueOf(System.TriggerOperation.BEFORE_UPDATE),
-					'Account'
+					ACCOUNT
 				}
 			)
 		);
 	}
-	
+
 	@IsTest
-	private static void afterUpdate_success () {
+	private static void afterUpdate_success() {
 		Account myAccount = new Account(
 			Name = MY_ACCOUNT,
 			Id = TestUtility.getFakeId(Schema.Account.SObjectType)
 		);
 		MetadataTriggerHandler handler = new MetadataTriggerHandler();
-		handler.triggerNew = new List<Account> {myAccount};
-		handler.triggerOld = new List<Account> {myAccount};
+		handler.triggerNew = new List<Account>{ myAccount };
+		handler.triggerOld = new List<Account>{ myAccount };
 		List<Trigger_Action__mdt> response;
 		sObject_Trigger_Setting__mdt setting = new sObject_Trigger_Setting__mdt(
 			SObject__c = ACCOUNT,
@@ -293,9 +377,7 @@ private class MetadataTriggerHandlerTest {
 			Order__c = 1,
 			Bypass_Execution__c = false
 		);
-		handler.afterUpdateActionMetadata = new List<Trigger_Action__mdt> {
-			action
-		};
+		handler.afterUpdateActionMetadata = new List<Trigger_Action__mdt>{ action };
 		Exception myException;
 		test.startTest();
 		try {
@@ -306,16 +388,16 @@ private class MetadataTriggerHandlerTest {
 		test.stopTest();
 		System.assertEquals(null, myException);
 	}
-	
+
 	@IsTest
-	private static void afterUpdate_fail () {
+	private static void afterUpdate_fail_incorrect_type() {
 		Account myAccount = new Account(
 			Name = MY_ACCOUNT,
 			Id = TestUtility.getFakeId(Schema.Account.SObjectType)
 		);
 		MetadataTriggerHandler handler = new MetadataTriggerHandler();
-		handler.triggerNew = new List<Account> {myAccount};
-		handler.triggerOld = new List<Account> {myAccount};
+		handler.triggerNew = new List<Account>{ myAccount };
+		handler.triggerOld = new List<Account>{ myAccount };
 		List<Trigger_Action__mdt> response;
 		sObject_Trigger_Setting__mdt setting = new sObject_Trigger_Setting__mdt(
 			SObject__c = ACCOUNT,
@@ -328,9 +410,7 @@ private class MetadataTriggerHandlerTest {
 			Order__c = 1,
 			Bypass_Execution__c = false
 		);
-		handler.afterUpdateActionMetadata = new List<Trigger_Action__mdt> {
-			action
-		};
+		handler.afterUpdateActionMetadata = new List<Trigger_Action__mdt>{ action };
 		Exception myException;
 		test.startTest();
 		try {
@@ -344,23 +424,68 @@ private class MetadataTriggerHandlerTest {
 			myException.getMessage(),
 			String.format(
 				MetadataTriggerHandler.INVALID_TYPE_ERROR,
-				new String[] {
+				new List<String>{
 					TEST_BEFORE_INSERT,
 					String.valueOf(System.TriggerOperation.AFTER_UPDATE),
-					'Account'
+					ACCOUNT
 				}
 			)
 		);
 	}
-	
+
 	@IsTest
-	private static void beforeDelete_success () {
+	private static void afterUpdate_fail_incorrect_class() {
 		Account myAccount = new Account(
 			Name = MY_ACCOUNT,
 			Id = TestUtility.getFakeId(Schema.Account.SObjectType)
 		);
 		MetadataTriggerHandler handler = new MetadataTriggerHandler();
-		handler.triggerOld = new List<Account> {myAccount};
+		handler.sObjectName = ACCOUNT;
+		handler.triggerNew = new List<Account>{ myAccount };
+		handler.triggerOld = new List<Account>{ myAccount };
+		List<Trigger_Action__mdt> response;
+		sObject_Trigger_Setting__mdt setting = new sObject_Trigger_Setting__mdt(
+			SObject__c = ACCOUNT,
+			Id = TestUtility.getFakeId(sObject_Trigger_Setting__mdt.SObjectType)
+		);
+		Trigger_Action__mdt action = new Trigger_Action__mdt(
+			Apex_Class_Name__c = BOGUS_CLASS_NAME,
+			After_Update__r = setting,
+			After_Update__c = setting.Id,
+			Order__c = 1,
+			Bypass_Execution__c = false
+		);
+		handler.afterUpdateActionMetadata = new List<Trigger_Action__mdt>{ action };
+		Exception myException;
+		test.startTest();
+		try {
+			handler.afterUpdate(handler.triggerNew, handler.triggerOld);
+		} catch (Exception e) {
+			myException = e;
+		}
+		test.stopTest();
+		System.assertNotEquals(null, myException);
+		System.assertEquals(
+			myException.getMessage(),
+			String.format(
+				MetadataTriggerHandler.INVALID_CLASS_ERROR,
+				new List<String>{
+					BOGUS_CLASS_NAME,
+					String.valueOf(System.TriggerOperation.AFTER_UPDATE),
+					ACCOUNT
+				}
+			)
+		);
+	}
+
+	@IsTest
+	private static void beforeDelete_success() {
+		Account myAccount = new Account(
+			Name = MY_ACCOUNT,
+			Id = TestUtility.getFakeId(Schema.Account.SObjectType)
+		);
+		MetadataTriggerHandler handler = new MetadataTriggerHandler();
+		handler.triggerOld = new List<Account>{ myAccount };
 		List<Trigger_Action__mdt> response;
 		sObject_Trigger_Setting__mdt setting = new sObject_Trigger_Setting__mdt(
 			SObject__c = ACCOUNT,
@@ -373,7 +498,7 @@ private class MetadataTriggerHandlerTest {
 			Order__c = 1,
 			Bypass_Execution__c = false
 		);
-		handler.beforeDeleteActionMetadata = new List<Trigger_Action__mdt> {
+		handler.beforeDeleteActionMetadata = new List<Trigger_Action__mdt>{
 			action
 		};
 		Exception myException;
@@ -386,15 +511,15 @@ private class MetadataTriggerHandlerTest {
 		test.stopTest();
 		System.assertEquals(null, myException);
 	}
-	
+
 	@IsTest
-	private static void beforeDelete_fail () {
+	private static void beforeDelete_fail_incorrect_type() {
 		Account myAccount = new Account(
 			Name = MY_ACCOUNT,
 			Id = TestUtility.getFakeId(Schema.Account.SObjectType)
 		);
 		MetadataTriggerHandler handler = new MetadataTriggerHandler();
-		handler.triggerOld = new List<Account> {myAccount};
+		handler.triggerOld = new List<Account>{ myAccount };
 		List<Trigger_Action__mdt> response;
 		sObject_Trigger_Setting__mdt setting = new sObject_Trigger_Setting__mdt(
 			SObject__c = ACCOUNT,
@@ -407,7 +532,7 @@ private class MetadataTriggerHandlerTest {
 			Order__c = 1,
 			Bypass_Execution__c = false
 		);
-		handler.beforeDeleteActionMetadata = new List<Trigger_Action__mdt> {
+		handler.beforeDeleteActionMetadata = new List<Trigger_Action__mdt>{
 			action
 		};
 		Exception myException;
@@ -423,23 +548,116 @@ private class MetadataTriggerHandlerTest {
 			myException.getMessage(),
 			String.format(
 				MetadataTriggerHandler.INVALID_TYPE_ERROR,
-				new String[] {
+				new List<String>{
 					TEST_BEFORE_INSERT,
 					String.valueOf(System.TriggerOperation.BEFORE_DELETE),
-					'Account'
+					ACCOUNT
 				}
 			)
 		);
 	}
-	
+
 	@IsTest
-	private static void afterDelete_success () {
+	private static void beforeUpdate_fail_incorrect_class() {
 		Account myAccount = new Account(
 			Name = MY_ACCOUNT,
 			Id = TestUtility.getFakeId(Schema.Account.SObjectType)
 		);
 		MetadataTriggerHandler handler = new MetadataTriggerHandler();
-		handler.triggerOld = new List<Account> {myAccount};
+		handler.sObjectName = ACCOUNT;
+		handler.triggerNew = new List<Account>{ myAccount };
+		handler.triggerOld = new List<Account>{ myAccount };
+		List<Trigger_Action__mdt> response;
+		sObject_Trigger_Setting__mdt setting = new sObject_Trigger_Setting__mdt(
+			SObject__c = ACCOUNT,
+			Id = TestUtility.getFakeId(sObject_Trigger_Setting__mdt.SObjectType)
+		);
+		Trigger_Action__mdt action = new Trigger_Action__mdt(
+			Apex_Class_Name__c = BOGUS_CLASS_NAME,
+			Before_Update__r = setting,
+			Before_Update__c = setting.Id,
+			Order__c = 1,
+			Bypass_Execution__c = false
+		);
+		handler.beforeUpdateActionMetadata = new List<Trigger_Action__mdt>{
+			action
+		};
+		Exception myException;
+		test.startTest();
+		try {
+			handler.beforeUpdate(handler.triggerNew, handler.triggerOld);
+		} catch (Exception e) {
+			myException = e;
+		}
+		test.stopTest();
+		System.assertNotEquals(null, myException);
+		System.assertEquals(
+			myException.getMessage(),
+			String.format(
+				MetadataTriggerHandler.INVALID_CLASS_ERROR,
+				new List<String>{
+					BOGUS_CLASS_NAME,
+					String.valueOf(System.TriggerOperation.BEFORE_UPDATE),
+					ACCOUNT
+				}
+			)
+		);
+	}
+
+	@IsTest
+	private static void beforeDelete_fail_incorrect_class() {
+		Account myAccount = new Account(
+			Name = MY_ACCOUNT,
+			Id = TestUtility.getFakeId(Schema.Account.SObjectType)
+		);
+		MetadataTriggerHandler handler = new MetadataTriggerHandler();
+		handler.sObjectName = ACCOUNT;
+		handler.triggerOld = new List<Account>{ myAccount };
+		List<Trigger_Action__mdt> response;
+		sObject_Trigger_Setting__mdt setting = new sObject_Trigger_Setting__mdt(
+			SObject__c = ACCOUNT,
+			Id = TestUtility.getFakeId(sObject_Trigger_Setting__mdt.SObjectType)
+		);
+		Trigger_Action__mdt action = new Trigger_Action__mdt(
+			Apex_Class_Name__c = BOGUS_CLASS_NAME,
+			Before_Delete__r = setting,
+			Before_Delete__c = setting.Id,
+			Order__c = 1,
+			Bypass_Execution__c = false
+		);
+		handler.beforeDeleteActionMetadata = new List<Trigger_Action__mdt>{
+			action
+		};
+		Exception myException;
+		test.startTest();
+		try {
+			handler.beforeDelete(handler.triggerOld);
+		} catch (Exception e) {
+			myException = e;
+		}
+		test.stopTest();
+		System.assertNotEquals(null, myException);
+		System.assertEquals(
+			myException.getMessage(),
+			String.format(
+				MetadataTriggerHandler.INVALID_CLASS_ERROR,
+				new List<String>{
+					BOGUS_CLASS_NAME,
+					String.valueOf(System.TriggerOperation.BEFORE_DELETE),
+					ACCOUNT
+				}
+			)
+		);
+	}
+
+	@IsTest
+	private static void afterDelete_success() {
+		Account myAccount = new Account(
+			Name = MY_ACCOUNT,
+			Id = TestUtility.getFakeId(Schema.Account.SObjectType)
+		);
+		MetadataTriggerHandler handler = new MetadataTriggerHandler();
+		handler.triggerOld = new List<Account>{ myAccount };
 		List<Trigger_Action__mdt> response;
 		sObject_Trigger_Setting__mdt setting = new sObject_Trigger_Setting__mdt(
 			SObject__c = ACCOUNT,
@@ -452,9 +670,7 @@ private class MetadataTriggerHandlerTest {
 			Order__c = 1,
 			Bypass_Execution__c = false
 		);
-		handler.afterDeleteActionMetadata = new List<Trigger_Action__mdt> {
-			action
-		};
+		handler.afterDeleteActionMetadata = new List<Trigger_Action__mdt>{ action };
 		Exception myException;
 		test.startTest();
 		try {
@@ -465,15 +681,15 @@ private class MetadataTriggerHandlerTest {
 		test.stopTest();
 		System.assertEquals(null, myException);
 	}
-	
+
 	@IsTest
-	private static void afterDelete_fail () {
+	private static void afterDelete_fail_incorrect_type() {
 		Account myAccount = new Account(
 			Name = MY_ACCOUNT,
 			Id = TestUtility.getFakeId(Schema.Account.SObjectType)
 		);
 		MetadataTriggerHandler handler = new MetadataTriggerHandler();
-		handler.triggerOld = new List<Account> {myAccount};
+		handler.triggerOld = new List<Account>{ myAccount };
 		List<Trigger_Action__mdt> response;
 		sObject_Trigger_Setting__mdt setting = new sObject_Trigger_Setting__mdt(
 			SObject__c = ACCOUNT,
@@ -486,9 +702,7 @@ private class MetadataTriggerHandlerTest {
 			Order__c = 1,
 			Bypass_Execution__c = false
 		);
-		handler.afterDeleteActionMetadata = new List<Trigger_Action__mdt> {
-			action
-		};
+		handler.afterDeleteActionMetadata = new List<Trigger_Action__mdt>{ action };
 		Exception myException;
 		test.startTest();
 		try {
@@ -502,20 +716,67 @@ private class MetadataTriggerHandlerTest {
 			myException.getMessage(),
 			String.format(
 				MetadataTriggerHandler.INVALID_TYPE_ERROR,
-				new String[] {
+				new List<String>{
 					TEST_BEFORE_INSERT,
 					String.valueOf(System.TriggerOperation.AFTER_DELETE),
-					'Account'
+					ACCOUNT
 				}
 			)
 		);
 	}
-	
+
 	@IsTest
-	private static void afterUndelete_success () {
-		Account myAccount = new Account(Name = MY_ACCOUNT, Id = TestUtility.getFakeId(Schema.Account.SObjectType));
+	private static void afterDelete_fail_incorrect_class() {
+		Account myAccount = new Account(
+			Name = MY_ACCOUNT,
+			Id = TestUtility.getFakeId(Schema.Account.SObjectType)
+		);
 		MetadataTriggerHandler handler = new MetadataTriggerHandler();
-		handler.triggerOld = new List<Account> {myAccount};
+		handler.sObjectName = ACCOUNT;
+		handler.triggerOld = new List<Account>{ myAccount };
+		List<Trigger_Action__mdt> response;
+		sObject_Trigger_Setting__mdt setting = new sObject_Trigger_Setting__mdt(
+			SObject__c = ACCOUNT,
+			Id = TestUtility.getFakeId(sObject_Trigger_Setting__mdt.SObjectType)
+		);
+		Trigger_Action__mdt action = new Trigger_Action__mdt(
+			Apex_Class_Name__c = BOGUS_CLASS_NAME,
+			After_Delete__r = setting,
+			After_Delete__c = setting.Id,
+			Order__c = 1,
+			Bypass_Execution__c = false
+		);
+		handler.afterDeleteActionMetadata = new List<Trigger_Action__mdt>{ action };
+		Exception myException;
+		test.startTest();
+		try {
+			handler.afterDelete(handler.triggerOld);
+		} catch (Exception e) {
+			myException = e;
+		}
+		test.stopTest();
+		System.assertNotEquals(null, myException);
+		System.assertEquals(
+			myException.getMessage(),
+			String.format(
+				MetadataTriggerHandler.INVALID_CLASS_ERROR,
+				new List<String>{
+					BOGUS_CLASS_NAME,
+					String.valueOf(System.TriggerOperation.AFTER_DELETE),
+					ACCOUNT
+				}
+			)
+		);
+	}
+
+	@IsTest
+	private static void afterUndelete_success() {
+		Account myAccount = new Account(
+			Name = MY_ACCOUNT,
+			Id = TestUtility.getFakeId(Schema.Account.SObjectType)
+		);
+		MetadataTriggerHandler handler = new MetadataTriggerHandler();
+		handler.triggerOld = new List<Account>{ myAccount };
 		List<Trigger_Action__mdt> response;
 		sObject_Trigger_Setting__mdt setting = new sObject_Trigger_Setting__mdt(
 			SObject__c = ACCOUNT,
@@ -528,7 +789,7 @@ private class MetadataTriggerHandlerTest {
 			Order__c = 1,
 			Bypass_Execution__c = false
 		);
-		handler.afterUndeleteActionMetadata = new List<Trigger_Action__mdt> {
+		handler.afterUndeleteActionMetadata = new List<Trigger_Action__mdt>{
 			action
 		};
 		Exception myException;
@@ -541,12 +802,15 @@ private class MetadataTriggerHandlerTest {
 		test.stopTest();
 		System.assertEquals(null, myException);
 	}
-	
+
 	@IsTest
-	private static void afterUndelete_fail () {
-		Account myAccount = new Account(Name = MY_ACCOUNT, Id = TestUtility.getFakeId(Schema.Account.SObjectType));
+	private static void afterUndelete_fail_incorrect_type() {
+		Account myAccount = new Account(
+			Name = MY_ACCOUNT,
+			Id = TestUtility.getFakeId(Schema.Account.SObjectType)
+		);
 		MetadataTriggerHandler handler = new MetadataTriggerHandler();
-		handler.triggerOld = new List<Account> {myAccount};
+		handler.triggerOld = new List<Account>{ myAccount };
 		List<Trigger_Action__mdt> response;
 		sObject_Trigger_Setting__mdt setting = new sObject_Trigger_Setting__mdt(
 			SObject__c = ACCOUNT,
@@ -559,7 +823,7 @@ private class MetadataTriggerHandlerTest {
 			Order__c = 1,
 			Bypass_Execution__c = false
 		);
-		handler.afterUndeleteActionMetadata = new List<Trigger_Action__mdt> {
+		handler.afterUndeleteActionMetadata = new List<Trigger_Action__mdt>{
 			action
 		};
 		Exception myException;
@@ -575,17 +839,82 @@ private class MetadataTriggerHandlerTest {
 			myException.getMessage(),
 			String.format(
 				MetadataTriggerHandler.INVALID_TYPE_ERROR,
-				new String[] {
+				new List<String>{
 					TEST_BEFORE_INSERT,
 					String.valueOf(System.TriggerOperation.AFTER_UNDELETE),
-					'Account'
+					ACCOUNT
 				}
 			)
 		);
 	}
-	
 	@IsTest
-	private static void bypass_success () {
+	private static void afterUndelete_fail_incorrect_class() {
+		Account myAccount = new Account(
+			Name = MY_ACCOUNT,
+			Id = TestUtility.getFakeId(Schema.Account.SObjectType)
+		);
+		MetadataTriggerHandler handler = new MetadataTriggerHandler();
+		handler.sObjectName = ACCOUNT;
+		handler.triggerOld = new List<Account>{ myAccount };
+		List<Trigger_Action__mdt> response;
+		sObject_Trigger_Setting__mdt setting = new sObject_Trigger_Setting__mdt(
+			SObject__c = ACCOUNT,
+			Id = TestUtility.getFakeId(sObject_Trigger_Setting__mdt.SObjectType)
+		);
+		Trigger_Action__mdt action = new Trigger_Action__mdt(
+			Apex_Class_Name__c = BOGUS_CLASS_NAME,
+			After_Undelete__r = setting,
+			After_Undelete__c = setting.Id,
+			Order__c = 1,
+			Bypass_Execution__c = false
+		);
+		handler.afterUndeleteActionMetadata = new List<Trigger_Action__mdt>{
+			action
+		};
+		Exception myException;
+		test.startTest();
+		try {
+			handler.afterUndelete(handler.triggerOld);
+		} catch (Exception e) {
+			myException = e;
+		}
+		test.stopTest();
+		System.assertNotEquals(null, myException);
+		System.assertEquals(
+			myException.getMessage(),
+			String.format(
+				MetadataTriggerHandler.INVALID_CLASS_ERROR,
+				new List<String>{
+					BOGUS_CLASS_NAME,
+					String.valueOf(System.TriggerOperation.AFTER_UNDELETE),
+					ACCOUNT
+				}
+			)
+		);
+	}
+
+	@IsTest
+	private static void actionMetadata() {
+		Account myAccount = new Account(
+			Name = MY_ACCOUNT,
+			Id = TestUtility.getFakeId(Schema.Account.SObjectType)
+		);
+		MetadataTriggerHandler handler = new MetadataTriggerHandler();
+		handler.triggerNew = new List<Account>{ myAccount };
+		handler.triggerOld = new List<Account>{ myAccount };
+		List<sObject_Trigger_Setting__mdt> actionMetadata = handler.actionMetadata;
+		System.assertNotEquals(null, handler.actionMetadata);
+		System.assertNotEquals(null, handler.beforeInsertActionMetadata);
+		System.assertNotEquals(null, handler.afterInsertActionMetadata);
+		System.assertNotEquals(null, handler.beforeUpdateActionMetadata);
+		System.assertNotEquals(null, handler.afterUpdateActionMetadata);
+		System.assertNotEquals(null, handler.beforeDeleteActionMetadata);
+		System.assertNotEquals(null, handler.afterDeleteActionMetadata);
+		System.assertNotEquals(null, handler.afterUndeleteActionMetadata);
+	}
+
+	@IsTest
+	private static void bypass_success() {
 		Exception myException;
 		test.startTest();
 		try {
@@ -595,11 +924,13 @@ private class MetadataTriggerHandlerTest {
 		}
 		test.stopTest();
 		system.assertEquals(null, myException);
-		System.assert (MetadataTriggerHandler.bypassedActions.contains(TEST_BEFORE_INSERT));
+		System.assert(
+			MetadataTriggerHandler.bypassedActions.contains(TEST_BEFORE_INSERT)
+		);
 	}
-	
+
 	@IsTest
-	private static void clearBypass_success () {
+	private static void clearBypass_success() {
 		Exception myException;
 		test.startTest();
 		try {
@@ -610,11 +941,13 @@ private class MetadataTriggerHandlerTest {
 		}
 		test.stopTest();
 		system.assertEquals(null, myException);
-		System.assert (!MetadataTriggerHandler.bypassedActions.contains(TEST_BEFORE_INSERT));
+		System.assert(
+			!MetadataTriggerHandler.bypassedActions.contains(TEST_BEFORE_INSERT)
+		);
 	}
-	
+
 	@IsTest
-	private static void isBypassed_success () {
+	private static void isBypassed_success() {
 		Boolean isBypassed;
 		MetadataTriggerHandler.bypass(TEST_BEFORE_INSERT);
 		Exception myException;
@@ -628,9 +961,9 @@ private class MetadataTriggerHandlerTest {
 		system.assertEquals(null, myException);
 		System.assertEquals(true, isBypassed);
 	}
-	
+
 	@IsTest
-	private static void clearAllBypasses_success () {
+	private static void clearAllBypasses_success() {
 		MetadataTriggerHandler.bypass(TEST_BEFORE_INSERT);
 		Exception myException;
 		test.startTest();
@@ -643,7 +976,7 @@ private class MetadataTriggerHandlerTest {
 		system.assertEquals(null, myException);
 		System.assertEquals(0, MetadataTriggerHandler.bypassedActions.size());
 	}
-	
+
 	public class BeforeInsert implements TriggerAction.BeforeInsert {
 		public void beforeInsert(List<SObject> newList) {
 		}
@@ -672,5 +1005,4 @@ private class MetadataTriggerHandlerTest {
 		public void afterUndelete(List<SObject> newList) {
 		}
 	}
-	
 }

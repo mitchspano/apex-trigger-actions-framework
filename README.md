@@ -1,5 +1,9 @@
 # Salesforce Trigger Actions Framework
 
+<a href="https://githubsfdeploy.herokuapp.com?owner=mitchspano&amp;repo=apex-trigger-actions-framework">
+  <img src="https://raw.githubusercontent.com/afawcett/githubsfdeploy/master/src/main/webapp/resources/img/deploy.png" alt="Deploy to Salesforce" />
+</a>
+
 This project is meant to demonstrate an Apex Trigger Framework which is built with the following goals in mind:
 
 1. Single Trigger per sObject

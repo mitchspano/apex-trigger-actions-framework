@@ -15,7 +15,6 @@
  */
 
 public class ta_Opportunity_YugeDeal implements TriggerAction.BeforeInsert {
-	
 	@TestVisible
 	private static final String YUGE_DEAL = 'Yuuuuuge Deal';
 

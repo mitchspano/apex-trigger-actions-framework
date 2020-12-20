@@ -15,7 +15,6 @@
  */
 
 public class Constants {
-	
 	public static final String OPPORTUNITY_STAGENAME_PROSPECTING = 'Prospecting';
 	public static final String OPPORTUNITY_STAGENAME_QUALIFICATION = 'Qualification';
 	public static final String OPPORTUNITY_STAGENAME_NEEDS_ANALYSIS = 'Needs Analysis';
@@ -26,5 +25,4 @@ public class Constants {
 	public static final String OPPORTUNITY_STAGENAME_NEGOTIATION_REVIEW = 'Negotiation/Review';
 	public static final String OPPORTUNITY_STAGENAME_CLOSED_WON = 'Closed Won';
 	public static final String OPPORTUNITY_STAGENAME_CLOSED_LOST = 'Closed Lost';
-	
 }

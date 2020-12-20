@@ -16,18 +16,17 @@
 
 @IsTest
 private class ta_Opportunity_StageInsertRulesTest {
-	
 	@IsTest
 	private static void beforeInsert_test() {
 		List<Opportunity> newList = new List<Opportunity>();
-		for (Integer i=0; i<100; i++ ) {
+		for (Integer i = 0; i < 100; i++) {
 			newList.add(
 				new Opportunity(
 					Name = String.valueOf(i),
 					StageName = Constants.OPPORTUNITY_STAGENAME_QUALIFICATION,
 					CloseDate = Date.today()
-					)
-				);
+				)
+			);
 		}
 		Test.startTest();
 		new ta_Opportunity_StageInsertRules().beforeInsert(newList);
@@ -35,6 +34,11 @@ private class ta_Opportunity_StageInsertRulesTest {
 		//Use Apex Pages Messages to get errors from AddError without performing DML
 		System.assertEquals(true, newList[0].hasErrors());
 		System.assertEquals(1, newList[0].getErrors().size());
-		System.assertEquals(true, newList[0].getErrors()[0].getMessage().contains(ta_Opportunity_StageInsertRules.INVALID_STAGE_INSERT_ERROR));
+		System.assertEquals(
+			true,
+			newList[0].getErrors()[0]
+				.getMessage()
+				.contains(ta_Opportunity_StageInsertRules.INVALID_STAGE_INSERT_ERROR)
+		);
 	}
 }
