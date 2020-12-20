@@ -15,7 +15,6 @@
  */
 
 public virtual class TriggerBase {
-	
 	@TestVisible
 	private static final String HANDLER_OUTSIDE_TRIGGER_MESSAGE = 'Trigger handler called outside of Trigger execution';
 	@TestVisible
@@ -24,36 +23,46 @@ public virtual class TriggerBase {
 	private static Set<Id> idsProcessedBeforeUpdate;
 	@TestVisible
 	private static Set<Id> idsProcessedAfterUpdate;
-	
+
 	static {
 		bypassedObjects = new Set<String>();
 		idsProcessedBeforeUpdate = new Set<Id>();
 		idsProcessedAfterUpdate = new Set<Id>();
 	}
-	
+
 	public void run() {
-		
-		if (!validateRun()) return;
-		
-		if (this.context == System.TriggerOperation.BEFORE_INSERT && this instanceof TriggerAction.BeforeInsert ) {
-            try {
-                ((TriggerAction.BeforeInsert)this).beforeInsert(triggerNew);
-            } catch (Exception e) {
-				for (SObject obj : triggerNew) {
-					obj.addError(e.getMessage());
-				}
-			}
-		} else if (this.context == System.TriggerOperation.AFTER_INSERT && this instanceof TriggerAction.AfterInsert) {
+		if (!validateRun())
+			return;
+
+		if (
+			this.context == System.TriggerOperation.BEFORE_INSERT &&
+			this instanceof TriggerAction.BeforeInsert
+		) {
 			try {
-				((TriggerAction.AfterInsert)this).afterInsert(triggerNew);
+				((TriggerAction.BeforeInsert) this).beforeInsert(triggerNew);
 			} catch (Exception e) {
 				for (SObject obj : triggerNew) {
 					obj.addError(e.getMessage());
 				}
 			}
-		} else if (this.context == System.TriggerOperation.BEFORE_UPDATE && this instanceof TriggerAction.BeforeUpdate) {
+		} else if (
+			this.context == System.TriggerOperation.AFTER_INSERT &&
+			this instanceof TriggerAction.AfterInsert
+		) {
 			try {
-				((TriggerAction.BeforeUpdate)this).beforeUpdate(triggerNew, triggerOld);
+				((TriggerAction.AfterInsert) this).afterInsert(triggerNew);
+			} catch (Exception e) {
+				for (SObject obj : triggerNew) {
+					obj.addError(e.getMessage());
+				}
+			}
+		} else if (
+			this.context == System.TriggerOperation.BEFORE_UPDATE &&
+			this instanceof TriggerAction.BeforeUpdate
+		) {
+			try {
+				((TriggerAction.BeforeUpdate) this)
+					.beforeUpdate(triggerNew, triggerOld);
 			} catch (Exception e) {
 				for (SObject obj : triggerNew) {
 					obj.addError(e.getMessage());
@@ -62,9 +71,12 @@ public virtual class TriggerBase {
 			for (SObject obj : triggerNew) {
 				TriggerBase.idsProcessedBeforeUpdate.add(obj.Id);
 			}
-		} else if (this.context == System.TriggerOperation.AFTER_UPDATE && this instanceof TriggerAction.AfterUpdate) {
+		} else if (
+			this.context == System.TriggerOperation.AFTER_UPDATE &&
+			this instanceof TriggerAction.AfterUpdate
+		) {
 			try {
-				((TriggerAction.AfterUpdate)this).afterUpdate(triggerNew, triggerOld);
+				((TriggerAction.AfterUpdate) this).afterUpdate(triggerNew, triggerOld);
 			} catch (Exception e) {
 				for (SObject obj : triggerNew) {
 					obj.addError(e.getMessage());
@@ -73,25 +85,34 @@ public virtual class TriggerBase {
 			for (SObject obj : triggerNew) {
 				TriggerBase.idsProcessedAfterUpdate.add(obj.Id);
 			}
-		} else if (this.context == System.TriggerOperation.BEFORE_DELETE && this instanceof TriggerAction.BeforeDelete) {
+		} else if (
+			this.context == System.TriggerOperation.BEFORE_DELETE &&
+			this instanceof TriggerAction.BeforeDelete
+		) {
 			try {
-				((TriggerAction.BeforeDelete)this).beforeDelete(triggerOld);
+				((TriggerAction.BeforeDelete) this).beforeDelete(triggerOld);
 			} catch (Exception e) {
 				for (SObject obj : triggerOld) {
 					obj.addError(e.getMessage());
 				}
 			}
-		} else if (this.context == System.TriggerOperation.AFTER_DELETE && this instanceof TriggerAction.AfterDelete) {
+		} else if (
+			this.context == System.TriggerOperation.AFTER_DELETE &&
+			this instanceof TriggerAction.AfterDelete
+		) {
 			try {
-				((TriggerAction.AfterDelete)this).afterDelete(triggerOld);
+				((TriggerAction.AfterDelete) this).afterDelete(triggerOld);
 			} catch (Exception e) {
 				for (SObject obj : triggerOld) {
 					obj.addError(e.getMessage());
 				}
 			}
-		} else if (this.context == System.TriggerOperation.AFTER_UNDELETE && this instanceof TriggerAction.AfterUndelete) {
+		} else if (
+			this.context == System.TriggerOperation.AFTER_UNDELETE &&
+			this instanceof TriggerAction.AfterUndelete
+		) {
 			try {
-				((TriggerAction.AfterUndelete)this).afterUndelete(triggerNew);
+				((TriggerAction.AfterUndelete) this).afterUndelete(triggerNew);
 			} catch (Exception e) {
 				for (SObject obj : triggerNew) {
 					obj.addError(e.getMessage());
@@ -99,23 +120,23 @@ public virtual class TriggerBase {
 			}
 		}
 	}
-	
+
 	public static void bypass(String sObjectName) {
 		TriggerBase.bypassedObjects.add(sObjectName);
 	}
-	
+
 	public static void clearBypass(String sObjectName) {
 		TriggerBase.bypassedObjects.remove(sObjectName);
 	}
-	
+
 	public static Boolean isBypassed(String sObjectName) {
 		return TriggerBase.bypassedObjects.contains(sObjectName);
 	}
-	
+
 	public static void clearAllBypasses() {
 		TriggerBase.bypassedObjects.clear();
 	}
-	
+
 	@TestVisible
 	private Boolean validateRun() {
 		if (!Trigger.isExecuting && this.context == null) {
@@ -126,23 +147,28 @@ public virtual class TriggerBase {
 		}
 		return true;
 	}
-	
 
 	@TestVisible
 	protected String sObjectName {
 		get {
 			if (sObjectName == null) {
-				if(this.TriggerNew != null) {
-					sObjectName = this.triggerNew[0].getSObjectType().getDescribe().getName();
+				if (this.TriggerNew != null) {
+					sObjectName = this.triggerNew[0]
+						.getSObjectType()
+						.getDescribe()
+						.getName();
 				} else {
-					sObjectName =  this.triggerOld[0].getSObjectType().getDescribe().getName();
+					sObjectName = this.triggerOld[0]
+						.getSObjectType()
+						.getDescribe()
+						.getName();
 				}
 			}
 			return sObjectName;
 		}
 		private set;
 	}
-	
+
 	@TestVisible
 	private System.TriggerOperation context {
 		get {
@@ -153,7 +179,7 @@ public virtual class TriggerBase {
 		}
 		set;
 	}
-	
+
 	@TestVisible
 	protected List<SObject> triggerNew {
 		get {
@@ -164,7 +190,7 @@ public virtual class TriggerBase {
 		}
 		private set;
 	}
-	
+
 	@TestVisible
 	protected List<SObject> triggerOld {
 		get {
@@ -175,7 +201,7 @@ public virtual class TriggerBase {
 		}
 		private set;
 	}
-	
-	public class TriggerBaseException extends Exception {}
-	
+
+	public class TriggerBaseException extends Exception {
+	}
 }

@@ -16,11 +16,10 @@
 
 @IsTest
 private class ta_Opportunity_YugeDealTest {
-	
 	@IsTest
 	private static void beforeInsert_test() {
 		List<Opportunity> newList = new List<Opportunity>();
-		for (Integer i=0; i<100; i++ ) {
+		for (Integer i = 0; i < 100; i++) {
 			newList.add(new Opportunity(Name = String.valueOf(i)));
 		}
 		Test.startTest();
