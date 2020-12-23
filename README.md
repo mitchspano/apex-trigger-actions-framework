@@ -93,7 +93,7 @@ public class OpportunityTriggerHandler extends TriggerBase implements TriggerAct
 
   @TestVisible
   private static final String YUGE_DEAL = 'Yuuuuuge Deal';
-  
+
   public void beforeInsert(List<Opportunity> newList){
     for (Opportunity opp : newList) {
       opp.Name = YUGE_DEAL;
@@ -179,7 +179,7 @@ private List<sObject_Trigger_Setting__mdt> actionMetadata {
 private List<Trigger_Action__mdt> beforeInsertActionMetadata {
   get {
     if (beforeInsertActionMetadata == null) {
-      beforeInsertActionMetadata = 
+      beforeInsertActionMetadata =
         this.actionMetadata.isEmpty() ?
         new List<Trigger_Action__mdt>() :
         this.actionMetadata[0].Before_Insert_Actions__r;
@@ -199,13 +199,13 @@ private List<TriggerAction.BeforeInsert> beforeInsertActions {
         handleException(
           INVALID_TYPE_ERROR,
           triggerMetadata.Apex_Class_Name__c,
-          System.TriggerOperation.AFTER_INSERT
+          System.TriggerOperation.BEFORE_INSERT
         );
       } catch (System.NullPointerException e) {
         handleException(
           INVALID_CLASS_ERROR,
           triggerMetadata.Apex_Class_Name__c,
-          System.TriggerOperation.BEFORE_UPDATE
+          System.TriggerOperation.BEFORE_INSERT
         );
       }
     }
@@ -223,7 +223,7 @@ public class ta_Opportunity_StageInsertRules implements TriggerAction.BeforeInse
 
   @TestVisible
   private static final String INVALID_STAGE_INSERT_ERROR = 'The Stage must be \'' +  Constants.  OPPORTUNITY_STAGENAME_PROSPECTING + '\' when an Opportunity is created';
-  
+
   public void beforeInsert(List<Opportunity> newList){
     for (Opportunity opp : newList) {
       if (opp.StageName != Constants.OPPORTUNITY_STAGENAME_PROSPECTING) {
@@ -313,7 +313,6 @@ public class ta_Opportunity_RecalculateCategory implements TriggerAction.AfterUp
 }
 
 ```
-
 
 ## Bypass Mechanisms
 
