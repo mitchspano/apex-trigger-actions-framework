@@ -14,112 +14,9 @@ This project is meant to demonstrate an Apex Trigger Framework which is built wi
 6. Configuration from Setup Menu
 7. Adherance to SOLID Principles
 
-## Build a Solid Base
-
-This one is a no brainer, but there should only be one Apex Trigger written in your Salesforce org per sObject.
-
-There is another well known truth amongst Salesforce developers: it is wise to partition your trigger from the logic that must be executed. Leaving logic within the Trigger itself leads to code which is extremely difficult to test, maintain, and understand.
-
-In order to achieve this, we must define a `TriggerBase` class, and extend that class. For this example, we will create a class called `OpportunityTriggerHandler`.
-
-```java
-public virtual class TriggerBase {
-  ...
-}
-```
-
-```java
-public class OpportunityTriggerHandler extends TriggerBase {
-  ...
-}
-```
-
-```java
-Trigger OppportunityTrigger on Opportunity (before insert, after insert, before update, after update, before delete, after delete, after undelete) {
-    new OpportunityTriggerHandler().run();
-}
-```
-
-We will get more into the body of the `TriggerBase` class shortly.
-
-Developers are familiar with having a method named `beforeUpdate` for example. This is what we mean when we say context specific implementation. Many trigger frameworks provide an virtual method to be overridden by the specific handler for each context. We will choose to define these methods as interfaces within our `TriggerAction` class. This will allow us some very nice perks when it comes time to unit test our code.
-
-```java
-public class TriggerAction {
-
-  public interface BeforeInsert {
-    void beforeInsert(List<SObject> newList);
-  }
-
-  public interface BeforeUpdate {
-    void beforeUpdate(List<SObject> newList, List<SObject> oldList);
-  }
-
-  ...
-
-}
-
-```
-
-Now that the foundations are set, we can take a closer look into the `run()` method of `TriggerBase` to get a better understanding of how this all works together.
-
-```java
-public void run() {
-
-  ...
-
-  if (this.context == System.TriggerOperation.BEFORE_UPDATE && this instanceof TriggerAction.BeforeUpdate) {
-    try {
-      ((TriggerAction.BeforeUpdate)this).beforeUpdate(triggerNew, triggerOld);
-    } catch (Exception e) {
-      for (SObject obj : triggerNew) {
-        obj.addError(e.getMessage());
-      }
-    }
-    for (SObject obj : triggerNew) {
-      TriggerBase.idsProcessedBeforeUpdate.add(obj.Id);
-    }
-  }
-
-  ...
-
-}
-```
-
-The check to see if `this` is an instance of any of those `TriggerAction` interfaces we specified earlier, in addition to the check of the context, allows us to specify the implementation context completely within the handler class definition. For example:
-
-```java
-public class OpportunityTriggerHandler extends TriggerBase implements TriggerAction.BeforeInsert {
-
-  @TestVisible
-  private static final String YUGE_DEAL = 'Yuuuuuge Deal';
-
-  public void beforeInsert(List<Opportunity> newList){
-    for (Opportunity opp : newList) {
-      opp.Name = YUGE_DEAL;
-    }
-  }
-}
-
-```
-
-Note that our beforeInsert method accepts `List<Opportunity>` instead of a `List<SObject>` - this is made possible by the `TriggerAction` interfaces. This is nice because there is no need to downcast `Trigger.new` in this framework as was the case in so many which came before it.
-
-This is great. We have successfully partitioned the Trigger framework from the logic in a repeatable way. This has been the place where the abstraction stops for writing triggers on the Salesforce platform for years, but it does not to adhere to all **SOLID** principles:
-
-|     | Principle                       | Definition                                                                                |
-| --- | ------------------------------- | ----------------------------------------------------------------------------------------- |
-| S   | Single Responsibility principle | A class should have a single responsibility                                               |
-| O   | Open-Closed principle           | Classes should be open for extension but closed for modification                          |
-| L   | Liskov Substitution principle   | An instance of a class should be able to be interchanged with an instance of its subclass |
-| I   | Interface Segregation principle | Many client-specific interfaces are better than one general purpose interface             |
-| D   | Dependency Inversion principle  | It is better to depend upon abstractions (interfaces) rather than concretions             |
-
-The `OpportunityTriggerHandler` class is responsible for _all_ trigger logic on the Opportunity sObject and reqires modification for every new piece of triggered functionality which violates the **Single Responsibility principle** and the **Open-Closed principle**. Oftentimes the `OpportunityTriggerHandler` class becomes so large it gets unmaintainable and difficult to work on across multiple teams. We want to create a framework which allows for _extension_ rather than _modification_ of our trigger handler classes. Additionally, we want to author classes which have a single responsibility.
-
 ## Metadata Driven Trigger Actions
 
-We can achieve our goal of adhering to **SOLID** principles for our trigger framework by making some slight modifications. Instead of defining the `OpportunityTriggerHandler` class like we did above, we will use the `MetadataTriggerHandler` class which is included in this project.
+In order to use this trigger framework, we start with the `MetadataTriggerHandler` class which is included in this project.
 
 ```java
 Trigger OppportunityTrigger on Opportunity (before insert, after insert, before update, after update, before delete, after delete, after undelete) {
@@ -127,96 +24,21 @@ Trigger OppportunityTrigger on Opportunity (before insert, after insert, before 
 }
 ```
 
-This class allows us to now use custom metadata to configure a few things from the setup menu:
+This class allows us to use custom metadata to configure a few things from the setup menu:
 
 - The sObject and context for which an action is supposed to execute
 - The order to take those actions within a given context
 - A checkbox to bypass execution at the sObject or trigger action level
 
-![Lightning Page](images/sObjectTriggerSettings.gif)
+The setup menu provides a consolidated view of all of the actions that are executed when a record is inserted, updated, deleted, or undeleted.
 
-The setup menu gives you a nice view of all of the actions that are executed when a record is inserted, updated, deleted, or undeleted.
+![Lightning Page](images/sObjectTriggerSettings.gif)
 
 The `MetadataTriggerHandler` class fetches all Trigger Action metadata that is configured in the org, and dynamically create an instance of an object which implements a `TriggerAction` interface and casts it to the appropriate interface as specified in the metadata, then calls their respective context methods in the order specified.
 
-```java
-public void beforeInsert(List<SObject> newList) {
-  for (TriggerAction.BeforeInsert action : beforeInsertActions) {
-    action.beforeInsert(newList);
-  }
-}
-
-private List<sObject_Trigger_Setting__mdt> actionMetadata {
-  get {
-    if (actionMetadata == null) {
-      actionMetadata = new List<sObject_Trigger_Setting__mdt>([
-        SELECT
-          Id,
-          (
-            SELECT
-              Apex_Class_Name__c
-            FROM
-              Before_Insert_Actions__r
-            WHERE
-              Bypass_Execution__c = false
-              AND Apex_Class_Name__c NOT IN: MetadataTriggerHandler.bypassedActions
-            ORDER BY
-              Order__c ASC
-          ),
-          ...
-        FROM
-          sObject_Trigger_Setting__mdt
-        WHERE
-          SObject__r.DeveloperName =: this.sObjectName
-          AND Bypass_Execution__c = false
-      ]);
-    }
-    return actionMetadata;
-  }
-  set;
-}
-
-private List<Trigger_Action__mdt> beforeInsertActionMetadata {
-  get {
-    if (beforeInsertActionMetadata == null) {
-      beforeInsertActionMetadata =
-        this.actionMetadata.isEmpty() ?
-        new List<Trigger_Action__mdt>() :
-        this.actionMetadata[0].Before_Insert_Actions__r;
-    }
-    return beforeInsertActionMetadata;
-  }
-  set;
-}
-
-private List<TriggerAction.BeforeInsert> beforeInsertActions {
-  get {
-    List<TriggerAction.BeforeInsert> returnValue = new List<TriggerAction.BeforeInsert>();
-    for (Trigger_Action__mdt triggerMetadata : this.beforeInsertActionMetadata) {
-      try {
-        returnValue.add((TriggerAction.BeforeInsert)(Type.forName(triggerMetadata.Apex_Class_Name__c).newInstance()));
-      } catch (System.TypeException e) {
-        handleException(
-          INVALID_TYPE_ERROR,
-          triggerMetadata.Apex_Class_Name__c,
-          System.TriggerOperation.BEFORE_INSERT
-        );
-      } catch (System.NullPointerException e) {
-        handleException(
-          INVALID_CLASS_ERROR,
-          triggerMetadata.Apex_Class_Name__c,
-          System.TriggerOperation.BEFORE_INSERT
-        );
-      }
-    }
-    return returnValue;
-  }
-}
-```
-
 Note that if an Apex class is specified in metadata and it does not exist or does not implement the correct interface, a runtime error will occur.
 
-This allows for extra freedom and configuration from the setup menu, but it also allows us to do something which I think is pretty amazing: we can now define a class for each specific trigger action that we want to implement.
+This allows for extra freedom and configuration from the setup menu, but it also allows us to define a class for each specific trigger action that we want to implement.
 
 ```java
 public class ta_Opportunity_StageInsertRules implements TriggerAction.BeforeInsert {
@@ -235,7 +57,7 @@ public class ta_Opportunity_StageInsertRules implements TriggerAction.BeforeInse
 
 ```
 
-Now, as future development work gets completed, we won't need to keep modifying the bodies of our triggerHandler classes, we can just create a new class per piece of functionality that we want and configure those to run in a specified order.
+Now, as future development work gets completed, we won't need to keep modifying the bodies of our triggerHandler classes, we can just create a new class for each new piece of functionality that we want and configure those to run in a specified order within a given context.
 
 ![Lightning Page](images/newTriggerAction.gif)
 
@@ -328,9 +150,9 @@ You can also bypass two different things:
 
 To bypass from the setup menu, simply navigate to the sObject Trigger Setting or Trigger Action metadata record you are interested in and check the Bypass Execution checkbox.
 
-![Lightning Page](images/setupMenuBypassSObject.jpg)
+![Lightning Page](images/setupMenuBypassSObject.png)
 
-![Lightning Page](images/setupMenuBypassAction.jpg)
+![Lightning Page](images/setupMenuBypassAction.png)
 
 These bypasses will stay active until the checkbox is unchecked.
 
