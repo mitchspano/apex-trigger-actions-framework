@@ -24,21 +24,7 @@ Trigger OppportunityTrigger on Opportunity (before insert, after insert, before 
 }
 ```
 
-This class allows us to use custom metadata to configure a few things from the setup menu:
-
-- The sObject and context for which an action is supposed to execute
-- The order to take those actions within a given context
-- A checkbox to bypass execution at the sObject or trigger action level
-
-The setup menu provides a consolidated view of all of the actions that are executed when a record is inserted, updated, deleted, or undeleted.
-
-![Lightning Page](images/sObjectTriggerSettings.gif)
-
-The `MetadataTriggerHandler` class fetches all Trigger Action metadata that is configured in the org, and dynamically create an instance of an object which implements a `TriggerAction` interface and casts it to the appropriate interface as specified in the metadata, then calls their respective context methods in the order specified.
-
-Note that if an Apex class is specified in metadata and it does not exist or does not implement the correct interface, a runtime error will occur.
-
-This allows for extra freedom and configuration from the setup menu, but it also allows us to define a class for each specific trigger action that we want to implement.
+To define a specific action, we write an individual class which implements the correct context interface.
 
 ```java
 public class ta_Opportunity_StageInsertRules implements TriggerAction.BeforeInsert {
@@ -57,11 +43,25 @@ public class ta_Opportunity_StageInsertRules implements TriggerAction.BeforeInse
 
 ```
 
+This allows us to use custom metadata to configure a few things from the setup menu:
+
+- The sObject and context for which an action is supposed to execute
+- The order to take those actions within a given context
+- A checkbox to bypass execution at the sObject or trigger action level
+
+The setup menu provides a consolidated view of all of the actions that are executed when a record is inserted, updated, deleted, or undeleted.
+
+![Lightning Page](images/sObjectTriggerSettings.gif)
+
+The `MetadataTriggerHandler` class fetches all Trigger Action metadata that is configured in the org, and dynamically creates an instance of an object which implements a `TriggerAction` interface and casts it to the appropriate interface as specified in the metadata, then calls their respective context methods in the order specified.
+
 Now, as future development work gets completed, we won't need to keep modifying the bodies of our triggerHandler classes, we can just create a new class for each new piece of functionality that we want and configure those to run in a specified order within a given context.
 
 ![Lightning Page](images/newTriggerAction.gif)
 
-With this multiplicity of Apex classes, it would be wise to follow a naming convention such as `ta_ObjectName_Description` and utilize the `sfdx-project.json` file to partition your application into multiple directories. In the example indluded in this sample project.
+Note that if an Apex class is specified in metadata and it does not exist or does not implement the correct interface, a runtime error will occur.
+
+With this multiplicity of Apex classes, it would be wise to follow a naming convention such as `ta_ObjectName_Description` and utilize the `sfdx-project.json` file to partition your application into multiple directories.
 
 ```javascript
 {
@@ -80,29 +80,6 @@ With this multiplicity of Apex classes, it would be wise to follow a naming conv
   "sourceApiVersion": "50.0"
 }
 ```
-
-## Use of Trigger Maps
-
-You may have noticed that the defined interfaces within the `TriggerAction` class do not accept a `Map<Id,sObject>` as an argument. This is because Apex does not permit for the use of generics which would allow us to specify the interfaces with an argument of type `Map<Id, ? extends sObject>`. Without the implementation of generics within the Apex language, we would have to downcast the keys of every map that we want to use to its particular sObject type:
-
-```java
-private void someMethod(Map<Id,sObject> sobjectMap) {
-  Map<Id,Opportunity> opportunityMap = (Map<Id,Opportunity>)sobjectMap;
-}
-```
-
-This could potentially break if called with a map of the incorrect sObject type.
-To avoid this scenario, we can simply construct a new map out of our `newList` or `oldList` variables:
-
-```java
-public void beforeUpdate(List<Opportunity> newList, List<Opportunity> oldList) {
-  Map<Id,Opportunity> newMap = new Map<Id,Opportunity>(newList);
-  Map<Id,Opportunity> oldMap = new Map<Id,Opportunity>(oldList);
-  ...
-}
-```
-
-This will help the transition process if you are migrating an existing Salesforce application to this new trigger actions framework.
 
 ## Recursion Prevention
 
@@ -138,15 +115,9 @@ public class ta_Opportunity_RecalculateCategory implements TriggerAction.AfterUp
 
 ## Bypass Mechanisms
 
-Sometimes, you want to bypass trigger execution. It could be for a bulk data load during off-peak hours, but it could be that you have a newly found exception in your business use case that is not supposed to execute code that otherwise would be. There are two types of bypasses built into this Apex Trigger Actions framework:
+You can also bypass execution on either an entire sObject, or for a specific action.
 
-1. Bypassing from the setup menu
-2. Bypassing from Apex
-
-You can also bypass two different things:
-
-1. Bypass all trigger execution on an sObject
-2. Bypass a specific action from executing.
+### Bypass from Setup Menu
 
 To bypass from the setup menu, simply navigate to the sObject Trigger Setting or Trigger Action metadata record you are interested in and check the Bypass Execution checkbox.
 
@@ -156,9 +127,41 @@ To bypass from the setup menu, simply navigate to the sObject Trigger Setting or
 
 These bypasses will stay active until the checkbox is unchecked.
 
+### Bypass from Apex
+
 To bypass from Apex, use the static `bypass(String actionName)` method in the `MetadataTriggerHandler` class, or the static `bypass(String sObjectName)` method in the `TriggerBase` class.
 
-These bypasses will only stay active until the transaction is complete.
+```java
+public void updateAccountsNoTrigger(List<Account> accountsToUpdate) {
+  TriggerBase.bypass('Account');
+  update accountsToUpdate;
+  TriggerBase.clearBypass('Account');
+}
+```
+
+```java
+public void insertOpportunitiesNoRules(List<Opportunity> opportunitiesToInsert) {
+  MetadataTriggerHandler.bypass('ta_Opportunity_StageInsertRules');
+  insert opportunitiesToInsert;
+  MetadataTriggerHandler.clearBypass('ta_Opportunity_StageInsertRules');
+}
+```
+
+These bypasses will stay active until the transaction is complete or until cleared using the `clearBypass` or `clearAllBypasses` methods in the `TriggerBase` and `MetadataTriggerHandler` classes.
+
+## Use of Trigger Maps
+
+To avoid having to downcast from `Map<Id,sObject>`, we simply construct a new map out of our `newList` and `oldList` variables:
+
+```java
+public void beforeUpdate(List<Opportunity> newList, List<Opportunity> oldList) {
+  Map<Id,Opportunity> newMap = new Map<Id,Opportunity>(newList);
+  Map<Id,Opportunity> oldMap = new Map<Id,Opportunity>(oldList);
+  ...
+}
+```
+
+This will help the transition process if you are migrating an existing Salesforce application to this new trigger actions framework.
 
 ## DML-Less Trigger Testing
 
