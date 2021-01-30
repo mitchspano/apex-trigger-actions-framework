@@ -73,7 +73,7 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 						SELECT
 							Id,
 							(
-								SELECT Apex_Class_Name__c
+								SELECT Apex_Class_Name__c, Order__c, Flow_Name__c
 								FROM Before_Insert_Actions__r
 								WHERE
 									Bypass_Execution__c = FALSE
@@ -81,7 +81,7 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 								ORDER BY Order__c ASC
 							),
 							(
-								SELECT Apex_Class_Name__c
+								SELECT Apex_Class_Name__c, Order__c, Flow_Name__c
 								FROM After_Insert_Actions__r
 								WHERE
 									Bypass_Execution__c = FALSE
@@ -89,7 +89,7 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 								ORDER BY Order__c ASC
 							),
 							(
-								SELECT Apex_Class_Name__c
+								SELECT Apex_Class_Name__c, Order__c, Flow_Name__c
 								FROM Before_Update_Actions__r
 								WHERE
 									Bypass_Execution__c = FALSE
@@ -97,7 +97,7 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 								ORDER BY Order__c ASC
 							),
 							(
-								SELECT Apex_Class_Name__c
+								SELECT Apex_Class_Name__c, Order__c, Flow_Name__c
 								FROM After_Update_Actions__r
 								WHERE
 									Bypass_Execution__c = FALSE
@@ -105,7 +105,7 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 								ORDER BY Order__c ASC
 							),
 							(
-								SELECT Apex_Class_Name__c
+								SELECT Apex_Class_Name__c, Order__c, Flow_Name__c
 								FROM Before_Delete_Actions__r
 								WHERE
 									Bypass_Execution__c = FALSE
@@ -113,7 +113,7 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 								ORDER BY Order__c ASC
 							),
 							(
-								SELECT Apex_Class_Name__c
+								SELECT Apex_Class_Name__c, Order__c, Flow_Name__c
 								FROM After_Delete_Actions__r
 								WHERE
 									Bypass_Execution__c = FALSE
@@ -121,7 +121,7 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 								ORDER BY Order__c ASC
 							),
 							(
-								SELECT Apex_Class_Name__c
+								SELECT Apex_Class_Name__c, Order__c, Flow_Name__c
 								FROM After_Undelete_Actions__r
 								WHERE
 									Bypass_Execution__c = FALSE
@@ -160,12 +160,14 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 				Trigger_Action__mdt triggerMetadata : this.beforeInsertActionMetadata
 			) {
 				try {
-					returnValue.add(
-						(TriggerAction.BeforeInsert) (Type.forName(
-								triggerMetadata.Apex_Class_Name__c
-							)
-							.newInstance())
-					);
+					TriggerAction.BeforeInsert triggerAction = (TriggerAction.BeforeInsert) Type.forName(
+							triggerMetadata.Apex_Class_Name__c
+						)
+						.newInstance();
+					if (triggerMetadata.Flow_Name__c != null) {
+						((ta_Flow) triggerAction).flowName = triggerMetadata.Flow_Name__c;
+					}
+					returnValue.add(triggerAction);
 				} catch (System.TypeException e) {
 					handleException(
 						INVALID_TYPE_ERROR,
@@ -202,12 +204,14 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 			List<TriggerAction.AfterInsert> returnValue = new List<TriggerAction.AfterInsert>();
 			for (Trigger_Action__mdt triggerMetadata : afterInsertActionMetadata) {
 				try {
-					returnValue.add(
-						(TriggerAction.AfterInsert) (Type.forName(
-								triggerMetadata.Apex_Class_Name__c
-							)
-							.newInstance())
-					);
+					TriggerAction.AfterInsert triggerAction = (TriggerAction.AfterInsert) Type.forName(
+							triggerMetadata.Apex_Class_Name__c
+						)
+						.newInstance();
+					if (triggerMetadata.Flow_Name__c != null) {
+						((ta_Flow) triggerAction).flowName = triggerMetadata.Flow_Name__c;
+					}
+					returnValue.add(triggerAction);
 				} catch (System.TypeException e) {
 					handleException(
 						INVALID_TYPE_ERROR,
@@ -244,12 +248,14 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 			List<TriggerAction.BeforeUpdate> returnValue = new List<TriggerAction.BeforeUpdate>();
 			for (Trigger_Action__mdt triggerMetadata : beforeUpdateActionMetadata) {
 				try {
-					returnValue.add(
-						(TriggerAction.BeforeUpdate) (Type.forName(
-								triggerMetadata.Apex_Class_Name__c
-							))
-							.newInstance()
-					);
+					TriggerAction.BeforeUpdate triggerAction = (TriggerAction.BeforeUpdate) Type.forName(
+							triggerMetadata.Apex_Class_Name__c
+						)
+						.newInstance();
+					if (triggerMetadata.Flow_Name__c != null) {
+						((ta_Flow) triggerAction).flowName = triggerMetadata.Flow_Name__c;
+					}
+					returnValue.add(triggerAction);
 				} catch (System.TypeException e) {
 					handleException(
 						INVALID_TYPE_ERROR,
@@ -286,12 +292,14 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 			List<TriggerAction.AfterUpdate> returnValue = new List<TriggerAction.AfterUpdate>();
 			for (Trigger_Action__mdt triggerMetadata : afterUpdateActionMetadata) {
 				try {
-					returnValue.add(
-						(TriggerAction.AfterUpdate) (Type.forName(
-								triggerMetadata.Apex_Class_Name__c
-							))
-							.newInstance()
-					);
+					TriggerAction.AfterUpdate triggerAction = (TriggerAction.AfterUpdate) Type.forName(
+							triggerMetadata.Apex_Class_Name__c
+						)
+						.newInstance();
+					if (triggerMetadata.Flow_Name__c != null) {
+						((ta_Flow) triggerAction).flowName = triggerMetadata.Flow_Name__c;
+					}
+					returnValue.add(triggerAction);
 				} catch (System.TypeException e) {
 					handleException(
 						INVALID_TYPE_ERROR,
@@ -328,12 +336,14 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 			List<TriggerAction.BeforeDelete> returnValue = new List<TriggerAction.BeforeDelete>();
 			for (Trigger_Action__mdt triggerMetadata : beforeDeleteActionMetadata) {
 				try {
-					returnValue.add(
-						(TriggerAction.BeforeDelete) (Type.forName(
-								triggerMetadata.Apex_Class_Name__c
-							))
-							.newInstance()
-					);
+					TriggerAction.BeforeDelete triggerAction = (TriggerAction.BeforeDelete) Type.forName(
+							triggerMetadata.Apex_Class_Name__c
+						)
+						.newInstance();
+					if (triggerMetadata.Flow_Name__c != null) {
+						((ta_Flow) triggerAction).flowName = triggerMetadata.Flow_Name__c;
+					}
+					returnValue.add(triggerAction);
 				} catch (System.TypeException e) {
 					handleException(
 						INVALID_TYPE_ERROR,
@@ -370,12 +380,14 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 			List<TriggerAction.AfterDelete> returnValue = new List<TriggerAction.AfterDelete>();
 			for (Trigger_Action__mdt triggerMetadata : afterDeleteActionMetadata) {
 				try {
-					returnValue.add(
-						(TriggerAction.AfterDelete) (Type.forName(
-								triggerMetadata.Apex_Class_Name__c
-							))
-							.newInstance()
-					);
+					TriggerAction.AfterDelete triggerAction = (TriggerAction.AfterDelete) Type.forName(
+							triggerMetadata.Apex_Class_Name__c
+						)
+						.newInstance();
+					if (triggerMetadata.Flow_Name__c != null) {
+						((ta_Flow) triggerAction).flowName = triggerMetadata.Flow_Name__c;
+					}
+					returnValue.add(triggerAction);
 				} catch (System.TypeException e) {
 					handleException(
 						INVALID_TYPE_ERROR,
@@ -412,12 +424,14 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 			List<TriggerAction.AfterUndelete> returnValue = new List<TriggerAction.AfterUndelete>();
 			for (Trigger_Action__mdt triggerMetadata : afterUndeleteActionMetadata) {
 				try {
-					returnValue.add(
-						(TriggerAction.AfterUndelete) (Type.forName(
-								triggerMetadata.Apex_Class_Name__c
-							))
-							.newInstance()
-					);
+					TriggerAction.AfterUndelete triggerAction = (TriggerAction.AfterUndelete) Type.forName(
+							triggerMetadata.Apex_Class_Name__c
+						)
+						.newInstance();
+					if (triggerMetadata.Flow_Name__c != null) {
+						((ta_Flow) triggerAction).flowName = triggerMetadata.Flow_Name__c;
+					}
+					returnValue.add(triggerAction);
 				} catch (System.TypeException e) {
 					handleException(
 						INVALID_TYPE_ERROR,
