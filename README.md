@@ -93,13 +93,13 @@ To make your flows usable, they must be auto-launched flows and you need to crea
 | oldList          | Record Collection | yes                 | no                   | Used to store the Trigger.old records                           |
 | newListAfterFlow | Record Collection | no                  | yes                  | Used to apply record values back during before insert or update |
 
-You can use the `ta_IsRecordChanged_Invc` invocable action to get the old version of a record and see which values have changed. In order to modify field values before insert or update, we must assign all records back to the `newListAfterFlow` collection variable.
+You can use the `OldRecordFlowService` invocable action to get the old version of a record and see which values have changed. In order to modify field values before insert or update, we must assign all records back to the `newListAfterFlow` collection variable.
 
 Here is an example of an auto-launched flow that checks if a Case's status has changed and if so it sets the Case's description to a default value.
 
 ![Sample Flow](images/sampleFlow.png)
 
-To enable this flow, simply insert a trigger action record with Apex Class Name equal to "ta_Flow" and set the Flow Name field with the API name of the flow itself.
+To enable this flow, simply insert a trigger action record with Apex Class Name equal to "TriggerActionFlow" and set the Flow Name field with the API name of the flow itself.
 
 ![Flow Trigger Action](images/flowTriggerAction.png)
 

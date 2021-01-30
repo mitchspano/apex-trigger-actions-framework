@@ -14,9 +14,32 @@
    limitations under the License.
  */
 
-public class ta_Flow implements TriggerAction.BeforeInsert, TriggerAction.AfterInsert, TriggerAction.BeforeUpdate, TriggerAction.AfterUpdate, TriggerAction.AfterUndelete {
-    
-    public string flowName;
+public class TriggerActionFlow implements TriggerAction.BeforeInsert, TriggerAction.AfterInsert, TriggerAction.BeforeUpdate, TriggerAction.AfterUpdate, TriggerAction.AfterUndelete {
+	public string flowName;
+	@testVisible
+	private static final String INVALID_FLOW_NAME = 'You must provide the name of a flow to execute';
+	@testVisible
+	private static final String NEW_LIST_AFTER_FLOW = 'newListAfterFlow';
+	@testVisible
+	private static final String NEW_LIST = 'newList';
+	@testVisible
+	private static final String OLD_LIST = 'oldList';
+	@testVisible
+	private static final String OLD_RECORD_NOT_FOUND = 'An old version of the record cannot be identified in the oldList';
+	@testVisible
+	private static final String INVALID_REQUEST = 'You can only pass one getOldRecordRequest into TriggerActionFlow.getOldRecord()';
+
+	@InvocableMethod
+	public static List<sObject> getOldRecord(List<getOldRecordRequest> request) {
+		if (request.isEmpty() || request.size() > 1) {
+			throw new TriggerActionFlowException(INVALID_REQUEST);
+		}
+		Map<Id, sObject> oldMap = new Map<Id, sObject>(request[0].oldList);
+		if (!oldMap.containsKey(request[0].currentRecord.Id)) {
+			throw new TriggerActionFlowException(OLD_RECORD_NOT_FOUND);
+		}
+		return new List<sObject>{ oldMap.get(request[0].currentRecord.Id) };
+	}
 
 	public void beforeInsert(List<SObject> newList) {
 		checkFlowName();
@@ -27,7 +50,7 @@ public class ta_Flow implements TriggerAction.BeforeInsert, TriggerAction.AfterI
 		myFlow.start();
 		applyFlowValues(
 			newList,
-			(List<sObject>) myFlow.getVariableValue('newListAfterFlow')
+			(List<sObject>) myFlow.getVariableValue(NEW_LIST_AFTER_FLOW)
 		);
 	}
 
@@ -55,7 +78,7 @@ public class ta_Flow implements TriggerAction.BeforeInsert, TriggerAction.AfterI
 		myFlow.start();
 		applyFlowValues(
 			newList,
-			(List<sObject>) myFlow.getVariableValue('newListAfterFlow')
+			(List<sObject>) myFlow.getVariableValue(NEW_LIST_AFTER_FLOW)
 		);
 	}
 
@@ -103,7 +126,7 @@ public class ta_Flow implements TriggerAction.BeforeInsert, TriggerAction.AfterI
 
 	private void checkFlowName() {
 		if (String.isBlank(flowName)) {
-			throw new ta_Flow_Exception(INVALID_FLOW_NAME);
+			throw new TriggerActionFlowException(INVALID_FLOW_NAME);
 		}
 	}
 
@@ -113,10 +136,10 @@ public class ta_Flow implements TriggerAction.BeforeInsert, TriggerAction.AfterI
 	) {
 		Map<String, Object> result = new Map<String, Object>();
 		if (newList != null) {
-			result.put('newList', newList);
+			result.put(NEW_LIST, newList);
 		}
 		if (oldList != null) {
-			result.put('oldList', oldList);
+			result.put(OLD_LIST, oldList);
 		}
 		return result;
 	}
@@ -149,8 +172,13 @@ public class ta_Flow implements TriggerAction.BeforeInsert, TriggerAction.AfterI
 		}
 	}
 
-	@testVisible
-	private static final String INVALID_FLOW_NAME = 'You must provide the name of a flow to execute';
+	public class getOldRecordRequest {
+		@InvocableVariable
+		public sObject currentRecord;
+		@InvocableVariable
+		public List<sObject> oldList;
+	}
 
-	class ta_Flow_Exception extends Exception {}
+	class TriggerActionFlowException extends Exception {
+	}
 }

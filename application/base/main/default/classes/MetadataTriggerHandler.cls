@@ -165,7 +165,8 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 						)
 						.newInstance();
 					if (triggerMetadata.Flow_Name__c != null) {
-						((ta_Flow) triggerAction).flowName = triggerMetadata.Flow_Name__c;
+						((TriggerActionFlow) triggerAction)
+							.flowName = triggerMetadata.Flow_Name__c;
 					}
 					returnValue.add(triggerAction);
 				} catch (System.TypeException e) {
@@ -209,7 +210,8 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 						)
 						.newInstance();
 					if (triggerMetadata.Flow_Name__c != null) {
-						((ta_Flow) triggerAction).flowName = triggerMetadata.Flow_Name__c;
+						((TriggerActionFlow) triggerAction)
+							.flowName = triggerMetadata.Flow_Name__c;
 					}
 					returnValue.add(triggerAction);
 				} catch (System.TypeException e) {
@@ -253,7 +255,8 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 						)
 						.newInstance();
 					if (triggerMetadata.Flow_Name__c != null) {
-						((ta_Flow) triggerAction).flowName = triggerMetadata.Flow_Name__c;
+						((TriggerActionFlow) triggerAction)
+							.flowName = triggerMetadata.Flow_Name__c;
 					}
 					returnValue.add(triggerAction);
 				} catch (System.TypeException e) {
@@ -297,7 +300,8 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 						)
 						.newInstance();
 					if (triggerMetadata.Flow_Name__c != null) {
-						((ta_Flow) triggerAction).flowName = triggerMetadata.Flow_Name__c;
+						((TriggerActionFlow) triggerAction)
+							.flowName = triggerMetadata.Flow_Name__c;
 					}
 					returnValue.add(triggerAction);
 				} catch (System.TypeException e) {
@@ -341,7 +345,8 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 						)
 						.newInstance();
 					if (triggerMetadata.Flow_Name__c != null) {
-						((ta_Flow) triggerAction).flowName = triggerMetadata.Flow_Name__c;
+						((TriggerActionFlow) triggerAction)
+							.flowName = triggerMetadata.Flow_Name__c;
 					}
 					returnValue.add(triggerAction);
 				} catch (System.TypeException e) {
@@ -385,7 +390,8 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 						)
 						.newInstance();
 					if (triggerMetadata.Flow_Name__c != null) {
-						((ta_Flow) triggerAction).flowName = triggerMetadata.Flow_Name__c;
+						((TriggerActionFlow) triggerAction)
+							.flowName = triggerMetadata.Flow_Name__c;
 					}
 					returnValue.add(triggerAction);
 				} catch (System.TypeException e) {
@@ -429,7 +435,8 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 						)
 						.newInstance();
 					if (triggerMetadata.Flow_Name__c != null) {
-						((ta_Flow) triggerAction).flowName = triggerMetadata.Flow_Name__c;
+						((TriggerActionFlow) triggerAction)
+							.flowName = triggerMetadata.Flow_Name__c;
 					}
 					returnValue.add(triggerAction);
 				} catch (System.TypeException e) {
