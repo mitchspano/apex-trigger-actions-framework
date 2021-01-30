@@ -173,7 +173,7 @@ These bypasses will stay active until the transaction is complete or until clear
 
 ## Avoid Repeated Queries
 
-It could be the case that multiple triggered actions on the same sObject require results from a query to implement their logic. In order to avoid making duplicative queries to fetch similar data, use the singleton pattern to fetch and store query results once, but use them in multiple individual action classes.
+It could be the case that multiple triggered actions on the same sObject require results from a query to implement their logic. In order to avoid making duplicative queries to fetch similar data, use the singleton pattern to fetch and store query results once then use them in multiple individual action classes.
 
 ```java
 public class ta_Opportunity_Queries {
@@ -213,6 +213,10 @@ public class ta_Opportunity_Queries {
 }
 
 ```
+
+Now configure the queries to be the first action to be executed within the given context, and the results will be available for any subsequent triggered action.
+
+![Query Setup](images/queriesSetup.png)
 
 ```java
 public class ta_Opportunity_StandardizeName implements TriggerAction.BeforeInsert {
