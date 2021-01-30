@@ -51,13 +51,13 @@ This allows us to use custom metadata to configure a few things from the setup m
 
 The setup menu provides a consolidated view of all of the actions that are executed when a record is inserted, updated, deleted, or undeleted.
 
-![Lightning Page](images/sObjectTriggerSettings.gif)
+![Setup Menu](images/sObjectTriggerSettings.gif)
 
 The `MetadataTriggerHandler` class fetches all Trigger Action metadata that is configured in the org, and dynamically creates an instance of an object which implements a `TriggerAction` interface and casts it to the appropriate interface as specified in the metadata, then calls their respective context methods in the order specified.
 
 Now, as future development work gets completed, we won't need to keep modifying the bodies of our triggerHandler classes, we can just create a new class for each new piece of functionality that we want and configure those to run in a specified order within a given context.
 
-![Lightning Page](images/newTriggerAction.gif)
+![Add an Action](images/newTriggerAction.gif)
 
 Note that if an Apex class is specified in metadata and it does not exist or does not implement the correct interface, a runtime error will occur.
 
@@ -80,6 +80,28 @@ With this multiplicity of Apex classes, it would be wise to follow a naming conv
   "sourceApiVersion": "50.0"
 }
 ```
+
+## Support for Flows
+
+The trigger action framework can also allow you to invoke a flow by name, and determine the order of the flow's execution amongst other trigger actions in a given trigger context.
+
+To make your flows usable, they must be auto-launched flows and you need to create the following flow resource variables depending on which context the flow is meant to be called in:
+
+| Variable Name    | Variable Type     | Available for Input | Available for Output | Description                                                     |
+| ---------------- | ----------------- | ------------------- | -------------------- | --------------------------------------------------------------- |
+| newList          | Record Collection | yes                 | no                   | Used to store the Trigger.new records                           |
+| oldList          | Record Collection | yes                 | no                   | Used to store the Trigger.old records                           |
+| newListAfterFlow | Record Collection | no                  | yes                  | Used to apply record values back during before insert or update |
+
+You can use the `ta_IsRecordChanged_Invc` invocable action to get the old version of a record and see which values have changed. In order to modify field values before insert or update, we must assign all records back to the `newListAfterFlow` collection variable.
+
+Here is an example of an auto-launched flow that checks if a Case's status has changed and if so it sets the Case's description to a default value.
+
+![Sample Flow](images/sampleFlow.png)
+
+To enable this flow, simply insert a trigger action record with Apex Class Name equal to "ta_Flow" and set the Flow Name field with the API name of the flow itself.
+
+![Flow Trigger Action](images/flowTriggerAction.png)
 
 ## Recursion Prevention
 
@@ -121,9 +143,9 @@ You can also bypass execution on either an entire sObject, or for a specific act
 
 To bypass from the setup menu, simply navigate to the sObject Trigger Setting or Trigger Action metadata record you are interested in and check the Bypass Execution checkbox.
 
-![Lightning Page](images/setupMenuBypassSObject.png)
+![Bypass Object](images/setupMenuBypassSObject.png)
 
-![Lightning Page](images/setupMenuBypassAction.png)
+![Bypass Action](images/setupMenuBypassAction.png)
 
 These bypasses will stay active until the checkbox is unchecked.
 

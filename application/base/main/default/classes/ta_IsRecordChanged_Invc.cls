@@ -14,7 +14,7 @@
    limitations under the License.
  */
 
-global class ta_Flow_Utilities {
+global class ta_IsRecordChanged_Invc {
 	@InvocableMethod
 	global static List<sObject> getOldRecord(List<getOldRecordRequest> request) {
 		if (request.isEmpty() || request.size() > 1) {
@@ -38,6 +38,6 @@ global class ta_Flow_Utilities {
 	@testVisible
 	private static final String OLD_RECORD_NOT_FOUND = 'An old version of the record cannot be identified in the oldList';
 	@testVisible
-	private static final String INVALID_REQUEST = 'You can only pass one getOldRecordRequest into ta_Flow_Utilities.getOldRecord()';
+	private static final String INVALID_REQUEST = 'You can only pass one getOldRecordRequest into ta_IsRecordChanged_Invc.getOldRecord()';
 	class ta_Flow_Exception extends Exception{}
 }
