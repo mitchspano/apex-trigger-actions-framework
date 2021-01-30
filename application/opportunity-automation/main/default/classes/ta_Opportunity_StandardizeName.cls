@@ -1,10 +1,9 @@
 public class ta_Opportunity_StandardizeName implements TriggerAction.BeforeInsert {
 	public void beforeInsert(List<Opportunity> newList) {
-		Map<Id, Account> populatedNewMap = OpportunityTriggerQueries.getInstance()
-			.oppIdToAccount;
-		system.debug('populatedNewMap: ' + populatedNewMap);
+		Map<Id, Account> accountIdToAccount = ta_Opportunity_Queries.getInstance()
+			.beforeAccountMap;
 		for (Opportunity myOpp : newList) {
-			String accountName = populatedNewMap.get(myOpp.Id)?.Name;
+			String accountName = accountIdToAccount.get(myOpp.AccountId)?.Name;
 			myOpp.Name = accountName != null
 				? accountName + ' | ' + myOpp.Name
 				: myOpp.Name;

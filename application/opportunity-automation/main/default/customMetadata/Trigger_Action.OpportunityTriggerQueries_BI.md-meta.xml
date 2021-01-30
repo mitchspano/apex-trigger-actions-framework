@@ -4,27 +4,27 @@
     <protected>false</protected>
     <values>
         <field>After_Delete__c</field>
-        <value xsi:nil="true"/>
+        <value xsi:nil="true" />
     </values>
     <values>
         <field>After_Insert__c</field>
-        <value xsi:nil="true"/>
+        <value xsi:nil="true" />
     </values>
     <values>
         <field>After_Undelete__c</field>
-        <value xsi:nil="true"/>
+        <value xsi:nil="true" />
     </values>
     <values>
         <field>After_Update__c</field>
-        <value xsi:nil="true"/>
+        <value xsi:nil="true" />
     </values>
     <values>
         <field>Apex_Class_Name__c</field>
-        <value xsi:type="xsd:string">OpportunityTriggerQueries.BeforeInsert</value>
+        <value xsi:type="xsd:string">ta_Opportunity_Queries.Service</value>
     </values>
     <values>
         <field>Before_Delete__c</field>
-        <value xsi:nil="true"/>
+        <value xsi:nil="true" />
     </values>
     <values>
         <field>Before_Insert__c</field>
@@ -32,7 +32,7 @@
     </values>
     <values>
         <field>Before_Update__c</field>
-        <value xsi:nil="true"/>
+        <value xsi:nil="true" />
     </values>
     <values>
         <field>Bypass_Execution__c</field>

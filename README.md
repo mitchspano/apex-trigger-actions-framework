@@ -93,7 +93,7 @@ To make your flows usable, they must be auto-launched flows and you need to crea
 | oldList          | Record Collection | yes                 | no                   | Used to store the Trigger.old records                           |
 | newListAfterFlow | Record Collection | no                  | yes                  | Used to apply record values back during before insert or update |
 
-You can use the `OldRecordFlowService` invocable action to get the old version of a record and see which values have changed. In order to modify field values before insert or update, we must assign all records back to the `newListAfterFlow` collection variable.
+You can use the `TriggerActionFlow.getOldRecord` invocable method to get the old version of a record and see which values have changed. In order to modify field values before insert or update, we must assign all records back to the `newListAfterFlow` collection variable.
 
 Here is an example of an auto-launched flow that checks if a Case's status has changed and if so it sets the Case's description to a default value.
 
@@ -170,6 +170,65 @@ public void insertOpportunitiesNoRules(List<Opportunity> opportunitiesToInsert) 
 ```
 
 These bypasses will stay active until the transaction is complete or until cleared using the `clearBypass` or `clearAllBypasses` methods in the `TriggerBase` and `MetadataTriggerHandler` classes.
+
+## Avoid Repeated Queries
+
+It could be the case that multiple triggered actions on the same sObject require results from a query to implement their logic. In order to avoid making duplicative queries to fetch similar data, use the singleton pattern to fetch and store query results once, but use them in multiple individual action classes.
+
+```java
+public class ta_Opportunity_Queries {
+	private static ta_Opportunity_Queries instance;
+
+	private ta_Opportunity_Queries() {
+	}
+
+	public static ta_Opportunity_Queries getInstance() {
+		if (ta_Opportunity_Queries.instance == null) {
+			ta_Opportunity_Queries.instance = new ta_Opportunity_Queries();
+		}
+		return ta_Opportunity_Queries.instance;
+	}
+
+	public Map<Id, Account> beforeAccountMap { get; private set; }
+
+	public class Service implements TriggerAction.BeforeInsert {
+		public void beforeInsert(List<Opportunity> newList) {
+			ta_Opportunity_Queries.getInstance().beforeAccountMap = getAccountMapFromOpportunities(
+				newList
+			);
+		}
+
+		private Map<Id, Account> getAccountMapFromOpportunities(
+			List<Opportunity> newList
+		) {
+			Set<Id> accountIds = new Set<Id>();
+			for (Opportunity myOpp : newList) {
+				accountIds.add(myOpp.AccountId);
+			}
+			return new Map<Id, Account>(
+				[SELECT Id, Name FROM Account WHERE Id IN :accountIds]
+			);
+		}
+	}
+}
+
+```
+
+```java
+public class ta_Opportunity_StandardizeName implements TriggerAction.BeforeInsert {
+	public void beforeInsert(List<Opportunity> newList) {
+		Map<Id, Account> accountIdToAccount = ta_Opportunity_Queries.getInstance()
+			.beforeAccountMap;
+		for (Opportunity myOpp : newList) {
+			String accountName = accountIdToAccount.get(myOpp.AccountId)?.Name;
+			myOpp.Name = accountName != null
+				? accountName + ' | ' + myOpp.Name
+				: myOpp.Name;
+		}
+	}
+}
+
+```
 
 ## Use of Trigger Maps
 
