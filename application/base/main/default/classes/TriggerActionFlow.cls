@@ -30,22 +30,26 @@ public class TriggerActionFlow implements TriggerAction.BeforeInsert, TriggerAct
 	private static final String INVALID_REQUEST = 'You can only pass one getOldRecordRequest into TriggerActionFlow.getOldRecord()';
 
 	@InvocableMethod
-	public static List<sObject> getOldRecord(List<getOldRecordRequest> request) {
+	public static List<sObject> getOldRecord(List<OldRecordRequest> request) {
 		if (request.isEmpty() || request.size() > 1) {
 			throw new TriggerActionFlowException(INVALID_REQUEST);
 		}
-		Map<Id, sObject> oldMap = new Map<Id, sObject>(request[0].oldList);
-		if (!oldMap.containsKey(request[0].currentRecord.Id)) {
-			throw new TriggerActionFlowException(OLD_RECORD_NOT_FOUND);
+		List<sObject> result;
+		if (request[0].currentRecord != null) {
+			Map<Id, sObject> oldMap = new Map<Id, sObject>(request[0].oldList);
+			if (!oldMap.containsKey(request[0].currentRecord.Id)) {
+				throw new TriggerActionFlowException(OLD_RECORD_NOT_FOUND);
+			}
+			result = new List<sObject>{ oldMap.get(request[0].currentRecord.Id) };
 		}
-		return new List<sObject>{ oldMap.get(request[0].currentRecord.Id) };
+		return result;
 	}
 
 	public void beforeInsert(List<SObject> newList) {
 		checkFlowName();
 		Flow.Interview myFlow = Flow.Interview.createInterview(
 			flowName,
-			this.getFlowInput(newList, null)
+			getFlowInput(newList, null)
 		);
 		myFlow.start();
 		applyFlowValues(
@@ -58,7 +62,7 @@ public class TriggerActionFlow implements TriggerAction.BeforeInsert, TriggerAct
 		checkFlowName();
 		Flow.Interview myFlow = Flow.Interview.createInterview(
 			flowName,
-			this.getFlowInput(newList, null)
+			getFlowInput(newList, null)
 		);
 		myFlow.start();
 	}
@@ -73,7 +77,7 @@ public class TriggerActionFlow implements TriggerAction.BeforeInsert, TriggerAct
 		}
 		Flow.Interview myFlow = Flow.Interview.createInterview(
 			flowName,
-			this.getFlowInput(recordsNotYetProcessed, oldList)
+			getFlowInput(recordsNotYetProcessed, oldList)
 		);
 		myFlow.start();
 		applyFlowValues(
@@ -92,7 +96,7 @@ public class TriggerActionFlow implements TriggerAction.BeforeInsert, TriggerAct
 		}
 		Flow.Interview myFlow = Flow.Interview.createInterview(
 			flowName,
-			this.getFlowInput(recordsNotYetProcessed, oldList)
+			getFlowInput(recordsNotYetProcessed, oldList)
 		);
 		myFlow.start();
 	}
@@ -101,7 +105,7 @@ public class TriggerActionFlow implements TriggerAction.BeforeInsert, TriggerAct
 		checkFlowName();
 		Flow.Interview myFlow = Flow.Interview.createInterview(
 			flowName,
-			this.getFlowInput(null, oldList)
+			getFlowInput(null, oldList)
 		);
 		myFlow.start();
 	}
@@ -110,7 +114,7 @@ public class TriggerActionFlow implements TriggerAction.BeforeInsert, TriggerAct
 		checkFlowName();
 		Flow.Interview myFlow = Flow.Interview.createInterview(
 			flowName,
-			this.getFlowInput(null, oldList)
+			getFlowInput(null, oldList)
 		);
 		myFlow.start();
 	}
@@ -119,7 +123,7 @@ public class TriggerActionFlow implements TriggerAction.BeforeInsert, TriggerAct
 		checkFlowName();
 		Flow.Interview myFlow = Flow.Interview.createInterview(
 			flowName,
-			this.getFlowInput(newList, null)
+			getFlowInput(newList, null)
 		);
 		myFlow.start();
 	}
@@ -172,7 +176,7 @@ public class TriggerActionFlow implements TriggerAction.BeforeInsert, TriggerAct
 		}
 	}
 
-	public class getOldRecordRequest {
+	public class OldRecordRequest {
 		@InvocableVariable
 		public sObject currentRecord;
 		@InvocableVariable
