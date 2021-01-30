@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Flow_Name__c</fullName>
+    <description>Enter the name of a flow you would like to execute. The flow name specified must have two resources called &quot;newList&quot; and &quot;oldList&quot; which are collections of sObjects to work properly.</description>
+    <externalId>false</externalId>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <inlineHelpText>Enter the name of a flow you would like to execute. The flow name specified must have two resources called &quot;newList&quot; and &quot;oldList&quot; which are collections of sObjects to work properly.</inlineHelpText>
+    <label>Flow Name</label>
+    <length>255</length>
+    <required>false</required>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

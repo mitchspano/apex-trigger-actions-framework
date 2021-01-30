@@ -51,13 +51,13 @@ This allows us to use custom metadata to configure a few things from the setup m
 
 The setup menu provides a consolidated view of all of the actions that are executed when a record is inserted, updated, deleted, or undeleted.
 
-![Lightning Page](images/sObjectTriggerSettings.gif)
+![Setup Menu](images/sObjectTriggerSettings.gif)
 
 The `MetadataTriggerHandler` class fetches all Trigger Action metadata that is configured in the org, and dynamically creates an instance of an object which implements a `TriggerAction` interface and casts it to the appropriate interface as specified in the metadata, then calls their respective context methods in the order specified.
 
 Now, as future development work gets completed, we won't need to keep modifying the bodies of our triggerHandler classes, we can just create a new class for each new piece of functionality that we want and configure those to run in a specified order within a given context.
 
-![Lightning Page](images/newTriggerAction.gif)
+![Add an Action](images/newTriggerAction.gif)
 
 Note that if an Apex class is specified in metadata and it does not exist or does not implement the correct interface, a runtime error will occur.
 
@@ -80,6 +80,28 @@ With this multiplicity of Apex classes, it would be wise to follow a naming conv
   "sourceApiVersion": "50.0"
 }
 ```
+
+## Support for Flows
+
+The trigger action framework can also allow you to invoke a flow by name, and determine the order of the flow's execution amongst other trigger actions in a given trigger context.
+
+To make your flows usable, they must be auto-launched flows and you need to create the following flow resource variables depending on which context the flow is meant to be called in:
+
+| Variable Name    | Variable Type     | Available for Input | Available for Output | Description                                                     |
+| ---------------- | ----------------- | ------------------- | -------------------- | --------------------------------------------------------------- |
+| newList          | Record Collection | yes                 | no                   | Used to store the Trigger.new records                           |
+| oldList          | Record Collection | yes                 | no                   | Used to store the Trigger.old records                           |
+| newListAfterFlow | Record Collection | no                  | yes                  | Used to apply record values back during before insert or update |
+
+You can use the `TriggerActionFlow.getOldRecord` invocable method to get the old version of a record and see which values have changed. In order to modify field values before insert or update, we must assign all records back to the `newListAfterFlow` collection variable.
+
+Here is an example of an auto-launched flow that checks if a Case's status has changed and if so it sets the Case's description to a default value.
+
+![Sample Flow](images/sampleFlow.png)
+
+To enable this flow, simply insert a trigger action record with Apex Class Name equal to "TriggerActionFlow" and set the Flow Name field with the API name of the flow itself.
+
+![Flow Trigger Action](images/flowTriggerAction.png)
 
 ## Recursion Prevention
 
@@ -121,9 +143,9 @@ You can also bypass execution on either an entire sObject, or for a specific act
 
 To bypass from the setup menu, simply navigate to the sObject Trigger Setting or Trigger Action metadata record you are interested in and check the Bypass Execution checkbox.
 
-![Lightning Page](images/setupMenuBypassSObject.png)
+![Bypass Object](images/setupMenuBypassSObject.png)
 
-![Lightning Page](images/setupMenuBypassAction.png)
+![Bypass Action](images/setupMenuBypassAction.png)
 
 These bypasses will stay active until the checkbox is unchecked.
 
@@ -148,6 +170,69 @@ public void insertOpportunitiesNoRules(List<Opportunity> opportunitiesToInsert) 
 ```
 
 These bypasses will stay active until the transaction is complete or until cleared using the `clearBypass` or `clearAllBypasses` methods in the `TriggerBase` and `MetadataTriggerHandler` classes.
+
+## Avoid Repeated Queries
+
+It could be the case that multiple triggered actions on the same sObject require results from a query to implement their logic. In order to avoid making duplicative queries to fetch similar data, use the singleton pattern to fetch and store query results once then use them in multiple individual action classes.
+
+```java
+public class ta_Opportunity_Queries {
+  private static ta_Opportunity_Queries instance;
+
+  private ta_Opportunity_Queries() {
+  }
+
+  public static ta_Opportunity_Queries getInstance() {
+    if (ta_Opportunity_Queries.instance == null) {
+      ta_Opportunity_Queries.instance = new ta_Opportunity_Queries();
+    }
+    return ta_Opportunity_Queries.instance;
+  }
+
+  public Map<Id, Account> beforeAccountMap { get; private set; }
+
+  public class Service implements TriggerAction.BeforeInsert {
+    public void beforeInsert(List<Opportunity> newList) {
+      ta_Opportunity_Queries.getInstance().beforeAccountMap = getAccountMapFromOpportunities(
+        newList
+      );
+    }
+
+    private Map<Id, Account> getAccountMapFromOpportunities(
+      List<Opportunity> newList
+    ) {
+      Set<Id> accountIds = new Set<Id>();
+      for (Opportunity myOpp : newList) {
+        accountIds.add(myOpp.AccountId);
+      }
+      return new Map<Id, Account>(
+        [SELECT Id, Name FROM Account WHERE Id IN :accountIds]
+      );
+    }
+  }
+}
+
+```
+
+Now configure the queries to be the first action to be executed within the given context, and the results will be available for any subsequent triggered action.
+
+![Query Setup](images/queriesSetup.png)
+
+```java
+public class ta_Opportunity_StandardizeName implements TriggerAction.BeforeInsert {
+  public void beforeInsert(List<Opportunity> newList) {
+    Map<Id, Account> accountIdToAccount = ta_Opportunity_Queries.getInstance()
+      .beforeAccountMap;
+    for (Opportunity myOpp : newList) {
+      String accountName = accountIdToAccount.get(myOpp.AccountId)?.Name;
+      myOpp.Name = accountName != null
+        ? accountName + ' | ' + myOpp.Name
+        : myOpp.Name;
+    }
+  }
+}
+
+```
 
 ## Use of Trigger Maps
 

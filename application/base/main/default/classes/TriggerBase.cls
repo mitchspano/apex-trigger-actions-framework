@@ -20,9 +20,9 @@ public virtual class TriggerBase {
 	@TestVisible
 	private static Set<String> bypassedObjects;
 	@TestVisible
-	private static Set<Id> idsProcessedBeforeUpdate;
+	public static Set<Id> idsProcessedBeforeUpdate {get; private set;}
 	@TestVisible
-	private static Set<Id> idsProcessedAfterUpdate;
+	public static Set<Id> idsProcessedAfterUpdate {get; private set;}
 
 	static {
 		bypassedObjects = new Set<String>();

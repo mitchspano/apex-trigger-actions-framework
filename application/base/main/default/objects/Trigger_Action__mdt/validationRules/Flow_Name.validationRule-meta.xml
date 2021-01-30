@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Flow_Name</fullName>
+    <active>true</active>
+    <errorConditionFormula>NOT(ISBLANK( Flow_Name__c ))  &amp;&amp;  Apex_Class_Name__c != &quot;TriggerActionFlow&quot;</errorConditionFormula>
+    <errorMessage>The Apex Class Name must equal &quot;TriggerActionFlow&quot; if the Flow Name is populated.</errorMessage>
+</ValidationRule>
