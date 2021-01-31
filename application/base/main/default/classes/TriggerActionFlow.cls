@@ -28,6 +28,8 @@ public class TriggerActionFlow implements TriggerAction.BeforeInsert, TriggerAct
 	private static final String OLD_RECORD_NOT_FOUND = 'An old version of the record cannot be identified in the oldList';
 	@testVisible
 	private static final String INVALID_REQUEST = 'You can only pass one getOldRecordRequest into TriggerActionFlow.getOldRecord()';
+	@testVisible
+	private static final String NEW_LIST_AFTER_FLOW_NOT_POPULATED_CORRECTLY = 'You must pass ALL records back to the newListAfterFlow in order to apply values to record before insert/update';
 
 	@InvocableMethod
 	public static List<sObject> getOldRecord(List<OldRecordRequest> request) {
@@ -152,7 +154,17 @@ public class TriggerActionFlow implements TriggerAction.BeforeInsert, TriggerAct
 		List<sObject> newList,
 		List<sObject> newListAfterFlow
 	) {
-		if (!newList.isEmpty()) {
+		if (
+			newList != null &&
+			!newList.isEmpty() &&
+			newListAfterFlow != null &&
+			!newListAfterFlow.isEmpty()
+		) {
+			if (newList.size() != newListAfterFlow.size()) {
+				throw new TriggerActionFlowException(
+					NEW_LIST_AFTER_FLOW_NOT_POPULATED_CORRECTLY
+				);
+			}
 			List<String> editableFields = new List<String>();
 			for (
 				Schema.SObjectField fieldRef : newList[0]
