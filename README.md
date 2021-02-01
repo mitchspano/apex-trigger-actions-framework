@@ -171,6 +171,18 @@ public void insertOpportunitiesNoRules(List<Opportunity> opportunitiesToInsert) 
 
 These bypasses will stay active until the transaction is complete or until cleared using the `clearBypass` or `clearAllBypasses` methods in the `TriggerBase` and `MetadataTriggerHandler` classes.
 
+### Bypass Execution with Permissions
+
+Both the `sObject_Trigger_Setting__mdt` and the `Trigger_Action__mdt` have fields called `Bypass_Permission__c` and `Required_Permission__c`. Both of these fields are optional, but they can control execution flow.
+
+#### Bypass Permission
+
+Developer can enter the API name of a permission in the `Bypass_Permission__c` field. If this field has a value, then the triggers on this object will be bypassed if the running user has the custom permission identified. This can be helpful when assigned to an integration service-account user to facilitate large data loads, or when assigned to a system administrator for a one-time data load activity.
+
+#### Required Permission
+
+Developer can enter the API name of a permission in the `Required_Permission__c` field. If this field has a value, then the triggers on this object will only exectute if the running user has the custom permission identified. This can be allow for new functionality to be released to a subset of users.
+
 ## Avoid Repeated Queries
 
 It could be the case that multiple triggered actions on the same sObject require results from a query to implement their logic. In order to avoid making duplicative queries to fetch similar data, use the singleton pattern to fetch and store query results once then use them in multiple individual action classes.

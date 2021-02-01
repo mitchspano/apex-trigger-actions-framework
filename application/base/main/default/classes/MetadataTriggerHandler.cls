@@ -72,8 +72,15 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 					[
 						SELECT
 							Id,
+							Bypass_Permission__c,
+							Required_Permission__c,
 							(
-								SELECT Apex_Class_Name__c, Order__c, Flow_Name__c
+								SELECT
+									Apex_Class_Name__c,
+									Order__c,
+									Flow_Name__c,
+									Bypass_Permission__c,
+									Required_Permission__c
 								FROM Before_Insert_Actions__r
 								WHERE
 									Bypass_Execution__c = FALSE
@@ -81,7 +88,12 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 								ORDER BY Order__c ASC
 							),
 							(
-								SELECT Apex_Class_Name__c, Order__c, Flow_Name__c
+								SELECT
+									Apex_Class_Name__c,
+									Order__c,
+									Flow_Name__c,
+									Bypass_Permission__c,
+									Required_Permission__c
 								FROM After_Insert_Actions__r
 								WHERE
 									Bypass_Execution__c = FALSE
@@ -89,7 +101,12 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 								ORDER BY Order__c ASC
 							),
 							(
-								SELECT Apex_Class_Name__c, Order__c, Flow_Name__c
+								SELECT
+									Apex_Class_Name__c,
+									Order__c,
+									Flow_Name__c,
+									Bypass_Permission__c,
+									Required_Permission__c
 								FROM Before_Update_Actions__r
 								WHERE
 									Bypass_Execution__c = FALSE
@@ -97,7 +114,12 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 								ORDER BY Order__c ASC
 							),
 							(
-								SELECT Apex_Class_Name__c, Order__c, Flow_Name__c
+								SELECT
+									Apex_Class_Name__c,
+									Order__c,
+									Flow_Name__c,
+									Bypass_Permission__c,
+									Required_Permission__c
 								FROM After_Update_Actions__r
 								WHERE
 									Bypass_Execution__c = FALSE
@@ -105,7 +127,12 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 								ORDER BY Order__c ASC
 							),
 							(
-								SELECT Apex_Class_Name__c, Order__c, Flow_Name__c
+								SELECT
+									Apex_Class_Name__c,
+									Order__c,
+									Flow_Name__c,
+									Bypass_Permission__c,
+									Required_Permission__c
 								FROM Before_Delete_Actions__r
 								WHERE
 									Bypass_Execution__c = FALSE
@@ -113,7 +140,12 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 								ORDER BY Order__c ASC
 							),
 							(
-								SELECT Apex_Class_Name__c, Order__c, Flow_Name__c
+								SELECT
+									Apex_Class_Name__c,
+									Order__c,
+									Flow_Name__c,
+									Bypass_Permission__c,
+									Required_Permission__c
 								FROM After_Delete_Actions__r
 								WHERE
 									Bypass_Execution__c = FALSE
@@ -121,7 +153,12 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 								ORDER BY Order__c ASC
 							),
 							(
-								SELECT Apex_Class_Name__c, Order__c, Flow_Name__c
+								SELECT
+									Apex_Class_Name__c,
+									Order__c,
+									Flow_Name__c,
+									Bypass_Permission__c,
+									Required_Permission__c
 								FROM After_Undelete_Actions__r
 								WHERE
 									Bypass_Execution__c = FALSE
@@ -132,9 +169,14 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 						WHERE
 							SObject__r.DeveloperName = :this.sObjectName
 							AND Bypass_Execution__c = FALSE
+						LIMIT 1
 					]
 				);
+				if ((!actionMetadata.isEmpty()) && !shouldExecute(actionMetadata[0])) {
+					actionMetadata = new List<sObject_Trigger_Setting__mdt>();
+				}
 			}
+
 			return actionMetadata;
 		}
 		set;
@@ -144,9 +186,17 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 	private List<Trigger_Action__mdt> beforeInsertActionMetadata {
 		get {
 			if (beforeInsertActionMetadata == null) {
-				beforeInsertActionMetadata = this.actionMetadata.isEmpty()
-					? new List<Trigger_Action__mdt>()
-					: this.actionMetadata[0].Before_Insert_Actions__r;
+				beforeInsertActionMetadata = new List<Trigger_Action__mdt>();
+				if (!this.actionMetadata.isEmpty()) {
+					for (
+						Trigger_Action__mdt action : this.actionMetadata[0]
+							.Before_Insert_Actions__r
+					) {
+						if (shouldExecute(action)) {
+							beforeInsertActionMetadata.add(action);
+						}
+					}
+				}
 			}
 			return beforeInsertActionMetadata;
 		}
@@ -191,9 +241,17 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 	private List<Trigger_Action__mdt> afterInsertActionMetadata {
 		get {
 			if (afterInsertActionMetadata == null) {
-				afterInsertActionMetadata = this.actionMetadata.isEmpty()
-					? new List<Trigger_Action__mdt>()
-					: this.actionMetadata[0].After_Insert_Actions__r;
+				afterInsertActionMetadata = new List<Trigger_Action__mdt>();
+				if (!this.actionMetadata.isEmpty()) {
+					for (
+						Trigger_Action__mdt action : this.actionMetadata[0]
+							.After_Insert_Actions__r
+					) {
+						if (shouldExecute(action)) {
+							afterInsertActionMetadata.add(action);
+						}
+					}
+				}
 			}
 			return afterInsertActionMetadata;
 		}
@@ -236,9 +294,17 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 	private List<Trigger_Action__mdt> beforeUpdateActionMetadata {
 		get {
 			if (beforeUpdateActionMetadata == null) {
-				beforeUpdateActionMetadata = this.actionMetadata.isEmpty()
-					? new List<Trigger_Action__mdt>()
-					: this.actionMetadata[0].Before_Update_Actions__r;
+				beforeUpdateActionMetadata = new List<Trigger_Action__mdt>();
+				if (!this.actionMetadata.isEmpty()) {
+					for (
+						Trigger_Action__mdt action : this.actionMetadata[0]
+							.Before_Update_Actions__r
+					) {
+						if (shouldExecute(action)) {
+							beforeUpdateActionMetadata.add(action);
+						}
+					}
+				}
 			}
 			return beforeUpdateActionMetadata;
 		}
@@ -281,9 +347,17 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 	private List<Trigger_Action__mdt> afterUpdateActionMetadata {
 		get {
 			if (afterUpdateActionMetadata == null) {
-				afterUpdateActionMetadata = this.actionMetadata.isEmpty()
-					? new List<Trigger_Action__mdt>()
-					: this.actionMetadata[0].After_Update_Actions__r;
+				afterUpdateActionMetadata = new List<Trigger_Action__mdt>();
+				if (!this.actionMetadata.isEmpty()) {
+					for (
+						Trigger_Action__mdt action : this.actionMetadata[0]
+							.After_Update_Actions__r
+					) {
+						if (shouldExecute(action)) {
+							afterUpdateActionMetadata.add(action);
+						}
+					}
+				}
 			}
 			return afterUpdateActionMetadata;
 		}
@@ -326,9 +400,17 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 	private List<Trigger_Action__mdt> beforeDeleteActionMetadata {
 		get {
 			if (beforeDeleteActionMetadata == null) {
-				beforeDeleteActionMetadata = this.actionMetadata.isEmpty()
-					? new List<Trigger_Action__mdt>()
-					: this.actionMetadata[0].Before_Delete_Actions__r;
+				beforeDeleteActionMetadata = new List<Trigger_Action__mdt>();
+				if (!this.actionMetadata.isEmpty()) {
+					for (
+						Trigger_Action__mdt action : this.actionMetadata[0]
+							.Before_Delete_Actions__r
+					) {
+						if (shouldExecute(action)) {
+							beforeDeleteActionMetadata.add(action);
+						}
+					}
+				}
 			}
 			return beforeDeleteActionMetadata;
 		}
@@ -371,9 +453,17 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 	private List<Trigger_Action__mdt> afterDeleteActionMetadata {
 		get {
 			if (afterDeleteActionMetadata == null) {
-				afterDeleteActionMetadata = this.actionMetadata.isEmpty()
-					? new List<Trigger_Action__mdt>()
-					: this.actionMetadata[0].After_Delete_Actions__r;
+				afterDeleteActionMetadata = new List<Trigger_Action__mdt>();
+				if (!this.actionMetadata.isEmpty()) {
+					for (
+						Trigger_Action__mdt action : this.actionMetadata[0]
+							.After_Delete_Actions__r
+					) {
+						if (shouldExecute(action)) {
+							afterDeleteActionMetadata.add(action);
+						}
+					}
+				}
 			}
 			return afterDeleteActionMetadata;
 		}
@@ -455,6 +545,22 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 			}
 			return returnValue;
 		}
+	}
+
+	@TestVisible
+	private boolean shouldExecute(Trigger_Action__mdt action) {
+		return !((action.Bypass_Permission__c != null &&
+		FeatureManagement.checkPermission(action.Bypass_Permission__c)) ||
+		(action.Required_Permission__c != null &&
+		!FeatureManagement.checkPermission(action.Required_Permission__c)));
+	}
+
+	@TestVisible
+	private boolean shouldExecute(sObject_Trigger_Setting__mdt setting) {
+		return !((setting.Bypass_Permission__c != null &&
+		FeatureManagement.checkPermission(setting.Bypass_Permission__c)) ||
+		(setting.Required_Permission__c != null &&
+		!FeatureManagement.checkPermission(setting.Required_Permission__c)));
 	}
 
 	private void handleException(
