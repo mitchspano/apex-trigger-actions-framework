@@ -177,11 +177,11 @@ Both the `sObject_Trigger_Setting__mdt` and the `Trigger_Action__mdt` have field
 
 #### Bypass Permission
 
-Developer can enter the API name of a permission in the `Bypass_Permission__c` field. If this field has a value, then the trigger/actions on this object will be bypassed if the running user has the custom permission identified. This can be helpful when assigned to an integration service-account user to facilitate large data loads, or when assigned to a system administrator for a one-time data load activity.
+Developer can enter the API name of a permission in the `Bypass_Permission__c` field. If this field has a value, then the trigger/action will be bypassed if the running user has the custom permission identified. This can be helpful when assigned to an integration service-account user to facilitate large data loads, or when assigned to a system administrator for a one-time data load activity.
 
 #### Required Permission
 
-Developer can enter the API name of a permission in the `Required_Permission__c` field. If this field has a value, then the trigger/actions on this object will only exectute if the running user has the custom permission identified. This can be allow for new functionality to be released to a subset of users.
+Developer can enter the API name of a permission in the `Required_Permission__c` field. If this field has a value, then the trigger/action will only exectute if the running user has the custom permission identified. This can be allow for new functionality to be released to a subset of users.
 
 ## Avoid Repeated Queries
 
