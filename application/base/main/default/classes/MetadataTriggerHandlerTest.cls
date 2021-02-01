@@ -935,7 +935,7 @@ private class MetadataTriggerHandlerTest {
 	@IsTest
 	private static void shouldExecute_action_bypass() {
 		System.assertEquals(
-			false,
+			true,
 			new MetadataTriggerHandler()
 				.shouldExecute(
 					new Trigger_Action__mdt(Bypass_Permission__c = BYPASS_PERMISSION)
@@ -967,7 +967,7 @@ private class MetadataTriggerHandlerTest {
 	@IsTest
 	private static void shouldExecute_setting_bypass() {
 		System.assertEquals(
-			false,
+			true,
 			new MetadataTriggerHandler()
 				.shouldExecute(
 					new sObject_Trigger_Setting__mdt(
