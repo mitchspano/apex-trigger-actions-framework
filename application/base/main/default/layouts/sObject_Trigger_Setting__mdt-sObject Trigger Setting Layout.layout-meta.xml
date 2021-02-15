@@ -67,9 +67,9 @@
         <detailHeading>true</detailHeading>
         <editHeading>false</editHeading>
         <label>Custom Links</label>
-        <layoutColumns/>
-        <layoutColumns/>
-        <layoutColumns/>
+        <layoutColumns />
+        <layoutColumns />
+        <layoutColumns />
         <style>CustomLinks</style>
     </layoutSections>
     <relatedLists>
@@ -85,36 +85,48 @@
         <fields>Description__c</fields>
         <fields>Order__c</fields>
         <relatedList>Trigger_Action__mdt.After_Insert__c</relatedList>
+        <sortField>Order__c</sortField>
+        <sortOrder>Asc</sortOrder>
     </relatedLists>
     <relatedLists>
         <fields>DeveloperName</fields>
         <fields>Description__c</fields>
         <fields>Order__c</fields>
         <relatedList>Trigger_Action__mdt.Before_Update__c</relatedList>
+        <sortField>Order__c</sortField>
+        <sortOrder>Asc</sortOrder>
     </relatedLists>
     <relatedLists>
         <fields>DeveloperName</fields>
         <fields>Description__c</fields>
         <fields>Order__c</fields>
         <relatedList>Trigger_Action__mdt.After_Update__c</relatedList>
+        <sortField>Order__c</sortField>
+        <sortOrder>Asc</sortOrder>
     </relatedLists>
     <relatedLists>
         <fields>DeveloperName</fields>
         <fields>Description__c</fields>
         <fields>Order__c</fields>
         <relatedList>Trigger_Action__mdt.Before_Delete__c</relatedList>
+        <sortField>Order__c</sortField>
+        <sortOrder>Asc</sortOrder>
     </relatedLists>
     <relatedLists>
         <fields>DeveloperName</fields>
         <fields>Description__c</fields>
         <fields>Order__c</fields>
         <relatedList>Trigger_Action__mdt.After_Delete__c</relatedList>
+        <sortField>Order__c</sortField>
+        <sortOrder>Asc</sortOrder>
     </relatedLists>
     <relatedLists>
         <fields>DeveloperName</fields>
         <fields>Description__c</fields>
         <fields>Order__c</fields>
         <relatedList>Trigger_Action__mdt.After_Undelete__c</relatedList>
+        <sortField>Order__c</sortField>
+        <sortOrder>Asc</sortOrder>
     </relatedLists>
     <showEmailCheckbox>false</showEmailCheckbox>
     <showHighlightsPanel>false</showHighlightsPanel>
