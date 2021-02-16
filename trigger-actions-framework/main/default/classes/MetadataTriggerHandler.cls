@@ -82,6 +82,13 @@ public with sharing class MetadataTriggerHandler extends TriggerBase implements 
 			list<Trigger_Action__mdt> result = new List<Trigger_Action__mdt>();
 			Set<String> bypassedActions = MetadataTriggerHandler.bypassedActions;
 			String sObjectName = this.sObjectName;
+			String sObjectLocalName = sObjectName;
+			List<String> split = sObjectName.split('__');
+			String namespace;
+			if (split.size() > 2) {
+				namespace = split[0];
+				sObjectLocalName = sObjectLocalName.replaceFirst(namespace + '__', '');
+			}
 			List<String> queryArray = new List<String>{
 				'SELECT Apex_Class_Name__c,',
 				'Order__c,',
@@ -94,7 +101,8 @@ public with sharing class MetadataTriggerHandler extends TriggerBase implements 
 				'WHERE',
 				'Apex_Class_Name__c NOT IN :bypassedActions',
 				'AND {0}__c != NULL',
-				'AND {0}__r.DeveloperName = :sObjectName',
+				'AND {0}__r.Object_API_Name__c = :sObjectLocalName',
+				'AND {0}__r.Object_Namespace__c = :namespace',
 				'AND {0}__r.Bypass_Execution__c = FALSE',
 				'ORDER BY Order__c ASC'
 			};

@@ -152,18 +152,17 @@ public inherited sharing virtual class TriggerBase {
 	protected String sObjectName {
 		get {
 			if (sObjectName == null) {
-				String name;
 				if (this.TriggerNew != null) {
-					name = this.triggerNew[0].getSObjectType().getDescribe().getName();
+					sObjectName = this.triggerNew[0]
+						.getSObjectType()
+						.getDescribe()
+						.getName();
 				} else {
-					name = this.triggerOld[0].getSObjectType().getDescribe().getName();
+					sObjectName = this.triggerOld[0]
+						.getSObjectType()
+						.getDescribe()
+						.getName();
 				}
-				sObjectName = [
-					SELECT DeveloperName
-					FROM EntityDefinition
-					WHERE QualifiedApiName = :name
-				]
-				.DeveloperName;
 			}
 			return sObjectName;
 		}
