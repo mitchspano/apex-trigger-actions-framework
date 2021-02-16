@@ -1,15 +1,11 @@
 {
-  "packageDirectories": [
-    {
-      "path": "application/base",
-      "default": false
-    },
-    {
-      "path": "application/opportunity-automation",
-      "default": true
-    }
-  ],
-  "namespace": "",
-  "sfdcLoginUrl": "https://login.salesforce.com",
-  "sourceApiVersion": "50.0"
+	"packageDirectories": [
+		{
+			"path": "trigger-actions-framework",
+			"default": true
+		}
+	],
+	"namespace": "",
+	"sfdcLoginUrl": "https://login.salesforce.com",
+	"sourceApiVersion": "50.0"
 }
