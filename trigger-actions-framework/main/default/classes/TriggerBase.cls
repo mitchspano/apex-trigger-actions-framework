@@ -20,9 +20,9 @@ public virtual class TriggerBase {
 	@TestVisible
 	private static Set<String> bypassedObjects;
 	@TestVisible
-	public static Set<Id> idsProcessedBeforeUpdate {get; private set;}
+	public static Set<Id> idsProcessedBeforeUpdate { get; private set; }
 	@TestVisible
-	public static Set<Id> idsProcessedAfterUpdate {get; private set;}
+	public static Set<Id> idsProcessedAfterUpdate { get; private set; }
 
 	static {
 		bypassedObjects = new Set<String>();
@@ -152,17 +152,18 @@ public virtual class TriggerBase {
 	protected String sObjectName {
 		get {
 			if (sObjectName == null) {
+				String name;
 				if (this.TriggerNew != null) {
-					sObjectName = this.triggerNew[0]
-						.getSObjectType()
-						.getDescribe()
-						.getName();
+					name = this.triggerNew[0].getSObjectType().getDescribe().getName();
 				} else {
-					sObjectName = this.triggerOld[0]
-						.getSObjectType()
-						.getDescribe()
-						.getName();
+					name = this.triggerOld[0].getSObjectType().getDescribe().getName();
 				}
+				sObjectName = [
+					SELECT DeveloperName
+					FROM EntityDefinition
+					WHERE QualifiedApiName = :name
+				]
+				.DeveloperName;
 			}
 			return sObjectName;
 		}
