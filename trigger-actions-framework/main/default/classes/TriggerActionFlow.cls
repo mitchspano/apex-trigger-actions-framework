@@ -14,7 +14,7 @@
    limitations under the License.
  */
 
-public class TriggerActionFlow implements TriggerAction.BeforeInsert, TriggerAction.AfterInsert, TriggerAction.BeforeUpdate, TriggerAction.AfterUpdate, TriggerAction.AfterUndelete {
+public inherited sharing class TriggerActionFlow implements TriggerAction.BeforeInsert, TriggerAction.AfterInsert, TriggerAction.BeforeUpdate, TriggerAction.AfterUpdate, TriggerAction.AfterUndelete {
 	public string flowName;
 	@testVisible
 	private static final String INVALID_FLOW_NAME = 'You must provide the name of a flow to execute';

@@ -904,7 +904,6 @@ private class MetadataTriggerHandlerTest {
 		MetadataTriggerHandler handler = new MetadataTriggerHandler();
 		handler.triggerNew = new List<Account>{ myAccount };
 		handler.triggerOld = new List<Account>{ myAccount };
-		System.assertNotEquals(null, handler.actionMetadata);
 		System.assertNotEquals(null, handler.beforeInsertActionMetadata);
 		System.assertNotEquals(null, handler.afterInsertActionMetadata);
 		System.assertNotEquals(null, handler.beforeUpdateActionMetadata);
@@ -912,69 +911,6 @@ private class MetadataTriggerHandlerTest {
 		System.assertNotEquals(null, handler.beforeDeleteActionMetadata);
 		System.assertNotEquals(null, handler.afterDeleteActionMetadata);
 		System.assertNotEquals(null, handler.afterUndeleteActionMetadata);
-	}
-
-	@IsTest
-	private static void shouldExecute_action_default() {
-		System.assertEquals(
-			true,
-			new MetadataTriggerHandler().shouldExecute(new Trigger_Action__mdt())
-		);
-	}
-
-	@IsTest
-	private static void shouldExecute_action_required() {
-		System.assertEquals(
-			false,
-			new MetadataTriggerHandler()
-				.shouldExecute(
-					new Trigger_Action__mdt(Required_Permission__c = REQUIRED_PERMISSION)
-				)
-		);
-	}
-	@IsTest
-	private static void shouldExecute_action_bypass() {
-		System.assertEquals(
-			true,
-			new MetadataTriggerHandler()
-				.shouldExecute(
-					new Trigger_Action__mdt(Bypass_Permission__c = BYPASS_PERMISSION)
-				)
-		);
-	}
-
-	@IsTest
-	private static void shouldExecute_setting_default() {
-		System.assertEquals(
-			true,
-			new MetadataTriggerHandler()
-				.shouldExecute(new sObject_Trigger_Setting__mdt())
-		);
-	}
-
-	@IsTest
-	private static void shouldExecute_setting_required() {
-		System.assertEquals(
-			false,
-			new MetadataTriggerHandler()
-				.shouldExecute(
-					new sObject_Trigger_Setting__mdt(
-						Required_Permission__c = REQUIRED_PERMISSION
-					)
-				)
-		);
-	}
-	@IsTest
-	private static void shouldExecute_setting_bypass() {
-		System.assertEquals(
-			true,
-			new MetadataTriggerHandler()
-				.shouldExecute(
-					new sObject_Trigger_Setting__mdt(
-						Bypass_Permission__c = BYPASS_PERMISSION
-					)
-				)
-		);
 	}
 
 	@IsTest
