@@ -14,12 +14,16 @@
    limitations under the License.
  */
 
-public class MetadataTriggerHandler extends TriggerBase implements TriggerAction.BeforeInsert, TriggerAction.AfterInsert, TriggerAction.BeforeUpdate, TriggerAction.AfterUpdate, TriggerAction.BeforeDelete, TriggerAction.AfterDelete, TriggerAction.AfterUndelete {
+public with sharing class MetadataTriggerHandler extends TriggerBase implements TriggerAction.BeforeInsert, TriggerAction.AfterInsert, TriggerAction.BeforeUpdate, TriggerAction.AfterUpdate, TriggerAction.BeforeDelete, TriggerAction.AfterDelete, TriggerAction.AfterUndelete {
 	@TestVisible
 	private static Set<String> bypassedActions;
+	static Map<String, Boolean> permissionMap;
+	static Map<String, Map<String, List<Trigger_Action__mdt>>> sObjectToContextToActions;
 
 	static {
 		bypassedActions = new Set<String>();
+		permissionMap = new Map<String, Boolean>();
+		sObjectToContextToActions = new Map<String, Map<String, List<Trigger_Action__mdt>>>();
 	}
 
 	public void beforeInsert(List<SObject> newList) {
@@ -64,139 +68,105 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 		}
 	}
 
-	@TestVisible
-	private List<sObject_Trigger_Setting__mdt> actionMetadata {
-		get {
-			if (actionMetadata == null) {
-				actionMetadata = new List<sObject_Trigger_Setting__mdt>(
-					[
-						SELECT
-							Id,
-							Bypass_Permission__c,
-							Required_Permission__c,
-							(
-								SELECT
-									Apex_Class_Name__c,
-									Order__c,
-									Flow_Name__c,
-									Bypass_Permission__c,
-									Required_Permission__c
-								FROM Before_Insert_Actions__r
-								WHERE
-									Bypass_Execution__c = FALSE
-									AND Apex_Class_Name__c NOT IN :MetadataTriggerHandler.bypassedActions
-								ORDER BY Order__c ASC
-							),
-							(
-								SELECT
-									Apex_Class_Name__c,
-									Order__c,
-									Flow_Name__c,
-									Bypass_Permission__c,
-									Required_Permission__c
-								FROM After_Insert_Actions__r
-								WHERE
-									Bypass_Execution__c = FALSE
-									AND Apex_Class_Name__c NOT IN :MetadataTriggerHandler.bypassedActions
-								ORDER BY Order__c ASC
-							),
-							(
-								SELECT
-									Apex_Class_Name__c,
-									Order__c,
-									Flow_Name__c,
-									Bypass_Permission__c,
-									Required_Permission__c
-								FROM Before_Update_Actions__r
-								WHERE
-									Bypass_Execution__c = FALSE
-									AND Apex_Class_Name__c NOT IN :MetadataTriggerHandler.bypassedActions
-								ORDER BY Order__c ASC
-							),
-							(
-								SELECT
-									Apex_Class_Name__c,
-									Order__c,
-									Flow_Name__c,
-									Bypass_Permission__c,
-									Required_Permission__c
-								FROM After_Update_Actions__r
-								WHERE
-									Bypass_Execution__c = FALSE
-									AND Apex_Class_Name__c NOT IN :MetadataTriggerHandler.bypassedActions
-								ORDER BY Order__c ASC
-							),
-							(
-								SELECT
-									Apex_Class_Name__c,
-									Order__c,
-									Flow_Name__c,
-									Bypass_Permission__c,
-									Required_Permission__c
-								FROM Before_Delete_Actions__r
-								WHERE
-									Bypass_Execution__c = FALSE
-									AND Apex_Class_Name__c NOT IN :MetadataTriggerHandler.bypassedActions
-								ORDER BY Order__c ASC
-							),
-							(
-								SELECT
-									Apex_Class_Name__c,
-									Order__c,
-									Flow_Name__c,
-									Bypass_Permission__c,
-									Required_Permission__c
-								FROM After_Delete_Actions__r
-								WHERE
-									Bypass_Execution__c = FALSE
-									AND Apex_Class_Name__c NOT IN :MetadataTriggerHandler.bypassedActions
-								ORDER BY Order__c ASC
-							),
-							(
-								SELECT
-									Apex_Class_Name__c,
-									Order__c,
-									Flow_Name__c,
-									Bypass_Permission__c,
-									Required_Permission__c
-								FROM After_Undelete_Actions__r
-								WHERE
-									Bypass_Execution__c = FALSE
-									AND Apex_Class_Name__c NOT IN :MetadataTriggerHandler.bypassedActions
-								ORDER BY Order__c ASC
-							)
-						FROM sObject_Trigger_Setting__mdt
-						WHERE
-							SObject__r.DeveloperName = :this.sObjectName
-							AND Bypass_Execution__c = FALSE
-						LIMIT 1
-					]
-				);
-				if ((!actionMetadata.isEmpty()) && !shouldExecute(actionMetadata[0])) {
-					actionMetadata = new List<sObject_Trigger_Setting__mdt>();
+	private list<Trigger_Action__mdt> getActionMetadata(String relationshipName) {
+		if (!sObjectToContextToActions.containsKey(this.sObjectName)) {
+			sObjectToContextToActions.put(
+				this.sObjectName,
+				new Map<String, List<Trigger_Action__mdt>>()
+			);
+		}
+		if (
+			!sObjectToContextToActions.get(this.sObjectName)
+				.containsKey(relationshipName)
+		) {
+			list<Trigger_Action__mdt> result = new List<Trigger_Action__mdt>();
+			Set<String> bypassedActions = MetadataTriggerHandler.bypassedActions;
+			String sObjectName = this.sObjectName;
+			List<String> queryArray = new List<String>{
+				'SELECT Apex_Class_Name__c,',
+				'Order__c,',
+				'Flow_Name__c,',
+				'Bypass_Permission__c,',
+				'Required_Permission__c,',
+				'{0}__r.Bypass_Permission__c,',
+				'{0}__r.Required_Permission__c',
+				'FROM Trigger_Action__mdt',
+				'WHERE',
+				'Apex_Class_Name__c NOT IN :bypassedActions',
+				'AND {0}__c != NULL',
+				'AND {0}__r.DeveloperName = :sObjectName',
+				'AND {0}__r.Bypass_Execution__c = FALSE',
+				'ORDER BY Order__c ASC'
+			};
+			String queryString = String.format(
+				String.join(queryArray, ' '),
+				new List<Object>{ relationshipName }
+			);
+			for (
+				Trigger_Action__mdt actionMetadata : (List<Trigger_Action__mdt>) Database.query(
+					queryString
+				)
+			) {
+				if (shouldExecute(actionMetadata, relationshipName)) {
+					result.add(actionMetadata);
 				}
 			}
-
-			return actionMetadata;
+			sObjectToContextToActions.get(this.sObjectName)
+				.put(relationshipName, result);
 		}
-		set;
+		return sObjectToContextToActions.get(this.sObjectName)
+			.get(relationshipName);
+	}
+
+	private Boolean shouldExecute(
+		Trigger_Action__mdt actionMetadata,
+		String relationshipName
+	) {
+		String sObjectBypassPermissionName = (String) ((sObject_Trigger_Setting__mdt) actionMetadata.getSobject(
+				relationshipName + '__r'
+			))
+			.get('Bypass_Permission__c');
+		String sObjectRequiredPermissionName = (String) ((sObject_Trigger_Setting__mdt) actionMetadata.getSobject(
+				relationshipName + '__r'
+			))
+			.get('Required_Permission__c');
+		for (
+			String permissionName : new List<String>{
+				actionMetadata.Bypass_Permission__c,
+				actionMetadata.Required_Permission__c,
+				sObjectBypassPermissionName,
+				sObjectRequiredPermissionName
+			}
+		) {
+			if (
+				permissionName != null && !permissionMap.containsKey(permissionName)
+			) {
+				permissionMap.put(
+					permissionName,
+					FeatureManagement.checkPermission(permissionName)
+				);
+			}
+		}
+		boolean actionShouldExecute = !((actionMetadata.Bypass_Permission__c !=
+		null && permissionMap.get(actionMetadata.Bypass_Permission__c)) ||
+		(actionMetadata.Required_Permission__c != null &&
+		!permissionMap.get(actionMetadata.Required_Permission__c)));
+
+		boolean sObjectShouldExecute = !((sObjectBypassPermissionName != null &&
+		permissionMap.get(sObjectBypassPermissionName)) ||
+		(sObjectRequiredPermissionName != null &&
+		!permissionMap.get(sObjectRequiredPermissionName)));
+
+		return actionShouldExecute && sObjectShouldExecute;
 	}
 
 	@TestVisible
 	private List<Trigger_Action__mdt> beforeInsertActionMetadata {
 		get {
 			if (beforeInsertActionMetadata == null) {
-				beforeInsertActionMetadata = new List<Trigger_Action__mdt>();
-				if (!this.actionMetadata.isEmpty()) {
-					for (
-						Trigger_Action__mdt action : this.actionMetadata[0]
-							.Before_Insert_Actions__r
-					) {
-						if (shouldExecute(action)) {
-							beforeInsertActionMetadata.add(action);
-						}
-					}
-				}
+				beforeInsertActionMetadata = getActionMetadata(
+					System.TriggerOperation.BEFORE_INSERT.name()
+				);
 			}
 			return beforeInsertActionMetadata;
 		}
@@ -241,17 +211,9 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 	private List<Trigger_Action__mdt> afterInsertActionMetadata {
 		get {
 			if (afterInsertActionMetadata == null) {
-				afterInsertActionMetadata = new List<Trigger_Action__mdt>();
-				if (!this.actionMetadata.isEmpty()) {
-					for (
-						Trigger_Action__mdt action : this.actionMetadata[0]
-							.After_Insert_Actions__r
-					) {
-						if (shouldExecute(action)) {
-							afterInsertActionMetadata.add(action);
-						}
-					}
-				}
+				afterInsertActionMetadata = getActionMetadata(
+					System.TriggerOperation.AFTER_INSERT.name()
+				);
 			}
 			return afterInsertActionMetadata;
 		}
@@ -294,17 +256,9 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 	private List<Trigger_Action__mdt> beforeUpdateActionMetadata {
 		get {
 			if (beforeUpdateActionMetadata == null) {
-				beforeUpdateActionMetadata = new List<Trigger_Action__mdt>();
-				if (!this.actionMetadata.isEmpty()) {
-					for (
-						Trigger_Action__mdt action : this.actionMetadata[0]
-							.Before_Update_Actions__r
-					) {
-						if (shouldExecute(action)) {
-							beforeUpdateActionMetadata.add(action);
-						}
-					}
-				}
+				beforeUpdateActionMetadata = getActionMetadata(
+					System.TriggerOperation.BEFORE_UPDATE.name()
+				);
 			}
 			return beforeUpdateActionMetadata;
 		}
@@ -347,17 +301,9 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 	private List<Trigger_Action__mdt> afterUpdateActionMetadata {
 		get {
 			if (afterUpdateActionMetadata == null) {
-				afterUpdateActionMetadata = new List<Trigger_Action__mdt>();
-				if (!this.actionMetadata.isEmpty()) {
-					for (
-						Trigger_Action__mdt action : this.actionMetadata[0]
-							.After_Update_Actions__r
-					) {
-						if (shouldExecute(action)) {
-							afterUpdateActionMetadata.add(action);
-						}
-					}
-				}
+				afterUpdateActionMetadata = getActionMetadata(
+					System.TriggerOperation.AFTER_UPDATE.name()
+				);
 			}
 			return afterUpdateActionMetadata;
 		}
@@ -400,17 +346,9 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 	private List<Trigger_Action__mdt> beforeDeleteActionMetadata {
 		get {
 			if (beforeDeleteActionMetadata == null) {
-				beforeDeleteActionMetadata = new List<Trigger_Action__mdt>();
-				if (!this.actionMetadata.isEmpty()) {
-					for (
-						Trigger_Action__mdt action : this.actionMetadata[0]
-							.Before_Delete_Actions__r
-					) {
-						if (shouldExecute(action)) {
-							beforeDeleteActionMetadata.add(action);
-						}
-					}
-				}
+				beforeDeleteActionMetadata = getActionMetadata(
+					System.TriggerOperation.BEFORE_DELETE.name()
+				);
 			}
 			return beforeDeleteActionMetadata;
 		}
@@ -453,17 +391,9 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 	private List<Trigger_Action__mdt> afterDeleteActionMetadata {
 		get {
 			if (afterDeleteActionMetadata == null) {
-				afterDeleteActionMetadata = new List<Trigger_Action__mdt>();
-				if (!this.actionMetadata.isEmpty()) {
-					for (
-						Trigger_Action__mdt action : this.actionMetadata[0]
-							.After_Delete_Actions__r
-					) {
-						if (shouldExecute(action)) {
-							afterDeleteActionMetadata.add(action);
-						}
-					}
-				}
+				afterDeleteActionMetadata = getActionMetadata(
+					System.TriggerOperation.AFTER_DELETE.name()
+				);
 			}
 			return afterDeleteActionMetadata;
 		}
@@ -506,9 +436,9 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 	private List<Trigger_Action__mdt> afterUndeleteActionMetadata {
 		get {
 			if (afterUndeleteActionMetadata == null) {
-				afterUndeleteActionMetadata = this.actionMetadata.isEmpty()
-					? new List<Trigger_Action__mdt>()
-					: this.actionMetadata[0].After_Undelete_Actions__r;
+				afterUndeleteActionMetadata = getActionMetadata(
+					System.TriggerOperation.AFTER_UNDELETE.name()
+				);
 			}
 			return afterUndeleteActionMetadata;
 		}
@@ -545,22 +475,6 @@ public class MetadataTriggerHandler extends TriggerBase implements TriggerAction
 			}
 			return returnValue;
 		}
-	}
-
-	@TestVisible
-	private boolean shouldExecute(Trigger_Action__mdt action) {
-		return !((action.Bypass_Permission__c != null &&
-		FeatureManagement.checkPermission(action.Bypass_Permission__c)) ||
-		(action.Required_Permission__c != null &&
-		!FeatureManagement.checkPermission(action.Required_Permission__c)));
-	}
-
-	@TestVisible
-	private boolean shouldExecute(sObject_Trigger_Setting__mdt setting) {
-		return !((setting.Bypass_Permission__c != null &&
-		FeatureManagement.checkPermission(setting.Bypass_Permission__c)) ||
-		(setting.Required_Permission__c != null &&
-		!FeatureManagement.checkPermission(setting.Required_Permission__c)));
 	}
 
 	private void handleException(
