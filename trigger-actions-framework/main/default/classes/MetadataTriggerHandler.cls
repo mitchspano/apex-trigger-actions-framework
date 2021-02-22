@@ -118,7 +118,7 @@ public with sharing class MetadataTriggerHandler extends TriggerBase implements 
 			) {
 				if (
 					shouldExecute(actionMetadata, relationshipName) &&
-					!TriggerBase.bypassedObjects.contains(this.sObjectName)
+					!TriggerBase.isBypassed(this.sObjectName)
 				) {
 					result.add(actionMetadata);
 				}
