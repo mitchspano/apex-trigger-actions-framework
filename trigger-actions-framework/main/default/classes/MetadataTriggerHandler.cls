@@ -81,8 +81,8 @@ public with sharing class MetadataTriggerHandler extends TriggerBase implements 
 		) {
 			list<Trigger_Action__mdt> result = new List<Trigger_Action__mdt>();
 			Set<String> bypassedActions = MetadataTriggerHandler.bypassedActions;
-			String sObjectName = this.sObjectName;
-			String sObjectLocalName = sObjectName;
+			Set<String> bypassedObjects = TriggerBase.bypassedObjects;
+			String sObjectLocalName = this.sObjectName;
 			List<String> split = sObjectName.split('__');
 			String namespace;
 			if (split.size() > 2) {
@@ -116,7 +116,10 @@ public with sharing class MetadataTriggerHandler extends TriggerBase implements 
 					queryString
 				)
 			) {
-				if (shouldExecute(actionMetadata, relationshipName)) {
+				if (
+					shouldExecute(actionMetadata, relationshipName) &&
+					!TriggerBase.bypassedObjects.contains(this.sObjectName)
+				) {
 					result.add(actionMetadata);
 				}
 			}
