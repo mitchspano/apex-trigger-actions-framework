@@ -81,8 +81,8 @@ public with sharing class MetadataTriggerHandler extends TriggerBase implements 
 		) {
 			list<Trigger_Action__mdt> result = new List<Trigger_Action__mdt>();
 			Set<String> bypassedActions = MetadataTriggerHandler.bypassedActions;
-			String sObjectName = this.sObjectName;
-			String sObjectLocalName = sObjectName;
+			Set<String> bypassedObjects = TriggerBase.bypassedObjects;
+			String sObjectLocalName = this.sObjectName;
 			List<String> split = sObjectName.split('__');
 			String namespace;
 			if (split.size() > 2) {
@@ -104,6 +104,7 @@ public with sharing class MetadataTriggerHandler extends TriggerBase implements 
 				'AND {0}__r.Object_API_Name__c = :sObjectLocalName',
 				'AND {0}__r.Object_Namespace__c = :namespace',
 				'AND {0}__r.Bypass_Execution__c = FALSE',
+				'AND {0}__r.Object_API_Name__c NOT IN: bypassedObjects',
 				'AND Bypass_Execution__c = FALSE',
 				'ORDER BY Order__c ASC'
 			};
