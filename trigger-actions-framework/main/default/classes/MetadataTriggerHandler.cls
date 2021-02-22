@@ -104,6 +104,7 @@ public with sharing class MetadataTriggerHandler extends TriggerBase implements 
 				'AND {0}__r.Object_API_Name__c = :sObjectLocalName',
 				'AND {0}__r.Object_Namespace__c = :namespace',
 				'AND {0}__r.Bypass_Execution__c = FALSE',
+				'AND Bypass_Execution__c = FALSE',
 				'ORDER BY Order__c ASC'
 			};
 			String queryString = String.format(
