@@ -31,7 +31,10 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 	@testVisible
 	private static final String NEW_LIST_AFTER_FLOW_NOT_POPULATED_CORRECTLY = 'You must pass ALL records back to the newListAfterFlow in order to apply values to record before insert/update';
 
-	@InvocableMethod
+	@InvocableMethod(
+		label='Get Old Record'
+		description='Returns the old version of a record from oldList'
+	)
 	public static List<sObject> getOldRecord(List<OldRecordRequest> request) {
 		if (request.isEmpty() || request.size() > 1) {
 			throw new TriggerActionFlowException(INVALID_REQUEST);
