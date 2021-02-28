@@ -76,7 +76,7 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 		checkFlowName();
 		List<sObject> recordsNotYetProcessed = new List<sObject>();
 		for (sObject record : newList) {
-			if (!TriggerBase.idsProcessedBeforeUpdate.contains(record.id)) {
+			if (TriggerBase.idsToNumberOfTimesSeenBeforeUpdate.get(record.id) == 1) {
 				recordsNotYetProcessed.add(record);
 			}
 		}
@@ -95,7 +95,7 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 		checkFlowName();
 		List<sObject> recordsNotYetProcessed = new List<sObject>();
 		for (sObject record : newList) {
-			if (!TriggerBase.idsProcessedAfterUpdate.contains(record.id)) {
+			if (TriggerBase.idsToNumberOfTimesSeenAfterUpdate.get(record.id) == 1) {
 				recordsNotYetProcessed.add(record);
 			}
 		}
