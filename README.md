@@ -105,7 +105,7 @@ To enable this flow, simply insert a trigger action record with Apex Class Name 
 
 ## Recursion Prevention
 
-Use the `TriggerBase.idsToNumberOfTimesSeenBeforeUpdate` and `TriggerBase.idsToNumberOfTimesSeenAfterUpdate` to prevent recursively processing the same record(s).
+Use the `TriggerBase.idToNumberOfTimesSeenBeforeUpdate` and `TriggerBase.idToNumberOfTimesSeenAfterUpdate` to prevent recursively processing the same record(s).
 
 ```java
 public class ta_Opportunity_RecalculateCategory implements TriggerAction.AfterUpdate {
@@ -115,7 +115,7 @@ public class ta_Opportunity_RecalculateCategory implements TriggerAction.AfterUp
     List<Opportunity> oppsToBeUpdated = new List<Opportunity>();
     for (Opportunity opp : newList) {
       if (
-        TriggerBase.idsToNumberOfTimesSeenAfterUpdate.get(opp.id) == 1 &&
+        TriggerBase.idToNumberOfTimesSeenAfterUpdate.get(opp.id) == 1 &&
         opp.StageName != oldMap.get(opp.id).StageName
       ) {
         oppsToBeUpdated.add(opp);

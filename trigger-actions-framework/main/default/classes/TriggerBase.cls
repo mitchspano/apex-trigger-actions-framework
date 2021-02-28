@@ -20,20 +20,20 @@ public inherited sharing virtual class TriggerBase {
 	@TestVisible
 	private static Set<String> bypassedObjects;
 	@TestVisible
-	public static Map<Id, Integer> idsToNumberOfTimesSeenBeforeUpdate {
+	public static Map<Id, Integer> idToNumberOfTimesSeenBeforeUpdate {
 		get;
 		private set;
 	}
 	@TestVisible
-	public static Map<Id, Integer> idsToNumberOfTimesSeenAfterUpdate {
+	public static Map<Id, Integer> idToNumberOfTimesSeenAfterUpdate {
 		get;
 		private set;
 	}
 
 	static {
 		bypassedObjects = new Set<String>();
-		idsToNumberOfTimesSeenBeforeUpdate = new Map<Id, Integer>();
-		idsToNumberOfTimesSeenAfterUpdate = new Map<Id, Integer>();
+		idToNumberOfTimesSeenBeforeUpdate = new Map<Id, Integer>();
+		idToNumberOfTimesSeenAfterUpdate = new Map<Id, Integer>();
 	}
 
 	public void run() {
@@ -67,12 +67,12 @@ public inherited sharing virtual class TriggerBase {
 			this instanceof TriggerAction.BeforeUpdate
 		) {
 			for (SObject obj : triggerNew) {
-				if (!idsToNumberOfTimesSeenBeforeUpdate.containsKey(obj.id)) {
-					idsToNumberOfTimesSeenBeforeUpdate.put(obj.id, 1);
+				if (!idToNumberOfTimesSeenBeforeUpdate.containsKey(obj.id)) {
+					idToNumberOfTimesSeenBeforeUpdate.put(obj.id, 1);
 				} else {
-					idsToNumberOfTimesSeenBeforeUpdate.put(
+					idToNumberOfTimesSeenBeforeUpdate.put(
 						obj.id,
-						idsToNumberOfTimesSeenBeforeUpdate.get(obj.id) + 1
+						idToNumberOfTimesSeenBeforeUpdate.get(obj.id) + 1
 					);
 				}
 			}
@@ -89,12 +89,12 @@ public inherited sharing virtual class TriggerBase {
 			this instanceof TriggerAction.AfterUpdate
 		) {
 			for (SObject obj : triggerNew) {
-				if (!idsToNumberOfTimesSeenAfterUpdate.containsKey(obj.id)) {
-					idsToNumberOfTimesSeenAfterUpdate.put(obj.id, 1);
+				if (!idToNumberOfTimesSeenAfterUpdate.containsKey(obj.id)) {
+					idToNumberOfTimesSeenAfterUpdate.put(obj.id, 1);
 				} else {
-					idsToNumberOfTimesSeenAfterUpdate.put(
+					idToNumberOfTimesSeenAfterUpdate.put(
 						obj.id,
-						idsToNumberOfTimesSeenAfterUpdate.get(obj.id) + 1
+						idToNumberOfTimesSeenAfterUpdate.get(obj.id) + 1
 					);
 				}
 			}
