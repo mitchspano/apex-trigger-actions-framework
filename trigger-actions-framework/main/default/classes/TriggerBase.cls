@@ -20,20 +20,26 @@ public inherited sharing virtual class TriggerBase {
 	@TestVisible
 	private static Set<String> bypassedObjects;
 	@TestVisible
-	public static Set<Id> idsProcessedBeforeUpdate { get; private set; }
+	public static Map<Id, Integer> idsToNumberOfTimesSeenBeforeUpdate {
+		get;
+		private set;
+	}
 	@TestVisible
-	public static Set<Id> idsProcessedAfterUpdate { get; private set; }
+	public static Map<Id, Integer> idsToNumberOfTimesSeenAfterUpdate {
+		get;
+		private set;
+	}
 
 	static {
 		bypassedObjects = new Set<String>();
-		idsProcessedBeforeUpdate = new Set<Id>();
-		idsProcessedAfterUpdate = new Set<Id>();
+		idsToNumberOfTimesSeenBeforeUpdate = new Map<Id, Integer>();
+		idsToNumberOfTimesSeenAfterUpdate = new Map<Id, Integer>();
 	}
 
 	public void run() {
-		if (!validateRun())
+		if (!validateRun()) {
 			return;
-
+		}
 		if (
 			this.context == System.TriggerOperation.BEFORE_INSERT &&
 			this instanceof TriggerAction.BeforeInsert
@@ -60,6 +66,16 @@ public inherited sharing virtual class TriggerBase {
 			this.context == System.TriggerOperation.BEFORE_UPDATE &&
 			this instanceof TriggerAction.BeforeUpdate
 		) {
+			for (SObject obj : triggerNew) {
+				if (!idsToNumberOfTimesSeenBeforeUpdate.containsKey(obj.id)) {
+					idsToNumberOfTimesSeenBeforeUpdate.put(obj.id, 1);
+				} else {
+					idsToNumberOfTimesSeenBeforeUpdate.put(
+						obj.id,
+						idsToNumberOfTimesSeenBeforeUpdate.get(obj.id) + 1
+					);
+				}
+			}
 			try {
 				((TriggerAction.BeforeUpdate) this)
 					.beforeUpdate(triggerNew, triggerOld);
@@ -68,22 +84,26 @@ public inherited sharing virtual class TriggerBase {
 					obj.addError(e.getMessage());
 				}
 			}
-			for (SObject obj : triggerNew) {
-				TriggerBase.idsProcessedBeforeUpdate.add(obj.Id);
-			}
 		} else if (
 			this.context == System.TriggerOperation.AFTER_UPDATE &&
 			this instanceof TriggerAction.AfterUpdate
 		) {
+			for (SObject obj : triggerNew) {
+				if (!idsToNumberOfTimesSeenAfterUpdate.containsKey(obj.id)) {
+					idsToNumberOfTimesSeenAfterUpdate.put(obj.id, 1);
+				} else {
+					idsToNumberOfTimesSeenAfterUpdate.put(
+						obj.id,
+						idsToNumberOfTimesSeenAfterUpdate.get(obj.id) + 1
+					);
+				}
+			}
 			try {
 				((TriggerAction.AfterUpdate) this).afterUpdate(triggerNew, triggerOld);
 			} catch (Exception e) {
 				for (SObject obj : triggerNew) {
 					obj.addError(e.getMessage());
 				}
-			}
-			for (SObject obj : triggerNew) {
-				TriggerBase.idsProcessedAfterUpdate.add(obj.Id);
 			}
 		} else if (
 			this.context == System.TriggerOperation.BEFORE_DELETE &&

@@ -19,7 +19,7 @@ This project is meant to demonstrate an Apex Trigger Framework which is built wi
 In order to use this trigger framework, we start with the `MetadataTriggerHandler` class which is included in this project.
 
 ```java
-Trigger OppportunityTrigger on Opportunity (before insert, after insert, before update, after update, before delete, after delete, after undelete) {
+Trigger OpportunityTrigger on Opportunity (before insert, after insert, before update, after update, before delete, after delete, after undelete) {
   new MetadataTriggerHandler().run();
 }
 ```
@@ -105,7 +105,7 @@ To enable this flow, simply insert a trigger action record with Apex Class Name 
 
 ## Recursion Prevention
 
-Use the `TriggerBase.idsProcessedBeforeUpdate` and `TriggerBase.idsProcessedAfterUpdate` to prevent recursively processing the same record(s).
+Use the `TriggerBase.idsToNumberOfTimesSeenBeforeUpdate` and `TriggerBase.idsToNumberOfTimesSeenAfterUpdate` to prevent recursively processing the same record(s).
 
 ```java
 public class ta_Opportunity_RecalculateCategory implements TriggerAction.AfterUpdate {
@@ -115,7 +115,7 @@ public class ta_Opportunity_RecalculateCategory implements TriggerAction.AfterUp
     List<Opportunity> oppsToBeUpdated = new List<Opportunity>();
     for (Opportunity opp : newList) {
       if (
-        !TriggerBase.idsProcessedAfterUpdate.contains(opp.id) &&
+        TriggerBase.idsToNumberOfTimesSeenAfterUpdate.get(opp.id) == 1 &&
         opp.StageName != oldMap.get(opp.id).StageName
       ) {
         oppsToBeUpdated.add(opp);
