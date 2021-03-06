@@ -16,6 +16,7 @@
 
 public inherited sharing class TriggerActionFlow implements TriggerAction.BeforeInsert, TriggerAction.AfterInsert, TriggerAction.BeforeUpdate, TriggerAction.AfterUpdate, TriggerAction.AfterUndelete {
 	public string flowName;
+	public boolean allowRecursion;
 	@testVisible
 	private static final String INVALID_FLOW_NAME = 'You must provide the name of a flow to execute';
 	@testVisible
@@ -76,7 +77,10 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 		checkFlowName();
 		List<sObject> recordsNotYetProcessed = new List<sObject>();
 		for (sObject record : newList) {
-			if (TriggerBase.idToNumberOfTimesSeenBeforeUpdate.get(record.id) == 1) {
+			if (
+				TriggerBase.idToNumberOfTimesSeenBeforeUpdate.get(record.id) == 1 ||
+				(allowRecursion == true)
+			) {
 				recordsNotYetProcessed.add(record);
 			}
 		}
@@ -95,7 +99,10 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 		checkFlowName();
 		List<sObject> recordsNotYetProcessed = new List<sObject>();
 		for (sObject record : newList) {
-			if (TriggerBase.idToNumberOfTimesSeenAfterUpdate.get(record.id) == 1) {
+			if (
+				TriggerBase.idToNumberOfTimesSeenAfterUpdate.get(record.id) == 1 ||
+				(allowRecursion == true)
+			) {
 				recordsNotYetProcessed.add(record);
 			}
 		}

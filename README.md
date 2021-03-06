@@ -99,7 +99,7 @@ Here is an example of an auto-launched flow that checks if a Case's status has c
 
 ![Sample Flow](images/sampleFlow.png)
 
-To enable this flow, simply insert a trigger action record with Apex Class Name equal to "TriggerActionFlow" and set the Flow Name field with the API name of the flow itself.
+To enable this flow, simply insert a trigger action record with Apex Class Name equal to "TriggerActionFlow" and set the Flow Name field with the API name of the flow itself. You can select the "Allow Flow Recursion" checkbox to allow flows to run recursively (advanced).
 
 ![Flow Trigger Action](images/flowTriggerAction.png)
 

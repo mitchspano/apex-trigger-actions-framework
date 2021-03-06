@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+	<fullName>Only_One_Context</fullName>
+	<active>true</active>
+	<description>Throws an error if the user selects more than one context.</description>
+	<errorConditionFormula>(NOT(ISBLANK(Before_Insert__c)) &amp;&amp;
+	( 
+					NOT(ISBLANK(After_Insert__c)) || 
+					NOT(ISBLANK(Before_Update__c)) || 
+					NOT(ISBLANK(After_Update__c)) || 
+					NOT(ISBLANK(Before_Delete__c)) || 
+					NOT(ISBLANK(After_Delete__c)) || 
+					NOT(ISBLANK(After_Undelete__c))
+))
+||
+ (NOT(ISBLANK(After_Insert__c)) &amp;&amp;
+	( 
+					NOT(ISBLANK(Before_Insert__c)) ||
+					NOT(ISBLANK(Before_Update__c)) || 
+					NOT(ISBLANK(After_Update__c)) || 
+					NOT(ISBLANK(Before_Delete__c)) || 
+					NOT(ISBLANK(After_Delete__c)) || 
+					NOT(ISBLANK(After_Undelete__c))
+))
+||
+ (NOT(ISBLANK(Before_Update__c)) &amp;&amp;
+	( 
+					NOT(ISBLANK(Before_Insert__c)) ||
+					NOT(ISBLANK(After_Insert__c)) || 
+					NOT(ISBLANK(After_Update__c)) || 
+					NOT(ISBLANK(Before_Delete__c)) || 
+					NOT(ISBLANK(After_Delete__c)) || 
+					NOT(ISBLANK(After_Undelete__c))
+))
+||
+ (NOT(ISBLANK(After_Update__c)) &amp;&amp;
+	( 
+					NOT(ISBLANK(Before_Insert__c)) ||
+					NOT(ISBLANK(After_Insert__c)) || 
+					NOT(ISBLANK(Before_Update__c)) || 
+					NOT(ISBLANK(Before_Delete__c)) || 
+					NOT(ISBLANK(After_Delete__c)) || 
+					NOT(ISBLANK(After_Undelete__c))
+))
+||
+ (NOT(ISBLANK(After_Update__c)) &amp;&amp;
+	( 
+					NOT(ISBLANK(Before_Insert__c)) ||
+					NOT(ISBLANK(After_Insert__c)) || 
+					NOT(ISBLANK(Before_Update__c)) || 
+					NOT(ISBLANK(Before_Delete__c)) || 
+					NOT(ISBLANK(After_Delete__c)) || 
+					NOT(ISBLANK(After_Undelete__c))
+))
+||
+ (NOT(ISBLANK(Before_Delete__c)) &amp;&amp;
+	( 
+					NOT(ISBLANK(Before_Insert__c)) ||
+					NOT(ISBLANK(After_Insert__c)) || 
+					NOT(ISBLANK(Before_Update__c)) || 
+					NOT(ISBLANK(After_Update__c)) || 
+					NOT(ISBLANK(After_Delete__c)) || 
+					NOT(ISBLANK(After_Undelete__c))
+))
+||
+ (NOT(ISBLANK(After_Delete__c)) &amp;&amp;
+	( 
+					NOT(ISBLANK(Before_Insert__c)) ||
+					NOT(ISBLANK(After_Insert__c)) || 
+					NOT(ISBLANK(Before_Update__c)) || 
+					NOT(ISBLANK(After_Update__c)) || 
+					NOT(ISBLANK(Before_Delete__c)) || 
+					NOT(ISBLANK(After_Undelete__c))
+))
+||
+ (NOT(ISBLANK(After_Undelete__c)) &amp;&amp;
+	( 
+					NOT(ISBLANK(Before_Insert__c)) ||
+					NOT(ISBLANK(After_Insert__c)) || 
+					NOT(ISBLANK(Before_Update__c)) || 
+					NOT(ISBLANK(After_Update__c)) || 
+					NOT(ISBLANK(Before_Delete__c)) || 
+					NOT(ISBLANK(After_Delete__c))
+))</errorConditionFormula>
+	<errorMessage>You can only choose one context</errorMessage>
+</ValidationRule>

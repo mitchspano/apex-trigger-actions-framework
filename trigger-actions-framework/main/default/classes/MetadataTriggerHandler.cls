@@ -98,6 +98,7 @@ public with sharing class MetadataTriggerHandler extends TriggerBase implements 
 					'Flow_Name__c,',
 					'Bypass_Permission__c,',
 					'Required_Permission__c,',
+					'Allow_Flow_Recursion__c,',
 					'{0}__r.Bypass_Permission__c,',
 					'{0}__r.Required_Permission__c',
 					'FROM Trigger_Action__mdt',
@@ -200,6 +201,8 @@ public with sharing class MetadataTriggerHandler extends TriggerBase implements 
 					if (triggerMetadata.Flow_Name__c != null) {
 						((TriggerActionFlow) triggerAction)
 							.flowName = triggerMetadata.Flow_Name__c;
+						((TriggerActionFlow) triggerAction)
+							.allowRecursion = triggerMetadata.Allow_Flow_Recursion__c;
 					}
 					returnValue.add(triggerAction);
 				} catch (System.TypeException e) {
@@ -245,6 +248,8 @@ public with sharing class MetadataTriggerHandler extends TriggerBase implements 
 					if (triggerMetadata.Flow_Name__c != null) {
 						((TriggerActionFlow) triggerAction)
 							.flowName = triggerMetadata.Flow_Name__c;
+						((TriggerActionFlow) triggerAction)
+							.allowRecursion = triggerMetadata.Allow_Flow_Recursion__c;
 					}
 					returnValue.add(triggerAction);
 				} catch (System.TypeException e) {
@@ -290,6 +295,8 @@ public with sharing class MetadataTriggerHandler extends TriggerBase implements 
 					if (triggerMetadata.Flow_Name__c != null) {
 						((TriggerActionFlow) triggerAction)
 							.flowName = triggerMetadata.Flow_Name__c;
+						((TriggerActionFlow) triggerAction)
+							.allowRecursion = triggerMetadata.Allow_Flow_Recursion__c;
 					}
 					returnValue.add(triggerAction);
 				} catch (System.TypeException e) {
@@ -335,6 +342,8 @@ public with sharing class MetadataTriggerHandler extends TriggerBase implements 
 					if (triggerMetadata.Flow_Name__c != null) {
 						((TriggerActionFlow) triggerAction)
 							.flowName = triggerMetadata.Flow_Name__c;
+						((TriggerActionFlow) triggerAction)
+							.allowRecursion = triggerMetadata.Allow_Flow_Recursion__c;
 					}
 					returnValue.add(triggerAction);
 				} catch (System.TypeException e) {
@@ -380,6 +389,8 @@ public with sharing class MetadataTriggerHandler extends TriggerBase implements 
 					if (triggerMetadata.Flow_Name__c != null) {
 						((TriggerActionFlow) triggerAction)
 							.flowName = triggerMetadata.Flow_Name__c;
+						((TriggerActionFlow) triggerAction)
+							.allowRecursion = triggerMetadata.Allow_Flow_Recursion__c;
 					}
 					returnValue.add(triggerAction);
 				} catch (System.TypeException e) {
@@ -425,6 +436,8 @@ public with sharing class MetadataTriggerHandler extends TriggerBase implements 
 					if (triggerMetadata.Flow_Name__c != null) {
 						((TriggerActionFlow) triggerAction)
 							.flowName = triggerMetadata.Flow_Name__c;
+						((TriggerActionFlow) triggerAction)
+							.allowRecursion = triggerMetadata.Allow_Flow_Recursion__c;
 					}
 					returnValue.add(triggerAction);
 				} catch (System.TypeException e) {
@@ -470,6 +483,8 @@ public with sharing class MetadataTriggerHandler extends TriggerBase implements 
 					if (triggerMetadata.Flow_Name__c != null) {
 						((TriggerActionFlow) triggerAction)
 							.flowName = triggerMetadata.Flow_Name__c;
+						((TriggerActionFlow) triggerAction)
+							.allowRecursion = triggerMetadata.Allow_Flow_Recursion__c;
 					}
 					returnValue.add(triggerAction);
 				} catch (System.TypeException e) {

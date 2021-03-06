@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Allow_Flow_Recursion__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Check this box to allow the flow to execute recursively</description>
+    <externalId>false</externalId>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <inlineHelpText>Check this box to allow the flow to execute recursively</inlineHelpText>
+    <label>Allow Flow Recursion?</label>
+    <type>Checkbox</type>
+</CustomField>
