@@ -1,5 +1,5 @@
 /*
-   Copyright 2020 Google LLC
+   Copyright 2021 Google LLC
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -31,8 +31,25 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 	private static final String INVALID_REQUEST = 'You can only pass one getOldRecordRequest into TriggerActionFlow.getOldRecord()';
 	@testVisible
 	private static final String NEW_LIST_AFTER_FLOW_NOT_POPULATED_CORRECTLY = 'You must pass ALL records back to the newListAfterFlow in order to apply values to record before insert/update';
+	public static final String OBJECT_STRING = 'Object';
+	public static final String APEX_STRING = 'Apex';
+	public static final String FLOW_STRING = 'Flow';
+	public static final String INVALID_BYPASS_REQUEST = 'You can only pass one request into {0}';
+	public static final String INVALID_TYPE = 'The bypassType must equal Object, Apex, or Flow';
+	public static final Set<String> REQUEST_TYPES = new Set<String>{
+		OBJECT_STRING,
+		APEX_STRING,
+		FLOW_STRING
+	};
+	@TestVisible
+	private static Set<String> bypassedFlows;
 
-	@InvocableMethod(
+	static {
+		bypassedFlows = new Set<String>();
+	}
+
+	@invocableMethod(
+		category='Trigger Action Flow'
 		label='Get Old Record'
 		description='Returns the old version of a record from oldList'
 	)
@@ -52,98 +69,122 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 	}
 
 	public void beforeInsert(List<SObject> newList) {
-		checkFlowName();
-		Flow.Interview myFlow = Flow.Interview.createInterview(
-			flowName,
-			getFlowInput(newList, null)
-		);
-		myFlow.start();
-		applyFlowValues(
-			newList,
-			(List<sObject>) myFlow.getVariableValue(NEW_LIST_AFTER_FLOW)
-		);
+		if (!thisFlowIsBypassed()) {
+			Flow.Interview myFlow = Flow.Interview.createInterview(
+				flowName,
+				getFlowInput(newList, null)
+			);
+			myFlow.start();
+			applyFlowValues(
+				newList,
+				(List<sObject>) myFlow.getVariableValue(NEW_LIST_AFTER_FLOW)
+			);
+		}
 	}
 
 	public void afterInsert(List<SObject> newList) {
-		checkFlowName();
-		Flow.Interview myFlow = Flow.Interview.createInterview(
-			flowName,
-			getFlowInput(newList, null)
-		);
-		myFlow.start();
+		if (!thisFlowIsBypassed()) {
+			Flow.Interview myFlow = Flow.Interview.createInterview(
+				flowName,
+				getFlowInput(newList, null)
+			);
+			myFlow.start();
+		}
 	}
 
 	public void beforeUpdate(List<SObject> newList, List<SObject> oldList) {
-		checkFlowName();
-		List<sObject> recordsNotYetProcessed = new List<sObject>();
-		for (sObject record : newList) {
-			if (
-				TriggerBase.idToNumberOfTimesSeenBeforeUpdate.get(record.id) == 1 ||
-				(allowRecursion == true)
-			) {
-				recordsNotYetProcessed.add(record);
+		if (!thisFlowIsBypassed()) {
+			List<sObject> recordsNotYetProcessed = new List<sObject>();
+			for (sObject record : newList) {
+				if (
+					TriggerBase.idToNumberOfTimesSeenBeforeUpdate.get(record.id) == 1 ||
+					(allowRecursion == true)
+				) {
+					recordsNotYetProcessed.add(record);
+				}
 			}
+			Flow.Interview myFlow = Flow.Interview.createInterview(
+				flowName,
+				getFlowInput(recordsNotYetProcessed, oldList)
+			);
+			myFlow.start();
+			applyFlowValues(
+				newList,
+				(List<sObject>) myFlow.getVariableValue(NEW_LIST_AFTER_FLOW)
+			);
 		}
-		Flow.Interview myFlow = Flow.Interview.createInterview(
-			flowName,
-			getFlowInput(recordsNotYetProcessed, oldList)
-		);
-		myFlow.start();
-		applyFlowValues(
-			newList,
-			(List<sObject>) myFlow.getVariableValue(NEW_LIST_AFTER_FLOW)
-		);
 	}
 
 	public void afterUpdate(List<SObject> newList, List<SObject> oldList) {
-		checkFlowName();
-		List<sObject> recordsNotYetProcessed = new List<sObject>();
-		for (sObject record : newList) {
-			if (
-				TriggerBase.idToNumberOfTimesSeenAfterUpdate.get(record.id) == 1 ||
-				(allowRecursion == true)
-			) {
-				recordsNotYetProcessed.add(record);
+		if (!thisFlowIsBypassed()) {
+			List<sObject> recordsNotYetProcessed = new List<sObject>();
+			for (sObject record : newList) {
+				if (
+					TriggerBase.idToNumberOfTimesSeenAfterUpdate.get(record.id) == 1 ||
+					(allowRecursion == true)
+				) {
+					recordsNotYetProcessed.add(record);
+				}
 			}
+			Flow.Interview myFlow = Flow.Interview.createInterview(
+				flowName,
+				getFlowInput(recordsNotYetProcessed, oldList)
+			);
+			myFlow.start();
 		}
-		Flow.Interview myFlow = Flow.Interview.createInterview(
-			flowName,
-			getFlowInput(recordsNotYetProcessed, oldList)
-		);
-		myFlow.start();
 	}
 
 	public void beforeDelete(List<SObject> oldList) {
-		checkFlowName();
-		Flow.Interview myFlow = Flow.Interview.createInterview(
-			flowName,
-			getFlowInput(null, oldList)
-		);
-		myFlow.start();
+		if (!thisFlowIsBypassed()) {
+			Flow.Interview myFlow = Flow.Interview.createInterview(
+				flowName,
+				getFlowInput(null, oldList)
+			);
+			myFlow.start();
+		}
 	}
 
 	public void afterDelete(List<SObject> oldList) {
-		checkFlowName();
-		Flow.Interview myFlow = Flow.Interview.createInterview(
-			flowName,
-			getFlowInput(null, oldList)
-		);
-		myFlow.start();
+		if (!thisFlowIsBypassed()) {
+			Flow.Interview myFlow = Flow.Interview.createInterview(
+				flowName,
+				getFlowInput(null, oldList)
+			);
+			myFlow.start();
+		}
 	}
 
 	public void afterUndelete(List<SObject> newList) {
-		checkFlowName();
-		Flow.Interview myFlow = Flow.Interview.createInterview(
-			flowName,
-			getFlowInput(newList, null)
-		);
-		myFlow.start();
+		if (!thisFlowIsBypassed()) {
+			Flow.Interview myFlow = Flow.Interview.createInterview(
+				flowName,
+				getFlowInput(newList, null)
+			);
+			myFlow.start();
+		}
 	}
 
-	private void checkFlowName() {
+	public static void bypass(String flowName) {
+		TriggerActionFlow.bypassedFlows.add(flowName);
+	}
+
+	public static void clearBypass(String flowName) {
+		TriggerActionFlow.bypassedFlows.remove(flowName);
+	}
+
+	public static Boolean isBypassed(String flowName) {
+		return TriggerActionFlow.bypassedFlows.contains(flowName);
+	}
+
+	public static void clearAllBypasses() {
+		TriggerActionFlow.bypassedFlows.clear();
+	}
+
+	private boolean thisFlowIsBypassed() {
 		if (String.isBlank(flowName)) {
 			throw new TriggerActionFlowException(INVALID_FLOW_NAME);
 		}
+		return TriggerActionFlow.isBypassed(flowName);
 	}
 
 	private Map<String, Object> getFlowInput(
