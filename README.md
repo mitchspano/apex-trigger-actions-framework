@@ -149,9 +149,13 @@ To bypass from the setup menu, simply navigate to the sObject Trigger Setting or
 
 These bypasses will stay active until the checkbox is unchecked.
 
-### Bypass from Apex
+### Static Bypasses
 
-To bypass from Apex, use the static `bypass(String actionName)` method in the `MetadataTriggerHandler` class, or the static `bypass(String sObjectName)` method in the `TriggerBase` class.
+You can bypass all actions on an sObject as well as specific Apex or Flow actions for the remainder of the transaction using Apex or Flow.
+
+#### Bypass from Apex
+
+To bypass from Apex, use the static `bypass(String name)` method in the `TriggerBase`, `MetadataTriggerHandler`, or `TriggerActionFlow` classes.
 
 ```java
 public void updateAccountsNoTrigger(List<Account> accountsToUpdate) {
@@ -169,7 +173,24 @@ public void insertOpportunitiesNoRules(List<Opportunity> opportunitiesToInsert) 
 }
 ```
 
-These bypasses will stay active until the transaction is complete or until cleared using the `clearBypass` or `clearAllBypasses` methods in the `TriggerBase` and `MetadataTriggerHandler` classes.
+```java
+public void updateContactsNoFlow(List<Contacts> contactsToUpdate) {
+  TriggerActionFlow.bypass('Contact_Flow');
+  update contactsToUpdate;
+  TriggerActionFlow.clearBypass('Contact_Flow');
+}
+```
+
+#### Bypass from Flow
+
+To bypass from Flow, use the `TriggerActionFlowBypass.bypass` invocable method. You can set the `bypassType` to `Apex`, `Object`, or `Flow`, then pass the API name of the object, class, or flow you would like to bypass into the `name` field.
+
+![Bypass Flow Action](images/bypass_flow_apex_action.png)
+![Bypass Flow Action](images/bypass_flow.png)
+
+#### Clear Apex and Flow Bypasses
+
+The Apex and Flow bypasses will stay active until the transaction is complete or until cleared using the `clearBypass` or `clearAllBypasses` methods in the `TriggerBase`, `MetadataTriggerHandler`, or `TriggerActionFlow` classes. There are also corresponding invocable methods in the `TriggerActionFlowClearBypass` and `TriggerActionFlowClearAllBypasses` which will perform the same resetting of the bypass. To use these invocable methods, set the `bypassType` to `Apex`, `Object`, or `Flow`, then to clear a specific bypass set the API name of the object, class, or flow you would like to clear the bypass for into the `name` field.
 
 ### Bypass Execution with Permissions
 
