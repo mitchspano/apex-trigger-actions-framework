@@ -176,8 +176,9 @@ public with sharing class MetadataTriggerHandler extends TriggerBase implements 
 			actionMetadata = this.afterUndeleteActionMetadata;
 		}
 		for (Trigger_Action__mdt triggerMetadata : actionMetadata) {
+			Object triggerAction;
 			try {
-				Object triggerAction = Type.forName(triggerMetadata.Apex_Class_Name__c)
+				triggerAction = Type.forName(triggerMetadata.Apex_Class_Name__c)
 					.newInstance();
 				if (triggerMetadata.Flow_Name__c != null) {
 					((TriggerActionFlow) triggerAction)
@@ -185,36 +186,6 @@ public with sharing class MetadataTriggerHandler extends TriggerBase implements 
 					((TriggerActionFlow) triggerAction)
 						.allowRecursion = triggerMetadata.Allow_Flow_Recursion__c;
 				}
-				if (
-					!MetadataTriggerHandler.isBypassed(
-						triggerMetadata.Apex_Class_Name__c
-					) && !TriggerBase.isBypassed(this.sObjectName)
-				) {
-					if (context == TriggerOperation.BEFORE_INSERT) {
-						((TriggerAction.BeforeInsert) triggerAction).beforeInsert(newList);
-					} else if (context == TriggerOperation.AFTER_INSERT) {
-						((TriggerAction.AfterInsert) triggerAction).afterInsert(newList);
-					} else if (context == TriggerOperation.BEFORE_UPDATE) {
-						((TriggerAction.BeforeUpdate) triggerAction)
-							.beforeUpdate(newList, oldList);
-					} else if (context == TriggerOperation.AFTER_UPDATE) {
-						((TriggerAction.AfterUpdate) triggerAction)
-							.afterUpdate(newList, oldList);
-					} else if (context == TriggerOperation.BEFORE_DELETE) {
-						((TriggerAction.BeforeDelete) triggerAction).beforeDelete(oldList);
-					} else if (context == TriggerOperation.AFTER_DELETE) {
-						((TriggerAction.AfterDelete) triggerAction).afterDelete(oldList);
-					} else if (context == TriggerOperation.AFTER_UNDELETE) {
-						((TriggerAction.AfterUndelete) triggerAction)
-							.afterUndelete(newList);
-					}
-				}
-			} catch (System.TypeException e) {
-				handleException(
-					INVALID_TYPE_ERROR,
-					triggerMetadata.Apex_Class_Name__c,
-					context
-				);
 			} catch (System.NullPointerException e) {
 				handleException(
 					INVALID_CLASS_ERROR,
@@ -222,6 +193,60 @@ public with sharing class MetadataTriggerHandler extends TriggerBase implements 
 					context
 				);
 			}
+			if (
+				!MetadataTriggerHandler.isBypassed(
+					triggerMetadata.Apex_Class_Name__c
+				) && !TriggerBase.isBypassed(this.sObjectName)
+			) {
+				this.validateType(
+					context,
+					triggerAction,
+					triggerMetadata.Apex_Class_Name__c
+				);
+				if (context == TriggerOperation.BEFORE_INSERT) {
+					((TriggerAction.BeforeInsert) triggerAction).beforeInsert(newList);
+				} else if (context == TriggerOperation.AFTER_INSERT) {
+					((TriggerAction.AfterInsert) triggerAction).afterInsert(newList);
+				} else if (context == TriggerOperation.BEFORE_UPDATE) {
+					((TriggerAction.BeforeUpdate) triggerAction)
+						.beforeUpdate(newList, oldList);
+				} else if (context == TriggerOperation.AFTER_UPDATE) {
+					((TriggerAction.AfterUpdate) triggerAction)
+						.afterUpdate(newList, oldList);
+				} else if (context == TriggerOperation.BEFORE_DELETE) {
+					((TriggerAction.BeforeDelete) triggerAction).beforeDelete(oldList);
+				} else if (context == TriggerOperation.AFTER_DELETE) {
+					((TriggerAction.AfterDelete) triggerAction).afterDelete(oldList);
+				} else if (context == TriggerOperation.AFTER_UNDELETE) {
+					((TriggerAction.AfterUndelete) triggerAction).afterUndelete(newList);
+				}
+			}
+		}
+	}
+
+	private void validateType(
+		TriggerOperation context,
+		Object triggerAction,
+		String className
+	) {
+		try {
+			if (context == TriggerOperation.BEFORE_INSERT) {
+				triggerAction = ((TriggerAction.BeforeInsert) triggerAction);
+			} else if (context == TriggerOperation.AFTER_INSERT) {
+				triggerAction = ((TriggerAction.AfterInsert) triggerAction);
+			} else if (context == TriggerOperation.BEFORE_UPDATE) {
+				triggerAction = ((TriggerAction.BeforeUpdate) triggerAction);
+			} else if (context == TriggerOperation.AFTER_UPDATE) {
+				triggerAction = ((TriggerAction.AfterUpdate) triggerAction);
+			} else if (context == TriggerOperation.BEFORE_DELETE) {
+				triggerAction = ((TriggerAction.BeforeDelete) triggerAction);
+			} else if (context == TriggerOperation.AFTER_DELETE) {
+				triggerAction = ((TriggerAction.AfterDelete) triggerAction);
+			} else if (context == TriggerOperation.AFTER_UNDELETE) {
+				triggerAction = ((TriggerAction.AfterUndelete) triggerAction);
+			}
+		} catch (System.TypeException e) {
+			handleException(INVALID_TYPE_ERROR, className, context);
 		}
 	}
 
