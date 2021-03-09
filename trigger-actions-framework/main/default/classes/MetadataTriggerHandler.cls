@@ -27,45 +27,31 @@ public with sharing class MetadataTriggerHandler extends TriggerBase implements 
 	}
 
 	public void beforeInsert(List<SObject> newList) {
-		for (TriggerAction.BeforeInsert action : beforeInsertActions) {
-			action.beforeInsert(newList);
-		}
+		this.executeActions(TriggerOperation.BEFORE_INSERT, newList, null);
 	}
 
 	public void afterInsert(List<SObject> newList) {
-		for (TriggerAction.AfterInsert action : afterInsertActions) {
-			action.AfterInsert(newList);
-		}
+		this.executeActions(TriggerOperation.AFTER_INSERT, newList, null);
 	}
 
 	public void beforeUpdate(List<SObject> newList, List<SObject> oldList) {
-		for (TriggerAction.BeforeUpdate action : beforeUpdateActions) {
-			action.BeforeUpdate(newList, oldList);
-		}
+		this.executeActions(TriggerOperation.BEFORE_UPDATE, newList, oldList);
 	}
 
 	public void afterUpdate(List<SObject> newList, List<SObject> oldList) {
-		for (TriggerAction.AfterUpdate action : AfterUpdateActions) {
-			action.AfterUpdate(newList, oldList);
-		}
+		this.executeActions(TriggerOperation.AFTER_UPDATE, newList, oldList);
 	}
 
 	public void beforeDelete(List<SObject> oldList) {
-		for (TriggerAction.BeforeDelete action : beforeDeleteActions) {
-			action.BeforeDelete(oldList);
-		}
+		this.executeActions(TriggerOperation.BEFORE_DELETE, null, oldList);
 	}
 
 	public void afterDelete(List<SObject> oldList) {
-		for (TriggerAction.AfterDelete action : afterDeleteActions) {
-			action.AfterDelete(oldList);
-		}
+		this.executeActions(TriggerOperation.AFTER_DELETE, null, oldList);
 	}
 
 	public void afterUndelete(List<SObject> newList) {
-		for (TriggerAction.AfterUndelete action : afterUndeleteActions) {
-			action.AfterUndelete(newList);
-		}
+		this.executeActions(TriggerOperation.AFTER_UNDELETE, newList, null);
 	}
 
 	private list<Trigger_Action__mdt> getActionMetadata(String relationshipName) {
@@ -80,51 +66,45 @@ public with sharing class MetadataTriggerHandler extends TriggerBase implements 
 				.containsKey(relationshipName)
 		) {
 			list<Trigger_Action__mdt> result = new List<Trigger_Action__mdt>();
-			if (!TriggerBase.isBypassed(this.sObjectName)) {
-				Set<String> bypassedActions = MetadataTriggerHandler.bypassedActions;
-				String sObjectLocalName = this.sObjectName;
-				List<String> split = sObjectName.split('__');
-				String namespace;
-				if (split.size() > 2) {
-					namespace = split[0];
-					sObjectLocalName = sObjectLocalName.replaceFirst(
-						namespace + '__',
-						''
-					);
-				}
-				List<String> queryArray = new List<String>{
-					'SELECT Apex_Class_Name__c,',
-					'Order__c,',
-					'Flow_Name__c,',
-					'Bypass_Permission__c,',
-					'Required_Permission__c,',
-					'Allow_Flow_Recursion__c,',
-					'{0}__r.Bypass_Permission__c,',
-					'{0}__r.Required_Permission__c',
-					'FROM Trigger_Action__mdt',
-					'WHERE',
-					'Apex_Class_Name__c NOT IN :bypassedActions',
-					'AND {0}__c != NULL',
-					'AND {0}__r.Object_API_Name__c = :sObjectLocalName',
-					'AND {0}__r.Object_Namespace__c = :namespace',
-					'AND {0}__r.Bypass_Execution__c = FALSE',
-					'AND Bypass_Execution__c = FALSE',
-					'ORDER BY Order__c ASC'
-				};
-				String queryString = String.format(
-					String.join(queryArray, ' '),
-					new List<Object>{ relationshipName }
-				);
-				for (
-					Trigger_Action__mdt actionMetadata : (List<Trigger_Action__mdt>) Database.query(
-						queryString
-					)
-				) {
-					if (shouldExecute(actionMetadata, relationshipName)) {
-						result.add(actionMetadata);
-					}
+			String sObjectLocalName = this.sObjectName;
+			List<String> split = sObjectName.split('__');
+			String namespace;
+			if (split.size() > 2) {
+				namespace = split[0];
+				sObjectLocalName = sObjectLocalName.replaceFirst(namespace + '__', '');
+			}
+			List<String> queryArray = new List<String>{
+				'SELECT Apex_Class_Name__c,',
+				'Order__c,',
+				'Flow_Name__c,',
+				'Bypass_Permission__c,',
+				'Required_Permission__c,',
+				'Allow_Flow_Recursion__c,',
+				'{0}__r.Bypass_Permission__c,',
+				'{0}__r.Required_Permission__c',
+				'FROM Trigger_Action__mdt',
+				'WHERE',
+				'{0}__c != NULL',
+				'AND {0}__r.Object_API_Name__c = :sObjectLocalName',
+				'AND {0}__r.Object_Namespace__c = :namespace',
+				'AND {0}__r.Bypass_Execution__c = FALSE',
+				'AND Bypass_Execution__c = FALSE',
+				'ORDER BY Order__c ASC'
+			};
+			String queryString = String.format(
+				String.join(queryArray, ' '),
+				new List<Object>{ relationshipName }
+			);
+			for (
+				Trigger_Action__mdt actionMetadata : (List<Trigger_Action__mdt>) Database.query(
+					queryString
+				)
+			) {
+				if (shouldExecute(actionMetadata, relationshipName)) {
+					result.add(actionMetadata);
 				}
 			}
+
 			sObjectToContextToActions.get(this.sObjectName)
 				.put(relationshipName, result);
 		}
@@ -174,12 +154,108 @@ public with sharing class MetadataTriggerHandler extends TriggerBase implements 
 		return actionShouldExecute && sObjectShouldExecute;
 	}
 
+	private void executeActions(
+		TriggerOperation context,
+		List<SObject> newList,
+		List<SObject> oldList
+	) {
+		List<Trigger_Action__mdt> actionMetadata;
+		if (context == TriggerOperation.BEFORE_INSERT) {
+			actionMetadata = this.beforeInsertActionMetadata;
+		} else if (context == TriggerOperation.AFTER_INSERT) {
+			actionMetadata = this.afterInsertActionMetadata;
+		} else if (context == TriggerOperation.BEFORE_UPDATE) {
+			actionMetadata = this.beforeUpdateActionMetadata;
+		} else if (context == TriggerOperation.AFTER_UPDATE) {
+			actionMetadata = this.afterUpdateActionMetadata;
+		} else if (context == TriggerOperation.BEFORE_DELETE) {
+			actionMetadata = this.beforeDeleteActionMetadata;
+		} else if (context == TriggerOperation.AFTER_DELETE) {
+			actionMetadata = this.afterDeleteActionMetadata;
+		} else if (context == TriggerOperation.AFTER_UNDELETE) {
+			actionMetadata = this.afterUndeleteActionMetadata;
+		}
+		for (Trigger_Action__mdt triggerMetadata : actionMetadata) {
+			Object triggerAction;
+			try {
+				triggerAction = Type.forName(triggerMetadata.Apex_Class_Name__c)
+					.newInstance();
+				if (triggerMetadata.Flow_Name__c != null) {
+					((TriggerActionFlow) triggerAction)
+						.flowName = triggerMetadata.Flow_Name__c;
+					((TriggerActionFlow) triggerAction)
+						.allowRecursion = triggerMetadata.Allow_Flow_Recursion__c;
+				}
+			} catch (System.NullPointerException e) {
+				handleException(
+					INVALID_CLASS_ERROR,
+					triggerMetadata.Apex_Class_Name__c,
+					context
+				);
+			}
+			if (
+				!MetadataTriggerHandler.isBypassed(
+					triggerMetadata.Apex_Class_Name__c
+				) && !TriggerBase.isBypassed(this.sObjectName)
+			) {
+				this.validateType(
+					context,
+					triggerAction,
+					triggerMetadata.Apex_Class_Name__c
+				);
+				if (context == TriggerOperation.BEFORE_INSERT) {
+					((TriggerAction.BeforeInsert) triggerAction).beforeInsert(newList);
+				} else if (context == TriggerOperation.AFTER_INSERT) {
+					((TriggerAction.AfterInsert) triggerAction).afterInsert(newList);
+				} else if (context == TriggerOperation.BEFORE_UPDATE) {
+					((TriggerAction.BeforeUpdate) triggerAction)
+						.beforeUpdate(newList, oldList);
+				} else if (context == TriggerOperation.AFTER_UPDATE) {
+					((TriggerAction.AfterUpdate) triggerAction)
+						.afterUpdate(newList, oldList);
+				} else if (context == TriggerOperation.BEFORE_DELETE) {
+					((TriggerAction.BeforeDelete) triggerAction).beforeDelete(oldList);
+				} else if (context == TriggerOperation.AFTER_DELETE) {
+					((TriggerAction.AfterDelete) triggerAction).afterDelete(oldList);
+				} else if (context == TriggerOperation.AFTER_UNDELETE) {
+					((TriggerAction.AfterUndelete) triggerAction).afterUndelete(newList);
+				}
+			}
+		}
+	}
+
+	private void validateType(
+		TriggerOperation context,
+		Object triggerAction,
+		String className
+	) {
+		try {
+			if (context == TriggerOperation.BEFORE_INSERT) {
+				triggerAction = ((TriggerAction.BeforeInsert) triggerAction);
+			} else if (context == TriggerOperation.AFTER_INSERT) {
+				triggerAction = ((TriggerAction.AfterInsert) triggerAction);
+			} else if (context == TriggerOperation.BEFORE_UPDATE) {
+				triggerAction = ((TriggerAction.BeforeUpdate) triggerAction);
+			} else if (context == TriggerOperation.AFTER_UPDATE) {
+				triggerAction = ((TriggerAction.AfterUpdate) triggerAction);
+			} else if (context == TriggerOperation.BEFORE_DELETE) {
+				triggerAction = ((TriggerAction.BeforeDelete) triggerAction);
+			} else if (context == TriggerOperation.AFTER_DELETE) {
+				triggerAction = ((TriggerAction.AfterDelete) triggerAction);
+			} else if (context == TriggerOperation.AFTER_UNDELETE) {
+				triggerAction = ((TriggerAction.AfterUndelete) triggerAction);
+			}
+		} catch (System.TypeException e) {
+			handleException(INVALID_TYPE_ERROR, className, context);
+		}
+	}
+
 	@TestVisible
 	private List<Trigger_Action__mdt> beforeInsertActionMetadata {
 		get {
 			if (beforeInsertActionMetadata == null) {
 				beforeInsertActionMetadata = getActionMetadata(
-					System.TriggerOperation.BEFORE_INSERT.name()
+					TriggerOperation.BEFORE_INSERT.name()
 				);
 			}
 			return beforeInsertActionMetadata;
@@ -187,48 +263,12 @@ public with sharing class MetadataTriggerHandler extends TriggerBase implements 
 		set;
 	}
 
-	private List<TriggerAction.BeforeInsert> beforeInsertActions {
-		get {
-			List<TriggerAction.BeforeInsert> returnValue = new List<TriggerAction.BeforeInsert>();
-			for (
-				Trigger_Action__mdt triggerMetadata : this.beforeInsertActionMetadata
-			) {
-				try {
-					TriggerAction.BeforeInsert triggerAction = (TriggerAction.BeforeInsert) Type.forName(
-							triggerMetadata.Apex_Class_Name__c
-						)
-						.newInstance();
-					if (triggerMetadata.Flow_Name__c != null) {
-						((TriggerActionFlow) triggerAction)
-							.flowName = triggerMetadata.Flow_Name__c;
-						((TriggerActionFlow) triggerAction)
-							.allowRecursion = triggerMetadata.Allow_Flow_Recursion__c;
-					}
-					returnValue.add(triggerAction);
-				} catch (System.TypeException e) {
-					handleException(
-						INVALID_TYPE_ERROR,
-						triggerMetadata.Apex_Class_Name__c,
-						System.TriggerOperation.BEFORE_INSERT
-					);
-				} catch (System.NullPointerException e) {
-					handleException(
-						INVALID_CLASS_ERROR,
-						triggerMetadata.Apex_Class_Name__c,
-						System.TriggerOperation.BEFORE_INSERT
-					);
-				}
-			}
-			return returnValue;
-		}
-	}
-
 	@TestVisible
 	private List<Trigger_Action__mdt> afterInsertActionMetadata {
 		get {
 			if (afterInsertActionMetadata == null) {
 				afterInsertActionMetadata = getActionMetadata(
-					System.TriggerOperation.AFTER_INSERT.name()
+					TriggerOperation.AFTER_INSERT.name()
 				);
 			}
 			return afterInsertActionMetadata;
@@ -236,46 +276,12 @@ public with sharing class MetadataTriggerHandler extends TriggerBase implements 
 		set;
 	}
 
-	private List<TriggerAction.AfterInsert> afterInsertActions {
-		get {
-			List<TriggerAction.AfterInsert> returnValue = new List<TriggerAction.AfterInsert>();
-			for (Trigger_Action__mdt triggerMetadata : afterInsertActionMetadata) {
-				try {
-					TriggerAction.AfterInsert triggerAction = (TriggerAction.AfterInsert) Type.forName(
-							triggerMetadata.Apex_Class_Name__c
-						)
-						.newInstance();
-					if (triggerMetadata.Flow_Name__c != null) {
-						((TriggerActionFlow) triggerAction)
-							.flowName = triggerMetadata.Flow_Name__c;
-						((TriggerActionFlow) triggerAction)
-							.allowRecursion = triggerMetadata.Allow_Flow_Recursion__c;
-					}
-					returnValue.add(triggerAction);
-				} catch (System.TypeException e) {
-					handleException(
-						INVALID_TYPE_ERROR,
-						triggerMetadata.Apex_Class_Name__c,
-						System.TriggerOperation.AFTER_INSERT
-					);
-				} catch (System.NullPointerException e) {
-					handleException(
-						INVALID_CLASS_ERROR,
-						triggerMetadata.Apex_Class_Name__c,
-						System.TriggerOperation.AFTER_INSERT
-					);
-				}
-			}
-			return returnValue;
-		}
-	}
-
 	@TestVisible
 	private List<Trigger_Action__mdt> beforeUpdateActionMetadata {
 		get {
 			if (beforeUpdateActionMetadata == null) {
 				beforeUpdateActionMetadata = getActionMetadata(
-					System.TriggerOperation.BEFORE_UPDATE.name()
+					TriggerOperation.BEFORE_UPDATE.name()
 				);
 			}
 			return beforeUpdateActionMetadata;
@@ -283,46 +289,12 @@ public with sharing class MetadataTriggerHandler extends TriggerBase implements 
 		set;
 	}
 
-	private List<TriggerAction.BeforeUpdate> beforeUpdateActions {
-		get {
-			List<TriggerAction.BeforeUpdate> returnValue = new List<TriggerAction.BeforeUpdate>();
-			for (Trigger_Action__mdt triggerMetadata : beforeUpdateActionMetadata) {
-				try {
-					TriggerAction.BeforeUpdate triggerAction = (TriggerAction.BeforeUpdate) Type.forName(
-							triggerMetadata.Apex_Class_Name__c
-						)
-						.newInstance();
-					if (triggerMetadata.Flow_Name__c != null) {
-						((TriggerActionFlow) triggerAction)
-							.flowName = triggerMetadata.Flow_Name__c;
-						((TriggerActionFlow) triggerAction)
-							.allowRecursion = triggerMetadata.Allow_Flow_Recursion__c;
-					}
-					returnValue.add(triggerAction);
-				} catch (System.TypeException e) {
-					handleException(
-						INVALID_TYPE_ERROR,
-						triggerMetadata.Apex_Class_Name__c,
-						System.TriggerOperation.BEFORE_UPDATE
-					);
-				} catch (System.NullPointerException e) {
-					handleException(
-						INVALID_CLASS_ERROR,
-						triggerMetadata.Apex_Class_Name__c,
-						System.TriggerOperation.BEFORE_UPDATE
-					);
-				}
-			}
-			return returnValue;
-		}
-	}
-
 	@TestVisible
 	private List<Trigger_Action__mdt> afterUpdateActionMetadata {
 		get {
 			if (afterUpdateActionMetadata == null) {
 				afterUpdateActionMetadata = getActionMetadata(
-					System.TriggerOperation.AFTER_UPDATE.name()
+					TriggerOperation.AFTER_UPDATE.name()
 				);
 			}
 			return afterUpdateActionMetadata;
@@ -330,46 +302,12 @@ public with sharing class MetadataTriggerHandler extends TriggerBase implements 
 		set;
 	}
 
-	private List<TriggerAction.AfterUpdate> afterUpdateActions {
-		get {
-			List<TriggerAction.AfterUpdate> returnValue = new List<TriggerAction.AfterUpdate>();
-			for (Trigger_Action__mdt triggerMetadata : afterUpdateActionMetadata) {
-				try {
-					TriggerAction.AfterUpdate triggerAction = (TriggerAction.AfterUpdate) Type.forName(
-							triggerMetadata.Apex_Class_Name__c
-						)
-						.newInstance();
-					if (triggerMetadata.Flow_Name__c != null) {
-						((TriggerActionFlow) triggerAction)
-							.flowName = triggerMetadata.Flow_Name__c;
-						((TriggerActionFlow) triggerAction)
-							.allowRecursion = triggerMetadata.Allow_Flow_Recursion__c;
-					}
-					returnValue.add(triggerAction);
-				} catch (System.TypeException e) {
-					handleException(
-						INVALID_TYPE_ERROR,
-						triggerMetadata.Apex_Class_Name__c,
-						System.TriggerOperation.AFTER_UPDATE
-					);
-				} catch (System.NullPointerException e) {
-					handleException(
-						INVALID_CLASS_ERROR,
-						triggerMetadata.Apex_Class_Name__c,
-						System.TriggerOperation.AFTER_UPDATE
-					);
-				}
-			}
-			return returnValue;
-		}
-	}
-
 	@TestVisible
 	private List<Trigger_Action__mdt> beforeDeleteActionMetadata {
 		get {
 			if (beforeDeleteActionMetadata == null) {
 				beforeDeleteActionMetadata = getActionMetadata(
-					System.TriggerOperation.BEFORE_DELETE.name()
+					TriggerOperation.BEFORE_DELETE.name()
 				);
 			}
 			return beforeDeleteActionMetadata;
@@ -377,46 +315,12 @@ public with sharing class MetadataTriggerHandler extends TriggerBase implements 
 		set;
 	}
 
-	private List<TriggerAction.BeforeDelete> beforeDeleteActions {
-		get {
-			List<TriggerAction.BeforeDelete> returnValue = new List<TriggerAction.BeforeDelete>();
-			for (Trigger_Action__mdt triggerMetadata : beforeDeleteActionMetadata) {
-				try {
-					TriggerAction.BeforeDelete triggerAction = (TriggerAction.BeforeDelete) Type.forName(
-							triggerMetadata.Apex_Class_Name__c
-						)
-						.newInstance();
-					if (triggerMetadata.Flow_Name__c != null) {
-						((TriggerActionFlow) triggerAction)
-							.flowName = triggerMetadata.Flow_Name__c;
-						((TriggerActionFlow) triggerAction)
-							.allowRecursion = triggerMetadata.Allow_Flow_Recursion__c;
-					}
-					returnValue.add(triggerAction);
-				} catch (System.TypeException e) {
-					handleException(
-						INVALID_TYPE_ERROR,
-						triggerMetadata.Apex_Class_Name__c,
-						System.TriggerOperation.BEFORE_DELETE
-					);
-				} catch (System.NullPointerException e) {
-					handleException(
-						INVALID_CLASS_ERROR,
-						triggerMetadata.Apex_Class_Name__c,
-						System.TriggerOperation.BEFORE_DELETE
-					);
-				}
-			}
-			return returnValue;
-		}
-	}
-
 	@TestVisible
 	private List<Trigger_Action__mdt> afterDeleteActionMetadata {
 		get {
 			if (afterDeleteActionMetadata == null) {
 				afterDeleteActionMetadata = getActionMetadata(
-					System.TriggerOperation.AFTER_DELETE.name()
+					TriggerOperation.AFTER_DELETE.name()
 				);
 			}
 			return afterDeleteActionMetadata;
@@ -424,46 +328,12 @@ public with sharing class MetadataTriggerHandler extends TriggerBase implements 
 		set;
 	}
 
-	private List<TriggerAction.AfterDelete> afterDeleteActions {
-		get {
-			List<TriggerAction.AfterDelete> returnValue = new List<TriggerAction.AfterDelete>();
-			for (Trigger_Action__mdt triggerMetadata : afterDeleteActionMetadata) {
-				try {
-					TriggerAction.AfterDelete triggerAction = (TriggerAction.AfterDelete) Type.forName(
-							triggerMetadata.Apex_Class_Name__c
-						)
-						.newInstance();
-					if (triggerMetadata.Flow_Name__c != null) {
-						((TriggerActionFlow) triggerAction)
-							.flowName = triggerMetadata.Flow_Name__c;
-						((TriggerActionFlow) triggerAction)
-							.allowRecursion = triggerMetadata.Allow_Flow_Recursion__c;
-					}
-					returnValue.add(triggerAction);
-				} catch (System.TypeException e) {
-					handleException(
-						INVALID_TYPE_ERROR,
-						triggerMetadata.Apex_Class_Name__c,
-						System.TriggerOperation.AFTER_DELETE
-					);
-				} catch (System.NullPointerException e) {
-					handleException(
-						INVALID_CLASS_ERROR,
-						triggerMetadata.Apex_Class_Name__c,
-						System.TriggerOperation.AFTER_DELETE
-					);
-				}
-			}
-			return returnValue;
-		}
-	}
-
 	@TestVisible
 	private List<Trigger_Action__mdt> afterUndeleteActionMetadata {
 		get {
 			if (afterUndeleteActionMetadata == null) {
 				afterUndeleteActionMetadata = getActionMetadata(
-					System.TriggerOperation.AFTER_UNDELETE.name()
+					TriggerOperation.AFTER_UNDELETE.name()
 				);
 			}
 			return afterUndeleteActionMetadata;
@@ -471,44 +341,10 @@ public with sharing class MetadataTriggerHandler extends TriggerBase implements 
 		set;
 	}
 
-	private List<TriggerAction.AfterUndelete> afterUndeleteActions {
-		get {
-			List<TriggerAction.AfterUndelete> returnValue = new List<TriggerAction.AfterUndelete>();
-			for (Trigger_Action__mdt triggerMetadata : afterUndeleteActionMetadata) {
-				try {
-					TriggerAction.AfterUndelete triggerAction = (TriggerAction.AfterUndelete) Type.forName(
-							triggerMetadata.Apex_Class_Name__c
-						)
-						.newInstance();
-					if (triggerMetadata.Flow_Name__c != null) {
-						((TriggerActionFlow) triggerAction)
-							.flowName = triggerMetadata.Flow_Name__c;
-						((TriggerActionFlow) triggerAction)
-							.allowRecursion = triggerMetadata.Allow_Flow_Recursion__c;
-					}
-					returnValue.add(triggerAction);
-				} catch (System.TypeException e) {
-					handleException(
-						INVALID_TYPE_ERROR,
-						triggerMetadata.Apex_Class_Name__c,
-						System.TriggerOperation.AFTER_UNDELETE
-					);
-				} catch (System.NullPointerException e) {
-					handleException(
-						INVALID_CLASS_ERROR,
-						triggerMetadata.Apex_Class_Name__c,
-						System.TriggerOperation.AFTER_UNDELETE
-					);
-				}
-			}
-			return returnValue;
-		}
-	}
-
 	private void handleException(
 		String error,
 		String className,
-		System.TriggerOperation triggerOperation
+		TriggerOperation triggerOperation
 	) {
 		throw new MetadataTriggerHandlerException(
 			String.format(
