@@ -103,6 +103,12 @@ To enable this flow, simply insert a trigger action record with Apex Class Name 
 
 ![Flow Trigger Action](images/flowTriggerAction.png)
 
+You can also call the `TriggerActionFlowAddError.AddError` invocable Apex method to add a nicely formatted error message to a record during flow execution.
+
+![Flow Trigger Action Error](images/flow_error_constant.png)
+![Flow Trigger Action Error](images/add_error_flow.png)
+![Flow Trigger Action Error](images/flow_error_UI.png)
+
 ## Recursion Prevention
 
 Use the `TriggerBase.idToNumberOfTimesSeenBeforeUpdate` and `TriggerBase.idToNumberOfTimesSeenAfterUpdate` to prevent recursively processing the same record(s).
