@@ -240,9 +240,17 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 	}
 
 	public class OldRecordRequest {
-		@InvocableVariable
+		@InvocableVariable(
+			label='Current Record'
+			description='The current record'
+			required=true
+		)
 		public sObject currentRecord;
-		@InvocableVariable
+		@InvocableVariable(
+			label='Old List'
+			description='A list of all the records with the old field values'
+			required=true
+		)
 		public List<sObject> oldList;
 	}
 
