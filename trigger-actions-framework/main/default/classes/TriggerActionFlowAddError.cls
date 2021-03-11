@@ -32,13 +32,31 @@ public inherited sharing class TriggerActionFlowAddError {
 		if (requests.size() != 1) {
 			throw new TriggerActionFlowAddErrorException(INVALID_REQUEST);
 		}
-		requests[0].record.addError(requests[0].errorMessage);
+		if (!String.isBlank(requests[0].fieldName)) {
+			requests[0]
+				.record.addError(requests[0].fieldName, requests[0].errorMessage);
+		} else {
+			requests[0].record.addError(requests[0].errorMessage);
+		}
 	}
 
 	public class Request {
-		@InvocableVariable
+		@InvocableVariable(
+			label='Record'
+			description='Record to add the error to'
+			required=true
+		)
 		public SObject record;
-		@InvocableVariable
+		@InvocableVariable(
+			label='Field Name'
+			description='API name of corresponding field'
+		)
+		public String fieldName;
+		@InvocableVariable(
+			label='Error Message'
+			description='Error Message'
+			required=true
+		)
 		public String errorMessage;
 	}
 

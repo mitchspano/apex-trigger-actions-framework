@@ -17,6 +17,7 @@
 @isTest
 private class TriggerActionFlowAddErrorTest {
 	private static final String MY_STRING = 'MY_STRING';
+	private static final String NAME = 'Name';
 
 	@IsTest
 	private static void error() {
@@ -25,6 +26,35 @@ private class TriggerActionFlowAddErrorTest {
 		TriggerActionFlowAddError.Request request = new TriggerActionFlowAddError.Request();
 		Account account = new Account();
 		request.errorMessage = MY_STRING;
+		request.record = account;
+		requests.add(request);
+		TriggerActionFlowAddError.addError(requests);
+		Test.stopTest();
+		System.assertEquals(
+			true,
+			account.hasErrors(),
+			'The Account should have an error'
+		);
+		System.assertEquals(
+			1,
+			account.getErrors().size(),
+			'There should only be one error'
+		);
+		System.assertEquals(
+			MY_STRING,
+			account.getErrors()[0].getMessage(),
+			'The error should contain the message we are looking for'
+		);
+	}
+
+	@IsTest
+	private static void fieldError() {
+		Test.startTest();
+		List<TriggerActionFlowAddError.Request> requests = new List<TriggerActionFlowAddError.Request>();
+		TriggerActionFlowAddError.Request request = new TriggerActionFlowAddError.Request();
+		Account account = new Account();
+		request.errorMessage = MY_STRING;
+		request.fieldName = NAME;
 		request.record = account;
 		requests.add(request);
 		TriggerActionFlowAddError.addError(requests);

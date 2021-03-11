@@ -49,9 +49,17 @@ public inherited sharing class TriggerActionFlowClearBypass {
 	}
 
 	public class Request {
-		@InvocableVariable
+		@InvocableVariable(
+			label='Name'
+			description='API Name of the trigger action flow, class, or sObject'
+			required=true
+		)
 		public String name;
-		@InvocableVariable
+		@InvocableVariable(
+			label='Bypass Type'
+			description='Apex, Flow, or Object'
+			required=true
+		)
 		public String bypassType;
 	}
 
