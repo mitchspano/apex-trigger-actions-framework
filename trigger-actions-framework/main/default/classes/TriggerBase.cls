@@ -1,19 +1,3 @@
-/*
-   Copyright 2020 Google LLC
-
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
-
-	https://www.apache.org/licenses/LICENSE-2.0
-
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
- */
-
 public inherited sharing virtual class TriggerBase {
 	@TestVisible
 	private static final String HANDLER_OUTSIDE_TRIGGER_MESSAGE = 'Trigger handler called outside of Trigger execution';
@@ -44,24 +28,12 @@ public inherited sharing virtual class TriggerBase {
 			this.context == System.TriggerOperation.BEFORE_INSERT &&
 			this instanceof TriggerAction.BeforeInsert
 		) {
-			try {
-				((TriggerAction.BeforeInsert) this).beforeInsert(triggerNew);
-			} catch (Exception e) {
-				for (SObject obj : triggerNew) {
-					obj.addError(e.getMessage());
-				}
-			}
+			((TriggerAction.BeforeInsert) this).beforeInsert(triggerNew);
 		} else if (
 			this.context == System.TriggerOperation.AFTER_INSERT &&
 			this instanceof TriggerAction.AfterInsert
 		) {
-			try {
-				((TriggerAction.AfterInsert) this).afterInsert(triggerNew);
-			} catch (Exception e) {
-				for (SObject obj : triggerNew) {
-					obj.addError(e.getMessage());
-				}
-			}
+			((TriggerAction.AfterInsert) this).afterInsert(triggerNew);
 		} else if (
 			this.context == System.TriggerOperation.BEFORE_UPDATE &&
 			this instanceof TriggerAction.BeforeUpdate
@@ -76,14 +48,7 @@ public inherited sharing virtual class TriggerBase {
 					);
 				}
 			}
-			try {
-				((TriggerAction.BeforeUpdate) this)
-					.beforeUpdate(triggerNew, triggerOld);
-			} catch (Exception e) {
-				for (SObject obj : triggerNew) {
-					obj.addError(e.getMessage());
-				}
-			}
+			((TriggerAction.BeforeUpdate) this).beforeUpdate(triggerNew, triggerOld);
 		} else if (
 			this.context == System.TriggerOperation.AFTER_UPDATE &&
 			this instanceof TriggerAction.AfterUpdate
@@ -98,46 +63,22 @@ public inherited sharing virtual class TriggerBase {
 					);
 				}
 			}
-			try {
-				((TriggerAction.AfterUpdate) this).afterUpdate(triggerNew, triggerOld);
-			} catch (Exception e) {
-				for (SObject obj : triggerNew) {
-					obj.addError(e.getMessage());
-				}
-			}
+			((TriggerAction.AfterUpdate) this).afterUpdate(triggerNew, triggerOld);
 		} else if (
 			this.context == System.TriggerOperation.BEFORE_DELETE &&
 			this instanceof TriggerAction.BeforeDelete
 		) {
-			try {
-				((TriggerAction.BeforeDelete) this).beforeDelete(triggerOld);
-			} catch (Exception e) {
-				for (SObject obj : triggerOld) {
-					obj.addError(e.getMessage());
-				}
-			}
+			((TriggerAction.BeforeDelete) this).beforeDelete(triggerOld);
 		} else if (
 			this.context == System.TriggerOperation.AFTER_DELETE &&
 			this instanceof TriggerAction.AfterDelete
 		) {
-			try {
-				((TriggerAction.AfterDelete) this).afterDelete(triggerOld);
-			} catch (Exception e) {
-				for (SObject obj : triggerOld) {
-					obj.addError(e.getMessage());
-				}
-			}
+			((TriggerAction.AfterDelete) this).afterDelete(triggerOld);
 		} else if (
 			this.context == System.TriggerOperation.AFTER_UNDELETE &&
 			this instanceof TriggerAction.AfterUndelete
 		) {
-			try {
-				((TriggerAction.AfterUndelete) this).afterUndelete(triggerNew);
-			} catch (Exception e) {
-				for (SObject obj : triggerNew) {
-					obj.addError(e.getMessage());
-				}
-			}
+			((TriggerAction.AfterUndelete) this).afterUndelete(triggerNew);
 		}
 	}
 
