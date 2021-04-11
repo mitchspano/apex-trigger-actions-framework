@@ -54,13 +54,13 @@ private class MetadataTriggerHandlerTest {
 			action
 		};
 		Exception myException;
-		test.startTest();
+		Test.startTest();
 		try {
 			handler.beforeInsert(handler.triggerNew);
 		} catch (Exception e) {
 			myException = e;
 		}
-		test.stopTest();
+		Test.stopTest();
 		System.assertEquals(null, myException);
 	}
 
@@ -89,13 +89,13 @@ private class MetadataTriggerHandlerTest {
 			action
 		};
 		Exception myException;
-		test.startTest();
+		Test.startTest();
 		try {
 			handler.beforeInsert(handler.triggerNew);
 		} catch (Exception e) {
 			myException = e;
 		}
-		test.stopTest();
+		Test.stopTest();
 		System.assertNotEquals(null, myException);
 		System.assertEquals(
 			myException.getMessage(),
@@ -135,13 +135,13 @@ private class MetadataTriggerHandlerTest {
 			action
 		};
 		Exception myException;
-		test.startTest();
+		Test.startTest();
 		try {
 			handler.beforeInsert(handler.triggerNew);
 		} catch (Exception e) {
 			myException = e;
 		}
-		test.stopTest();
+		Test.stopTest();
 		System.assertNotEquals(null, myException);
 		System.assertEquals(
 			myException.getMessage(),
@@ -179,13 +179,13 @@ private class MetadataTriggerHandlerTest {
 		);
 		handler.afterInsertActionMetadata = new List<Trigger_Action__mdt>{ action };
 		Exception myException;
-		test.startTest();
+		Test.startTest();
 		try {
 			handler.afterInsert(handler.triggerNew);
 		} catch (Exception e) {
 			myException = e;
 		}
-		test.stopTest();
+		Test.stopTest();
 		System.assertEquals(null, myException);
 	}
 
@@ -212,13 +212,13 @@ private class MetadataTriggerHandlerTest {
 		);
 		handler.afterInsertActionMetadata = new List<Trigger_Action__mdt>{ action };
 		Exception myException;
-		test.startTest();
+		Test.startTest();
 		try {
 			handler.afterInsert(handler.triggerNew);
 		} catch (Exception e) {
 			myException = e;
 		}
-		test.stopTest();
+		Test.stopTest();
 		System.assertNotEquals(null, myException);
 		System.assertEquals(
 			myException.getMessage(),
@@ -256,13 +256,13 @@ private class MetadataTriggerHandlerTest {
 		);
 		handler.afterInsertActionMetadata = new List<Trigger_Action__mdt>{ action };
 		Exception myException;
-		test.startTest();
+		Test.startTest();
 		try {
 			handler.afterInsert(handler.triggerNew);
 		} catch (Exception e) {
 			myException = e;
 		}
-		test.stopTest();
+		Test.stopTest();
 		System.assertNotEquals(null, myException);
 		System.assertEquals(
 			myException.getMessage(),
@@ -302,13 +302,13 @@ private class MetadataTriggerHandlerTest {
 			action
 		};
 		Exception myException;
-		test.startTest();
+		Test.startTest();
 		try {
 			handler.beforeUpdate(handler.triggerNew, handler.triggerOld);
 		} catch (Exception e) {
 			myException = e;
 		}
-		test.stopTest();
+		Test.stopTest();
 		System.assertEquals(null, myException);
 	}
 
@@ -337,13 +337,13 @@ private class MetadataTriggerHandlerTest {
 			action
 		};
 		Exception myException;
-		test.startTest();
+		Test.startTest();
 		try {
 			handler.beforeUpdate(handler.triggerNew, handler.triggerOld);
 		} catch (Exception e) {
 			myException = e;
 		}
-		test.stopTest();
+		Test.stopTest();
 		System.assertNotEquals(null, myException);
 		System.assertEquals(
 			myException.getMessage(),
@@ -381,13 +381,13 @@ private class MetadataTriggerHandlerTest {
 		);
 		handler.afterUpdateActionMetadata = new List<Trigger_Action__mdt>{ action };
 		Exception myException;
-		test.startTest();
+		Test.startTest();
 		try {
 			handler.afterUpdate(handler.triggerNew, handler.triggerOld);
 		} catch (Exception e) {
 			myException = e;
 		}
-		test.stopTest();
+		Test.stopTest();
 		System.assertEquals(null, myException);
 	}
 
@@ -414,13 +414,13 @@ private class MetadataTriggerHandlerTest {
 		);
 		handler.afterUpdateActionMetadata = new List<Trigger_Action__mdt>{ action };
 		Exception myException;
-		test.startTest();
+		Test.startTest();
 		try {
 			handler.afterUpdate(handler.triggerNew, handler.triggerOld);
 		} catch (Exception e) {
 			myException = e;
 		}
-		test.stopTest();
+		Test.stopTest();
 		System.assertNotEquals(null, myException);
 		System.assertEquals(
 			myException.getMessage(),
@@ -459,13 +459,13 @@ private class MetadataTriggerHandlerTest {
 		);
 		handler.afterUpdateActionMetadata = new List<Trigger_Action__mdt>{ action };
 		Exception myException;
-		test.startTest();
+		Test.startTest();
 		try {
 			handler.afterUpdate(handler.triggerNew, handler.triggerOld);
 		} catch (Exception e) {
 			myException = e;
 		}
-		test.stopTest();
+		Test.stopTest();
 		System.assertNotEquals(null, myException);
 		System.assertEquals(
 			myException.getMessage(),
@@ -504,13 +504,13 @@ private class MetadataTriggerHandlerTest {
 			action
 		};
 		Exception myException;
-		test.startTest();
+		Test.startTest();
 		try {
 			handler.beforeDelete(handler.triggerOld);
 		} catch (Exception e) {
 			myException = e;
 		}
-		test.stopTest();
+		Test.stopTest();
 		System.assertEquals(null, myException);
 	}
 
@@ -538,13 +538,13 @@ private class MetadataTriggerHandlerTest {
 			action
 		};
 		Exception myException;
-		test.startTest();
+		Test.startTest();
 		try {
 			handler.beforeDelete(handler.triggerOld);
 		} catch (Exception e) {
 			myException = e;
 		}
-		test.stopTest();
+		Test.stopTest();
 		System.assertNotEquals(null, myException);
 		System.assertEquals(
 			myException.getMessage(),
@@ -585,13 +585,13 @@ private class MetadataTriggerHandlerTest {
 			action
 		};
 		Exception myException;
-		test.startTest();
+		Test.startTest();
 		try {
 			handler.beforeUpdate(handler.triggerNew, handler.triggerOld);
 		} catch (Exception e) {
 			myException = e;
 		}
-		test.stopTest();
+		Test.stopTest();
 		System.assertNotEquals(null, myException);
 		System.assertEquals(
 			myException.getMessage(),
@@ -631,13 +631,13 @@ private class MetadataTriggerHandlerTest {
 			action
 		};
 		Exception myException;
-		test.startTest();
+		Test.startTest();
 		try {
 			handler.beforeDelete(handler.triggerOld);
 		} catch (Exception e) {
 			myException = e;
 		}
-		test.stopTest();
+		Test.stopTest();
 		System.assertNotEquals(null, myException);
 		System.assertEquals(
 			myException.getMessage(),
@@ -674,13 +674,13 @@ private class MetadataTriggerHandlerTest {
 		);
 		handler.afterDeleteActionMetadata = new List<Trigger_Action__mdt>{ action };
 		Exception myException;
-		test.startTest();
+		Test.startTest();
 		try {
 			handler.afterDelete(handler.triggerOld);
 		} catch (Exception e) {
 			myException = e;
 		}
-		test.stopTest();
+		Test.stopTest();
 		System.assertEquals(null, myException);
 	}
 
@@ -706,13 +706,13 @@ private class MetadataTriggerHandlerTest {
 		);
 		handler.afterDeleteActionMetadata = new List<Trigger_Action__mdt>{ action };
 		Exception myException;
-		test.startTest();
+		Test.startTest();
 		try {
 			handler.afterDelete(handler.triggerOld);
 		} catch (Exception e) {
 			myException = e;
 		}
-		test.stopTest();
+		Test.stopTest();
 		System.assertNotEquals(null, myException);
 		System.assertEquals(
 			myException.getMessage(),
@@ -750,13 +750,13 @@ private class MetadataTriggerHandlerTest {
 		);
 		handler.afterDeleteActionMetadata = new List<Trigger_Action__mdt>{ action };
 		Exception myException;
-		test.startTest();
+		Test.startTest();
 		try {
 			handler.afterDelete(handler.triggerOld);
 		} catch (Exception e) {
 			myException = e;
 		}
-		test.stopTest();
+		Test.stopTest();
 		System.assertNotEquals(null, myException);
 		System.assertEquals(
 			myException.getMessage(),
@@ -795,13 +795,13 @@ private class MetadataTriggerHandlerTest {
 			action
 		};
 		Exception myException;
-		test.startTest();
+		Test.startTest();
 		try {
 			handler.afterUndelete(handler.triggerOld);
 		} catch (Exception e) {
 			myException = e;
 		}
-		test.stopTest();
+		Test.stopTest();
 		System.assertEquals(null, myException);
 	}
 
@@ -829,13 +829,13 @@ private class MetadataTriggerHandlerTest {
 			action
 		};
 		Exception myException;
-		test.startTest();
+		Test.startTest();
 		try {
 			handler.afterUndelete(handler.triggerOld);
 		} catch (Exception e) {
 			myException = e;
 		}
-		test.stopTest();
+		Test.stopTest();
 		System.assertNotEquals(null, myException);
 		System.assertEquals(
 			myException.getMessage(),
@@ -874,13 +874,13 @@ private class MetadataTriggerHandlerTest {
 			action
 		};
 		Exception myException;
-		test.startTest();
+		Test.startTest();
 		try {
 			handler.afterUndelete(handler.triggerOld);
 		} catch (Exception e) {
 			myException = e;
 		}
-		test.stopTest();
+		Test.stopTest();
 		System.assertNotEquals(null, myException);
 		System.assertEquals(
 			myException.getMessage(),
@@ -916,13 +916,13 @@ private class MetadataTriggerHandlerTest {
 	@IsTest
 	private static void bypass_success() {
 		Exception myException;
-		test.startTest();
+		Test.startTest();
 		try {
 			MetadataTriggerHandler.bypass(TEST_BEFORE_INSERT);
 		} catch (Exception e) {
 			myException = e;
 		}
-		test.stopTest();
+		Test.stopTest();
 		system.assertEquals(null, myException);
 		System.assert(
 			MetadataTriggerHandler.bypassedActions.contains(TEST_BEFORE_INSERT)
@@ -932,14 +932,14 @@ private class MetadataTriggerHandlerTest {
 	@IsTest
 	private static void clearBypass_success() {
 		Exception myException;
-		test.startTest();
+		Test.startTest();
 		try {
 			MetadataTriggerHandler.bypass(TEST_BEFORE_INSERT);
 			MetadataTriggerHandler.clearBypass(TEST_BEFORE_INSERT);
 		} catch (Exception e) {
 			myException = e;
 		}
-		test.stopTest();
+		Test.stopTest();
 		system.assertEquals(null, myException);
 		System.assert(
 			!MetadataTriggerHandler.bypassedActions.contains(TEST_BEFORE_INSERT)
@@ -951,13 +951,13 @@ private class MetadataTriggerHandlerTest {
 		Boolean isBypassed;
 		MetadataTriggerHandler.bypass(TEST_BEFORE_INSERT);
 		Exception myException;
-		test.startTest();
+		Test.startTest();
 		try {
 			isBypassed = MetadataTriggerHandler.isBypassed(TEST_BEFORE_INSERT);
 		} catch (Exception e) {
 			myException = e;
 		}
-		test.stopTest();
+		Test.stopTest();
 		system.assertEquals(null, myException);
 		System.assertEquals(true, isBypassed);
 	}
@@ -966,13 +966,13 @@ private class MetadataTriggerHandlerTest {
 	private static void clearAllBypasses_success() {
 		MetadataTriggerHandler.bypass(TEST_BEFORE_INSERT);
 		Exception myException;
-		test.startTest();
+		Test.startTest();
 		try {
 			MetadataTriggerHandler.clearAllBypasses();
 		} catch (Exception e) {
 			myException = e;
 		}
-		test.stopTest();
+		Test.stopTest();
 		system.assertEquals(null, myException);
 		System.assertEquals(0, MetadataTriggerHandler.bypassedActions.size());
 	}

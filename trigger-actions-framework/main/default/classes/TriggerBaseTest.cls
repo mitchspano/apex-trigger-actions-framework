@@ -19,20 +19,20 @@ private class TriggerBaseTest {
 	@IsTest
 	private static void constructor_success() {
 		Exception myException;
-		test.startTest();
+		Test.startTest();
 		try {
 			BaseTest base = new BaseTest();
 		} catch (Exception e) {
 			myException = e;
 		}
-		test.stopTest();
+		Test.stopTest();
 		system.assertEquals(null, myException);
 	}
 
 	@IsTest
 	private static void beforeInsert_success() {
 		Exception myException;
-		test.startTest();
+		Test.startTest();
 		BaseTest base = new BaseTest();
 		base.context = System.TriggerOperation.BEFORE_INSERT;
 		base.triggerNew = new List<SObject>{ new Account(name = 'My Account') };
@@ -41,14 +41,14 @@ private class TriggerBaseTest {
 		} catch (Exception e) {
 			myException = e;
 		}
-		test.stopTest();
+		Test.stopTest();
 		system.assertEquals(null, myException);
 	}
 
 	@IsTest
 	private static void afterInsert_success() {
 		Exception myException;
-		test.startTest();
+		Test.startTest();
 		BaseTest base = new BaseTest();
 		base.context = System.TriggerOperation.AFTER_INSERT;
 		base.triggerNew = new List<SObject>{ new Account(name = 'My Account') };
@@ -57,14 +57,14 @@ private class TriggerBaseTest {
 		} catch (Exception e) {
 			myException = e;
 		}
-		test.stopTest();
+		Test.stopTest();
 		system.assertEquals(null, myException);
 	}
 
 	@IsTest
 	private static void beforeUpdate_success() {
 		Exception myException;
-		test.startTest();
+		Test.startTest();
 		BaseTest base = new BaseTest();
 		base.context = System.TriggerOperation.BEFORE_UPDATE;
 		base.triggerNew = new List<SObject>{ new Account(name = 'My Account') };
@@ -74,14 +74,14 @@ private class TriggerBaseTest {
 		} catch (Exception e) {
 			myException = e;
 		}
-		test.stopTest();
+		Test.stopTest();
 		system.assertEquals(null, myException);
 	}
 
 	@IsTest
 	private static void afterUpdate_success() {
 		Exception myException;
-		test.startTest();
+		Test.startTest();
 		BaseTest base = new BaseTest();
 		base.context = System.TriggerOperation.After_UPDATE;
 		base.triggerNew = new List<SObject>{ new Account(name = 'My Account') };
@@ -91,14 +91,14 @@ private class TriggerBaseTest {
 		} catch (Exception e) {
 			myException = e;
 		}
-		test.stopTest();
+		Test.stopTest();
 		system.assertEquals(null, myException);
 	}
 
 	@IsTest
 	private static void beforeDelete_success() {
 		Exception myException;
-		test.startTest();
+		Test.startTest();
 		BaseTest base = new BaseTest();
 		base.context = System.TriggerOperation.BEFORE_DELETE;
 		base.triggerOld = new List<SObject>{ new Account(name = 'My Account') };
@@ -107,14 +107,14 @@ private class TriggerBaseTest {
 		} catch (Exception e) {
 			myException = e;
 		}
-		test.stopTest();
+		Test.stopTest();
 		system.assertEquals(null, myException);
 	}
 
 	@IsTest
 	private static void afterDelete_success() {
 		Exception myException;
-		test.startTest();
+		Test.startTest();
 		BaseTest base = new BaseTest();
 		base.context = System.TriggerOperation.AFTER_DELETE;
 		base.triggerOld = new List<SObject>{ new Account(name = 'My Account') };
@@ -123,14 +123,14 @@ private class TriggerBaseTest {
 		} catch (Exception e) {
 			myException = e;
 		}
-		test.stopTest();
+		Test.stopTest();
 		system.assertEquals(null, myException);
 	}
 
 	@IsTest
 	private static void afterUndelete_success() {
 		Exception myException;
-		test.startTest();
+		Test.startTest();
 		BaseTest base = new BaseTest();
 		base.context = System.TriggerOperation.AFTER_UNDELETE;
 		base.triggerNew = new List<SObject>{ new Account(name = 'My Account') };
@@ -139,21 +139,21 @@ private class TriggerBaseTest {
 		} catch (Exception e) {
 			myException = e;
 		}
-		test.stopTest();
+		Test.stopTest();
 		system.assertEquals(null, myException);
 	}
 
 	@IsTest
 	private static void run_fail() {
 		Exception myException;
-		test.startTest();
+		Test.startTest();
 		BaseTest base = new BaseTest();
 		try {
 			base.run();
 		} catch (Exception e) {
 			myException = e;
 		}
-		test.stopTest();
+		Test.stopTest();
 		system.assertNotEquals(null, myException);
 		System.assert(
 			myException.getMessage()
@@ -164,13 +164,13 @@ private class TriggerBaseTest {
 	@IsTest
 	private static void bypass_success() {
 		Exception myException;
-		test.startTest();
+		Test.startTest();
 		try {
 			TriggerBase.bypass('Account');
 		} catch (Exception e) {
 			myException = e;
 		}
-		test.stopTest();
+		Test.stopTest();
 		system.assertEquals(null, myException);
 		System.assert(TriggerBase.bypassedObjects.contains('Account'));
 	}
@@ -178,14 +178,14 @@ private class TriggerBaseTest {
 	@IsTest
 	private static void clearBypass_success() {
 		Exception myException;
-		test.startTest();
+		Test.startTest();
 		try {
 			TriggerBase.bypass('Account');
 			TriggerBase.clearBypass('Account');
 		} catch (Exception e) {
 			myException = e;
 		}
-		test.stopTest();
+		Test.stopTest();
 		system.assertEquals(null, myException);
 		System.assert(!TriggerBase.bypassedObjects.contains('Account'));
 	}
@@ -195,13 +195,13 @@ private class TriggerBaseTest {
 		Boolean isBypassed;
 		TriggerBase.bypass('Account');
 		Exception myException;
-		test.startTest();
+		Test.startTest();
 		try {
 			isBypassed = TriggerBase.isBypassed('Account');
 		} catch (Exception e) {
 			myException = e;
 		}
-		test.stopTest();
+		Test.stopTest();
 		system.assertEquals(null, myException);
 		System.assertEquals(true, isBypassed);
 	}
@@ -210,13 +210,13 @@ private class TriggerBaseTest {
 	private static void clearAllBypasses_success() {
 		TriggerBase.bypass('Account');
 		Exception myException;
-		test.startTest();
+		Test.startTest();
 		try {
 			TriggerBase.clearAllBypasses();
 		} catch (Exception e) {
 			myException = e;
 		}
-		test.stopTest();
+		Test.stopTest();
 		system.assertEquals(null, myException);
 		System.assertEquals(0, TriggerBase.bypassedObjects.size());
 	}

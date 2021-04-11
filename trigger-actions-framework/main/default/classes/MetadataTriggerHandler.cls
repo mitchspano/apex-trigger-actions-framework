@@ -141,12 +141,12 @@ public with sharing class MetadataTriggerHandler extends TriggerBase implements 
 				);
 			}
 		}
-		boolean actionShouldExecute = !((actionMetadata.Bypass_Permission__c !=
+		Boolean actionShouldExecute = !((actionMetadata.Bypass_Permission__c !=
 		null && permissionMap.get(actionMetadata.Bypass_Permission__c)) ||
 		(actionMetadata.Required_Permission__c != null &&
 		!permissionMap.get(actionMetadata.Required_Permission__c)));
 
-		boolean sObjectShouldExecute = !((sObjectBypassPermissionName != null &&
+		Boolean sObjectShouldExecute = !((sObjectBypassPermissionName != null &&
 		permissionMap.get(sObjectBypassPermissionName)) ||
 		(sObjectRequiredPermissionName != null &&
 		!permissionMap.get(sObjectRequiredPermissionName)));
