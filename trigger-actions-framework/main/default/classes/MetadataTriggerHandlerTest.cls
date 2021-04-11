@@ -38,7 +38,6 @@ private class MetadataTriggerHandlerTest {
 				Id = TestUtility.getFakeId(Schema.Account.SObjectType)
 			)
 		};
-		List<Trigger_Action__mdt> response;
 		sObject_Trigger_Setting__mdt setting = new sObject_Trigger_Setting__mdt(
 			Object_API_Name__c = ACCOUNT,
 			Id = TestUtility.getFakeId(sObject_Trigger_Setting__mdt.SObjectType)
@@ -73,7 +72,6 @@ private class MetadataTriggerHandlerTest {
 		MetadataTriggerHandler handler = new MetadataTriggerHandler();
 		handler.sObjectName = ACCOUNT;
 		handler.triggerNew = new List<Account>{ myAccount };
-		List<Trigger_Action__mdt> response;
 		sObject_Trigger_Setting__mdt setting = new sObject_Trigger_Setting__mdt(
 			Object_API_Name__c = ACCOUNT,
 			Id = TestUtility.getFakeId(sObject_Trigger_Setting__mdt.SObjectType)
@@ -119,7 +117,6 @@ private class MetadataTriggerHandlerTest {
 		MetadataTriggerHandler handler = new MetadataTriggerHandler();
 		handler.sObjectName = ACCOUNT;
 		handler.triggerNew = new List<Account>{ myAccount };
-		List<Trigger_Action__mdt> response;
 		sObject_Trigger_Setting__mdt setting = new sObject_Trigger_Setting__mdt(
 			Object_API_Name__c = ACCOUNT,
 			Id = TestUtility.getFakeId(sObject_Trigger_Setting__mdt.SObjectType)
@@ -165,7 +162,6 @@ private class MetadataTriggerHandlerTest {
 				Id = TestUtility.getFakeId(Schema.Account.SObjectType)
 			)
 		};
-		List<Trigger_Action__mdt> response;
 		sObject_Trigger_Setting__mdt setting = new sObject_Trigger_Setting__mdt(
 			Object_API_Name__c = ACCOUNT,
 			Id = TestUtility.getFakeId(sObject_Trigger_Setting__mdt.SObjectType)
@@ -198,7 +194,6 @@ private class MetadataTriggerHandlerTest {
 		MetadataTriggerHandler handler = new MetadataTriggerHandler();
 		handler.sObjectName = ACCOUNT;
 		handler.triggerNew = new List<Account>{ myAccount };
-		List<Trigger_Action__mdt> response;
 		sObject_Trigger_Setting__mdt setting = new sObject_Trigger_Setting__mdt(
 			Object_API_Name__c = ACCOUNT,
 			Id = TestUtility.getFakeId(sObject_Trigger_Setting__mdt.SObjectType)
@@ -242,7 +237,6 @@ private class MetadataTriggerHandlerTest {
 		MetadataTriggerHandler handler = new MetadataTriggerHandler();
 		handler.sObjectName = ACCOUNT;
 		handler.triggerNew = new List<Account>{ myAccount };
-		List<Trigger_Action__mdt> response;
 		sObject_Trigger_Setting__mdt setting = new sObject_Trigger_Setting__mdt(
 			Object_API_Name__c = ACCOUNT,
 			Id = TestUtility.getFakeId(sObject_Trigger_Setting__mdt.SObjectType)
@@ -286,7 +280,6 @@ private class MetadataTriggerHandlerTest {
 		MetadataTriggerHandler handler = new MetadataTriggerHandler();
 		handler.triggerNew = new List<Account>{ myAccount };
 		handler.triggerOld = new List<Account>{ myAccount };
-		List<Trigger_Action__mdt> response;
 		sObject_Trigger_Setting__mdt setting = new sObject_Trigger_Setting__mdt(
 			Object_API_Name__c = ACCOUNT,
 			Id = TestUtility.getFakeId(sObject_Trigger_Setting__mdt.SObjectType)
@@ -321,7 +314,6 @@ private class MetadataTriggerHandlerTest {
 		MetadataTriggerHandler handler = new MetadataTriggerHandler();
 		handler.triggerNew = new List<Account>{ myAccount };
 		handler.triggerOld = new List<Account>{ myAccount };
-		List<Trigger_Action__mdt> response;
 		sObject_Trigger_Setting__mdt setting = new sObject_Trigger_Setting__mdt(
 			Object_API_Name__c = ACCOUNT,
 			Id = TestUtility.getFakeId(sObject_Trigger_Setting__mdt.SObjectType)
@@ -367,7 +359,6 @@ private class MetadataTriggerHandlerTest {
 		MetadataTriggerHandler handler = new MetadataTriggerHandler();
 		handler.triggerNew = new List<Account>{ myAccount };
 		handler.triggerOld = new List<Account>{ myAccount };
-		List<Trigger_Action__mdt> response;
 		sObject_Trigger_Setting__mdt setting = new sObject_Trigger_Setting__mdt(
 			Object_API_Name__c = ACCOUNT,
 			Id = TestUtility.getFakeId(sObject_Trigger_Setting__mdt.SObjectType)
@@ -400,7 +391,6 @@ private class MetadataTriggerHandlerTest {
 		MetadataTriggerHandler handler = new MetadataTriggerHandler();
 		handler.triggerNew = new List<Account>{ myAccount };
 		handler.triggerOld = new List<Account>{ myAccount };
-		List<Trigger_Action__mdt> response;
 		sObject_Trigger_Setting__mdt setting = new sObject_Trigger_Setting__mdt(
 			Object_API_Name__c = ACCOUNT,
 			Id = TestUtility.getFakeId(sObject_Trigger_Setting__mdt.SObjectType)
@@ -445,7 +435,6 @@ private class MetadataTriggerHandlerTest {
 		handler.sObjectName = ACCOUNT;
 		handler.triggerNew = new List<Account>{ myAccount };
 		handler.triggerOld = new List<Account>{ myAccount };
-		List<Trigger_Action__mdt> response;
 		sObject_Trigger_Setting__mdt setting = new sObject_Trigger_Setting__mdt(
 			Object_API_Name__c = ACCOUNT,
 			Id = TestUtility.getFakeId(sObject_Trigger_Setting__mdt.SObjectType)
@@ -488,7 +477,6 @@ private class MetadataTriggerHandlerTest {
 		);
 		MetadataTriggerHandler handler = new MetadataTriggerHandler();
 		handler.triggerOld = new List<Account>{ myAccount };
-		List<Trigger_Action__mdt> response;
 		sObject_Trigger_Setting__mdt setting = new sObject_Trigger_Setting__mdt(
 			Object_API_Name__c = ACCOUNT,
 			Id = TestUtility.getFakeId(sObject_Trigger_Setting__mdt.SObjectType)
@@ -522,7 +510,6 @@ private class MetadataTriggerHandlerTest {
 		);
 		MetadataTriggerHandler handler = new MetadataTriggerHandler();
 		handler.triggerOld = new List<Account>{ myAccount };
-		List<Trigger_Action__mdt> response;
 		sObject_Trigger_Setting__mdt setting = new sObject_Trigger_Setting__mdt(
 			Object_API_Name__c = ACCOUNT,
 			Id = TestUtility.getFakeId(sObject_Trigger_Setting__mdt.SObjectType)
@@ -569,7 +556,6 @@ private class MetadataTriggerHandlerTest {
 		handler.sObjectName = ACCOUNT;
 		handler.triggerNew = new List<Account>{ myAccount };
 		handler.triggerOld = new List<Account>{ myAccount };
-		List<Trigger_Action__mdt> response;
 		sObject_Trigger_Setting__mdt setting = new sObject_Trigger_Setting__mdt(
 			Object_API_Name__c = ACCOUNT,
 			Id = TestUtility.getFakeId(sObject_Trigger_Setting__mdt.SObjectType)
@@ -615,7 +601,6 @@ private class MetadataTriggerHandlerTest {
 		MetadataTriggerHandler handler = new MetadataTriggerHandler();
 		handler.sObjectName = ACCOUNT;
 		handler.triggerOld = new List<Account>{ myAccount };
-		List<Trigger_Action__mdt> response;
 		sObject_Trigger_Setting__mdt setting = new sObject_Trigger_Setting__mdt(
 			Object_API_Name__c = ACCOUNT,
 			Id = TestUtility.getFakeId(sObject_Trigger_Setting__mdt.SObjectType)
@@ -660,7 +645,6 @@ private class MetadataTriggerHandlerTest {
 		);
 		MetadataTriggerHandler handler = new MetadataTriggerHandler();
 		handler.triggerOld = new List<Account>{ myAccount };
-		List<Trigger_Action__mdt> response;
 		sObject_Trigger_Setting__mdt setting = new sObject_Trigger_Setting__mdt(
 			Object_API_Name__c = ACCOUNT,
 			Id = TestUtility.getFakeId(sObject_Trigger_Setting__mdt.SObjectType)
@@ -692,7 +676,6 @@ private class MetadataTriggerHandlerTest {
 		);
 		MetadataTriggerHandler handler = new MetadataTriggerHandler();
 		handler.triggerOld = new List<Account>{ myAccount };
-		List<Trigger_Action__mdt> response;
 		sObject_Trigger_Setting__mdt setting = new sObject_Trigger_Setting__mdt(
 			Object_API_Name__c = ACCOUNT,
 			Id = TestUtility.getFakeId(sObject_Trigger_Setting__mdt.SObjectType)
@@ -736,7 +719,6 @@ private class MetadataTriggerHandlerTest {
 		MetadataTriggerHandler handler = new MetadataTriggerHandler();
 		handler.sObjectName = ACCOUNT;
 		handler.triggerOld = new List<Account>{ myAccount };
-		List<Trigger_Action__mdt> response;
 		sObject_Trigger_Setting__mdt setting = new sObject_Trigger_Setting__mdt(
 			Object_API_Name__c = ACCOUNT,
 			Id = TestUtility.getFakeId(sObject_Trigger_Setting__mdt.SObjectType)
@@ -779,7 +761,6 @@ private class MetadataTriggerHandlerTest {
 		);
 		MetadataTriggerHandler handler = new MetadataTriggerHandler();
 		handler.triggerOld = new List<Account>{ myAccount };
-		List<Trigger_Action__mdt> response;
 		sObject_Trigger_Setting__mdt setting = new sObject_Trigger_Setting__mdt(
 			Object_API_Name__c = ACCOUNT,
 			Id = TestUtility.getFakeId(sObject_Trigger_Setting__mdt.SObjectType)
@@ -813,7 +794,6 @@ private class MetadataTriggerHandlerTest {
 		);
 		MetadataTriggerHandler handler = new MetadataTriggerHandler();
 		handler.triggerOld = new List<Account>{ myAccount };
-		List<Trigger_Action__mdt> response;
 		sObject_Trigger_Setting__mdt setting = new sObject_Trigger_Setting__mdt(
 			Object_API_Name__c = ACCOUNT,
 			Id = TestUtility.getFakeId(sObject_Trigger_Setting__mdt.SObjectType)
@@ -858,7 +838,6 @@ private class MetadataTriggerHandlerTest {
 		MetadataTriggerHandler handler = new MetadataTriggerHandler();
 		handler.sObjectName = ACCOUNT;
 		handler.triggerOld = new List<Account>{ myAccount };
-		List<Trigger_Action__mdt> response;
 		sObject_Trigger_Setting__mdt setting = new sObject_Trigger_Setting__mdt(
 			Object_API_Name__c = ACCOUNT,
 			Id = TestUtility.getFakeId(sObject_Trigger_Setting__mdt.SObjectType)
