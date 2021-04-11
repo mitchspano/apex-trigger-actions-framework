@@ -4,5 +4,5 @@
     <active>true</active>
     <description>Throws an error if the &quot;Allow Flow Recursion&quot; checkbox is checked without a &quot;Flow Name&quot;.</description>
     <errorConditionFormula>Allow_Flow_Recursion__c == true &amp;&amp; ISBLANK( Flow_Name__c )</errorConditionFormula>
-    <errorMessage>You can only mark &quot;Allow Flow Recursion&quot; checkbox is as &quot;True&quot; when you have a value for &quot;Flow Name&quot;.</errorMessage>
+    <errorMessage>You can only mark &quot;Allow Flow Recursion&quot; checkbox as &quot;True&quot; when you have a value for &quot;Flow Name&quot;.</errorMessage>
 </ValidationRule>
