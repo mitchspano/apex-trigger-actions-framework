@@ -15,8 +15,8 @@
  */
 
 public inherited sharing class TriggerActionFlow implements TriggerAction.BeforeInsert, TriggerAction.AfterInsert, TriggerAction.BeforeUpdate, TriggerAction.AfterUpdate, TriggerAction.AfterUndelete {
-	public string flowName;
-	public boolean allowRecursion;
+	public String flowName;
+	public Boolean allowRecursion;
 	@testVisible
 	private static final String INVALID_FLOW_NAME = 'You must provide the name of a flow to execute';
 	@testVisible
@@ -180,7 +180,7 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 		TriggerActionFlow.bypassedFlows.clear();
 	}
 
-	private boolean thisFlowIsBypassed() {
+	private Boolean thisFlowIsBypassed() {
 		if (String.isBlank(flowName)) {
 			throw new TriggerActionFlowException(INVALID_FLOW_NAME);
 		}
@@ -226,7 +226,7 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 			) {
 				Schema.DescribeFieldResult fieldResult = fieldRef.getDescribe();
 				if (fieldResult.isUpdateable()) {
-					editableFields.add(fieldResult.getname());
+					editableFields.add(fieldResult.getName());
 				}
 			}
 			for (Integer i = 0; i < newList.size(); i++) {

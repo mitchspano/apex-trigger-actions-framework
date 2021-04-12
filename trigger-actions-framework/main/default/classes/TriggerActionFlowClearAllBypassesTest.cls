@@ -21,7 +21,7 @@ private class TriggerActionFlowClearAllBypassesTest {
 	@IsTest
 	private static void object() {
 		TriggerBase.bypass(MY_STRING);
-		test.startTest();
+		Test.startTest();
 		TriggerActionFlowClearAllBypasses.clearAllBypasses(
 			new List<String>{ TriggerActionFlow.OBJECT_STRING }
 		);
@@ -36,7 +36,7 @@ private class TriggerActionFlowClearAllBypassesTest {
 	@IsTest
 	private static void apex() {
 		MetadataTriggerHandler.bypass(MY_STRING);
-		test.startTest();
+		Test.startTest();
 		TriggerActionFlowClearAllBypasses.clearAllBypasses(
 			new List<String>{ TriggerActionFlow.APEX_STRING }
 		);
@@ -51,7 +51,7 @@ private class TriggerActionFlowClearAllBypassesTest {
 	@IsTest
 	private static void flow() {
 		TriggerActionFlow.bypass(MY_STRING);
-		test.startTest();
+		Test.startTest();
 		TriggerActionFlowClearAllBypasses.clearAllBypasses(
 			new List<String>{ TriggerActionFlow.FLOW_STRING }
 		);
@@ -66,7 +66,7 @@ private class TriggerActionFlowClearAllBypassesTest {
 	@IsTest
 	private static void invalidRequest() {
 		Exception myException;
-		test.startTest();
+		Test.startTest();
 		try {
 			TriggerActionFlowClearAllBypasses.clearAllBypasses(new List<String>());
 		} catch (Exception e) {
@@ -92,7 +92,7 @@ private class TriggerActionFlowClearAllBypassesTest {
 	@IsTest
 	private static void invalidBypassType() {
 		Exception myException;
-		test.startTest();
+		Test.startTest();
 		try {
 			TriggerActionFlowClearAllBypasses.clearAllBypasses(
 				new List<String>{ MY_STRING }

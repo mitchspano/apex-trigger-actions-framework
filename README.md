@@ -19,7 +19,15 @@ This project is meant to demonstrate an Apex Trigger Framework which is built wi
 In order to use this trigger framework, we start with the `MetadataTriggerHandler` class which is included in this project.
 
 ```java
-Trigger OpportunityTrigger on Opportunity (before insert, after insert, before update, after update, before delete, after delete, after undelete) {
+Trigger OpportunityTrigger on Opportunity (
+  before insert,
+  after insert,
+  before update,
+  after update,
+  before delete,
+  after delete,
+  after undelete
+) {
   new MetadataTriggerHandler().run();
 }
 ```
@@ -30,11 +38,13 @@ To define a specific action, we write an individual class which implements the c
 public class ta_Opportunity_StageInsertRules implements TriggerAction.BeforeInsert {
 
   @TestVisible
-  private static final String INVALID_STAGE_INSERT_ERROR = 'The Stage must be \'' +  Constants.  OPPORTUNITY_STAGENAME_PROSPECTING + '\' when an Opportunity is created';
+  private static final String PROSPECTING = 'Prospecting';
+  @TestVisible
+  private static final String INVALID_STAGE_INSERT_ERROR = 'The Stage must be \'Prospecting\' when an Opportunity is created';
 
   public void beforeInsert(List<Opportunity> newList){
     for (Opportunity opp : newList) {
-      if (opp.StageName != Constants.OPPORTUNITY_STAGENAME_PROSPECTING) {
+      if (opp.StageName != PROSPECTING) {
         opp.addError(INVALID_STAGE_INSERT_ERROR);
       }
     }
