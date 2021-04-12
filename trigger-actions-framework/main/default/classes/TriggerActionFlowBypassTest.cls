@@ -20,7 +20,7 @@ private class TriggerActionFlowBypassTest {
 
 	@IsTest
 	private static void object() {
-		test.startTest();
+		Test.startTest();
 		List<TriggerActionFlowBypass.Request> requests = new List<TriggerActionFlowBypass.Request>();
 		TriggerActionFlowBypass.Request request = new TriggerActionFlowBypass.Request();
 		request.Name = MY_STRING;
@@ -37,7 +37,7 @@ private class TriggerActionFlowBypassTest {
 
 	@IsTest
 	private static void apex() {
-		test.startTest();
+		Test.startTest();
 		List<TriggerActionFlowBypass.Request> requests = new List<TriggerActionFlowBypass.Request>();
 		TriggerActionFlowBypass.Request request = new TriggerActionFlowBypass.Request();
 		request.Name = MY_STRING;
@@ -54,7 +54,7 @@ private class TriggerActionFlowBypassTest {
 
 	@IsTest
 	private static void flow() {
-		test.startTest();
+		Test.startTest();
 		List<TriggerActionFlowBypass.Request> requests = new List<TriggerActionFlowBypass.Request>();
 		TriggerActionFlowBypass.Request request = new TriggerActionFlowBypass.Request();
 		request.Name = MY_STRING;
@@ -72,7 +72,7 @@ private class TriggerActionFlowBypassTest {
 	@IsTest
 	private static void invalidRequest() {
 		Exception myException;
-		test.startTest();
+		Test.startTest();
 		try {
 			TriggerActionFlowBypass.bypass(
 				new List<TriggerActionFlowBypass.Request>()
@@ -100,7 +100,7 @@ private class TriggerActionFlowBypassTest {
 	@IsTest
 	private static void invalidBypassType() {
 		Exception myException;
-		test.startTest();
+		Test.startTest();
 		List<TriggerActionFlowBypass.Request> requests = new List<TriggerActionFlowBypass.Request>();
 		TriggerActionFlowBypass.Request request = new TriggerActionFlowBypass.Request();
 		request.Name = MY_STRING;
