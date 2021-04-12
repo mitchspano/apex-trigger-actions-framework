@@ -17,17 +17,20 @@
 @IsTest
 private class TriggerActionFlowTest {
 	private static final String MY_ACCOUNT = 'My Account';
+	private static final String OLD_NAME = 'Old Name';
 	private static final String SAMPLE_FLOW_NAME = 'TriggerActionFlowTest';
+	private static Account myAccount = new Account(
+		Name = MY_ACCOUNT,
+		Id = TestUtility.getFakeId(Schema.Account.SObjectType)
+	);
+	private static Account oldAccount = new Account(
+		Name = OLD_NAME,
+		Id = myAccount.Id
+	);
 	@IsTest
 	private static void getOldRecord_Success() {
 		List<sObject> result;
 		Exception myException;
-		String oldAccountName = 'Old Name';
-		Account myAccount = new Account(
-			Name = MY_ACCOUNT,
-			Id = TestUtility.getFakeId(Schema.Account.SObjectType)
-		);
-		Account oldAccount = new Account(Name = oldAccountName, Id = myAccount.Id);
 		Test.startTest();
 		try {
 			TriggerActionFlow.OldRecordRequest oldRecordRequest = new TriggerActionFlow.OldRecordRequest();
@@ -51,7 +54,7 @@ private class TriggerActionFlowTest {
 			'There should only ever be one response from oldRecordRequest'
 		);
 		System.assertEquals(
-			oldAccountName,
+			OLD_NAME,
 			((Account) result[0]).Name,
 			'The result of the getOldRecord method should always contain the previous values on the record'
 		);
@@ -87,12 +90,6 @@ private class TriggerActionFlowTest {
 	private static void getOldRecord_Failure_InvalidRequest_TooMany() {
 		List<sObject> result;
 		Exception myException;
-		String oldAccountName = 'Old Name';
-		Account myAccount = new Account(
-			Name = MY_ACCOUNT,
-			Id = TestUtility.getFakeId(Schema.Account.SObjectType)
-		);
-		Account oldAccount = new Account(Name = oldAccountName, Id = myAccount.Id);
 		Test.startTest();
 		try {
 			TriggerActionFlow.OldRecordRequest oldRecordRequest = new TriggerActionFlow.OldRecordRequest();
@@ -124,10 +121,6 @@ private class TriggerActionFlowTest {
 	private static void beforeInsert_Success() {
 		Exception myException;
 		Test.startTest();
-		Account myAccount = new Account(
-			Name = MY_ACCOUNT,
-			Id = TestUtility.getFakeId(Schema.Account.SObjectType)
-		);
 		TriggerActionFlow triggerActionFlow = new TriggerActionFlow();
 		triggerActionFlow.flowName = SAMPLE_FLOW_NAME;
 		try {
@@ -147,10 +140,6 @@ private class TriggerActionFlowTest {
 	private static void afterInsert_Success() {
 		Exception myException;
 		Test.startTest();
-		Account myAccount = new Account(
-			Name = MY_ACCOUNT,
-			Id = TestUtility.getFakeId(Schema.Account.SObjectType)
-		);
 		TriggerActionFlow triggerActionFlow = new TriggerActionFlow();
 		triggerActionFlow.flowName = SAMPLE_FLOW_NAME;
 		try {
@@ -170,10 +159,6 @@ private class TriggerActionFlowTest {
 	private static void beforeUpdate_Success() {
 		Exception myException;
 		Test.startTest();
-		Account myAccount = new Account(
-			Name = MY_ACCOUNT,
-			Id = TestUtility.getFakeId(Schema.Account.SObjectType)
-		);
 		TriggerActionFlow triggerActionFlow = new TriggerActionFlow();
 		triggerActionFlow.flowName = SAMPLE_FLOW_NAME;
 		try {
@@ -195,10 +180,6 @@ private class TriggerActionFlowTest {
 	private static void afterUpdate_Success() {
 		Exception myException;
 		Test.startTest();
-		Account myAccount = new Account(
-			Name = MY_ACCOUNT,
-			Id = TestUtility.getFakeId(Schema.Account.SObjectType)
-		);
 		TriggerActionFlow triggerActionFlow = new TriggerActionFlow();
 		triggerActionFlow.flowName = SAMPLE_FLOW_NAME;
 		try {
@@ -220,10 +201,6 @@ private class TriggerActionFlowTest {
 	private static void beforeDelete_Success() {
 		Exception myException;
 		Test.startTest();
-		Account myAccount = new Account(
-			Name = MY_ACCOUNT,
-			Id = TestUtility.getFakeId(Schema.Account.SObjectType)
-		);
 		TriggerActionFlow triggerActionFlow = new TriggerActionFlow();
 		triggerActionFlow.flowName = SAMPLE_FLOW_NAME;
 		try {
@@ -242,10 +219,6 @@ private class TriggerActionFlowTest {
 	private static void afterDelete_Success() {
 		Exception myException;
 		Test.startTest();
-		Account myAccount = new Account(
-			Name = MY_ACCOUNT,
-			Id = TestUtility.getFakeId(Schema.Account.SObjectType)
-		);
 		TriggerActionFlow triggerActionFlow = new TriggerActionFlow();
 		triggerActionFlow.flowName = SAMPLE_FLOW_NAME;
 		try {
@@ -264,10 +237,6 @@ private class TriggerActionFlowTest {
 	private static void afterUndelete_Success() {
 		Exception myException;
 		Test.startTest();
-		Account myAccount = new Account(
-			Name = MY_ACCOUNT,
-			Id = TestUtility.getFakeId(Schema.Account.SObjectType)
-		);
 		TriggerActionFlow triggerActionFlow = new TriggerActionFlow();
 		triggerActionFlow.flowName = SAMPLE_FLOW_NAME;
 		try {
