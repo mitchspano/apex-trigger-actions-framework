@@ -32,7 +32,7 @@ private class TriggerBaseTest {
 			myException = e;
 		}
 		Test.stopTest();
-		system.assertEquals(null, myException);
+		System.assertEquals(null, myException);
 	}
 
 	@IsTest
@@ -47,7 +47,7 @@ private class TriggerBaseTest {
 			myException = e;
 		}
 		Test.stopTest();
-		system.assertEquals(null, myException);
+		System.assertEquals(null, myException);
 	}
 
 	@IsTest
@@ -63,7 +63,7 @@ private class TriggerBaseTest {
 			myException = e;
 		}
 		Test.stopTest();
-		system.assertEquals(null, myException);
+		System.assertEquals(null, myException);
 	}
 
 	@IsTest
@@ -79,7 +79,7 @@ private class TriggerBaseTest {
 			myException = e;
 		}
 		Test.stopTest();
-		system.assertEquals(null, myException);
+		System.assertEquals(null, myException);
 	}
 
 	@IsTest
@@ -94,7 +94,7 @@ private class TriggerBaseTest {
 			myException = e;
 		}
 		Test.stopTest();
-		system.assertEquals(null, myException);
+		System.assertEquals(null, myException);
 	}
 
 	@IsTest
@@ -109,7 +109,7 @@ private class TriggerBaseTest {
 			myException = e;
 		}
 		Test.stopTest();
-		system.assertEquals(null, myException);
+		System.assertEquals(null, myException);
 	}
 
 	@IsTest
@@ -124,7 +124,7 @@ private class TriggerBaseTest {
 			myException = e;
 		}
 		Test.stopTest();
-		system.assertEquals(null, myException);
+		System.assertEquals(null, myException);
 	}
 
 	@IsTest
@@ -137,7 +137,7 @@ private class TriggerBaseTest {
 			myException = e;
 		}
 		Test.stopTest();
-		system.assertNotEquals(null, myException);
+		System.assertNotEquals(null, myException);
 		System.assert(
 			myException.getMessage()
 				.contains(TriggerBase.HANDLER_OUTSIDE_TRIGGER_MESSAGE)
@@ -154,7 +154,7 @@ private class TriggerBaseTest {
 			myException = e;
 		}
 		Test.stopTest();
-		system.assertEquals(null, myException);
+		System.assertEquals(null, myException);
 		System.assert(TriggerBase.bypassedObjects.contains(ACCOUNT));
 	}
 
@@ -169,7 +169,7 @@ private class TriggerBaseTest {
 			myException = e;
 		}
 		Test.stopTest();
-		system.assertEquals(null, myException);
+		System.assertEquals(null, myException);
 		System.assert(!TriggerBase.bypassedObjects.contains(ACCOUNT));
 	}
 
@@ -185,7 +185,7 @@ private class TriggerBaseTest {
 			myException = e;
 		}
 		Test.stopTest();
-		system.assertEquals(null, myException);
+		System.assertEquals(null, myException);
 		System.assertEquals(true, isBypassed);
 	}
 
@@ -200,7 +200,7 @@ private class TriggerBaseTest {
 			myException = e;
 		}
 		Test.stopTest();
-		system.assertEquals(null, myException);
+		System.assertEquals(null, myException);
 		System.assertEquals(0, TriggerBase.bypassedObjects.size());
 	}
 
