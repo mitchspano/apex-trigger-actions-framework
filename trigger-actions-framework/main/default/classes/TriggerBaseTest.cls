@@ -145,6 +145,25 @@ private class TriggerBaseTest {
 	}
 
 	@IsTest
+	private static void run_false() {
+		Exception myException;
+		Boolean validateRun = true;
+		Test.startTest();
+		base.context = System.TriggerOperation.BEFORE_INSERT;
+		base.triggerNew = new List<SObject>{ MY_ACCOUNT };
+		TriggerBase.bypass(ACCOUNT);
+		try {
+			base.run();
+			validateRun = base.validateRun();
+		} catch (Exception e) {
+			myException = e;
+		}
+		Test.stopTest();
+		System.assertEquals(null, myException);
+		System.assertEquals(false, validateRun);
+	}
+
+	@IsTest
 	private static void bypass_success() {
 		Exception myException;
 		Test.startTest();
