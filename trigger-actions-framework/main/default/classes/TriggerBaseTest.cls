@@ -17,7 +17,10 @@
 @IsTest
 private class TriggerBaseTest {
 	private static final String ACCOUNT = 'Account';
-	private static final Account MY_ACCOUNT = new Account(name = 'My Account');
+	private static final Account MY_ACCOUNT = new Account(
+		Id = TestUtility.getFakeId(Schema.Account.SObjectType),
+		Name = 'My Account'
+	);
 	private static BaseTest base = new BaseTest();
 
 	@IsTest
@@ -124,6 +127,48 @@ private class TriggerBaseTest {
 			myException = e;
 		}
 		Test.stopTest();
+		System.assertEquals(null, myException);
+	}
+
+	@IsTest
+	private static void idToNumberOfTimesSeenBeforeUpdate() {
+		Exception myException;
+		Test.startTest();
+		base.context = System.TriggerOperation.BEFORE_UPDATE;
+		base.triggerNew = new List<SObject>{ MY_ACCOUNT };
+		base.triggerOld = new List<SObject>{ MY_ACCOUNT };
+		try {
+			base.run();
+			base.run();
+		} catch (Exception e) {
+			myException = e;
+		}
+		Test.stopTest();
+		System.assertEquals(
+			2,
+			base.getIdToNumberOfTimesSeenBeforeUpdate().get(MY_ACCOUNT.Id)
+		);
+		System.assertEquals(null, myException);
+	}
+
+	@IsTest
+	private static void idToNumberOfTimesSeenAfterUpdate() {
+		Exception myException;
+		Test.startTest();
+		base.context = System.TriggerOperation.AFTER_UPDATE;
+		base.triggerNew = new List<SObject>{ MY_ACCOUNT };
+		base.triggerOld = new List<SObject>{ MY_ACCOUNT };
+		try {
+			base.run();
+			base.run();
+		} catch (Exception e) {
+			myException = e;
+		}
+		Test.stopTest();
+		System.assertEquals(
+			2,
+			base.getIdToNumberOfTimesSeenAfterUpdate().get(MY_ACCOUNT.Id)
+		);
 		System.assertEquals(null, myException);
 	}
 
@@ -237,6 +282,12 @@ private class TriggerBaseTest {
 		public void afterDelete(List<SObject> newList) {
 		}
 		public void afterUndelete(List<SObject> newList) {
+		}
+		public Map<Id, Integer> getIdToNumberOfTimesSeenBeforeUpdate() {
+			return TriggerBase.idToNumberOfTimesSeenBeforeUpdate;
+		}
+		public Map<Id, Integer> getIdToNumberOfTimesSeenAfterUpdate() {
+			return TriggerBase.idToNumberOfTimesSeenAfterUpdate;
 		}
 	}
 }
