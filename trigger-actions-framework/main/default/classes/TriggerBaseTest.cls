@@ -146,7 +146,7 @@ private class TriggerBaseTest {
 		Test.stopTest();
 		System.assertEquals(
 			2,
-			base.getIdToNumberOfTimesSeenBeforeUpdate().get(MY_ACCOUNT.Id)
+			TriggerBase.idToNumberOfTimesSeenBeforeUpdate.get(MY_ACCOUNT.Id)
 		);
 		System.assertEquals(null, myException);
 	}
@@ -167,7 +167,7 @@ private class TriggerBaseTest {
 		Test.stopTest();
 		System.assertEquals(
 			2,
-			base.getIdToNumberOfTimesSeenAfterUpdate().get(MY_ACCOUNT.Id)
+			TriggerBase.idToNumberOfTimesSeenAfterUpdate.get(MY_ACCOUNT.Id)
 		);
 		System.assertEquals(null, myException);
 	}
@@ -282,12 +282,6 @@ private class TriggerBaseTest {
 		public void afterDelete(List<SObject> newList) {
 		}
 		public void afterUndelete(List<SObject> newList) {
-		}
-		public Map<Id, Integer> getIdToNumberOfTimesSeenBeforeUpdate() {
-			return TriggerBase.idToNumberOfTimesSeenBeforeUpdate;
-		}
-		public Map<Id, Integer> getIdToNumberOfTimesSeenAfterUpdate() {
-			return TriggerBase.idToNumberOfTimesSeenAfterUpdate;
 		}
 	}
 }
