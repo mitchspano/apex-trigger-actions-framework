@@ -25,6 +25,7 @@ private class TriggerBaseTest {
 
 	@IsTest
 	private static void beforeInsert_success() {
+		MY_ACCOUNT.Id = null;
 		Exception myException;
 		Test.startTest();
 		base.context = System.TriggerOperation.BEFORE_INSERT;
@@ -190,22 +191,38 @@ private class TriggerBaseTest {
 	}
 
 	@IsTest
-	private static void run_false() {
+	private static void run_true() {
+		MY_ACCOUNT.Id = null;
 		Exception myException;
-		Boolean validateRun = true;
-		Test.startTest();
 		base.context = System.TriggerOperation.BEFORE_INSERT;
 		base.triggerNew = new List<SObject>{ MY_ACCOUNT };
-		TriggerBase.bypass(ACCOUNT);
+		Test.startTest();
 		try {
 			base.run();
-			validateRun = base.validateRun();
 		} catch (Exception e) {
 			myException = e;
 		}
 		Test.stopTest();
 		System.assertEquals(null, myException);
-		System.assertEquals(false, validateRun);
+		System.assertEquals(true, base.hasBeenExecuted);
+	}
+
+	@IsTest
+	private static void run_false() {
+		MY_ACCOUNT.Id = null;
+		TriggerBase.bypass(ACCOUNT);
+		Exception myException;
+		base.context = System.TriggerOperation.BEFORE_INSERT;
+		base.triggerNew = new List<SObject>{ MY_ACCOUNT };
+		Test.startTest();
+		try {
+			base.run();
+		} catch (Exception e) {
+			myException = e;
+		}
+		Test.stopTest();
+		System.assertEquals(null, myException);
+		System.assertEquals(false, base.hasBeenExecuted);
 	}
 
 	@IsTest
@@ -269,19 +286,27 @@ private class TriggerBaseTest {
 	}
 
 	class BaseTest extends TriggerBase implements TriggerAction.BeforeInsert, TriggerAction.AfterInsert, TriggerAction.BeforeUpdate, TriggerAction.AfterUpdate, TriggerAction.BeforeDelete, TriggerAction.AfterDelete, TriggerAction.AfterUndelete {
+		public Boolean hasBeenExecuted = false;
 		public void beforeInsert(List<SObject> newList) {
+			this.hasBeenExecuted = true;
 		}
 		public void afterInsert(List<SObject> newList) {
+			this.hasBeenExecuted = true;
 		}
 		public void beforeUpdate(List<SObject> newList, List<SObject> oldList) {
+			this.hasBeenExecuted = true;
 		}
 		public void afterUpdate(List<SObject> newList, List<SObject> oldList) {
+			this.hasBeenExecuted = true;
 		}
 		public void beforeDelete(List<SObject> oldList) {
+			this.hasBeenExecuted = true;
 		}
 		public void afterDelete(List<SObject> newList) {
+			this.hasBeenExecuted = true;
 		}
 		public void afterUndelete(List<SObject> newList) {
+			this.hasBeenExecuted = true;
 		}
 	}
 }
