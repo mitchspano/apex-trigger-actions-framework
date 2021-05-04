@@ -111,7 +111,6 @@ public inherited sharing virtual class TriggerBase {
 		TriggerBase.bypassedObjects.clear();
 	}
 
-	@TestVisible
 	private Boolean validateRun() {
 		if (!Trigger.isExecuting && this.context == null) {
 			throw new TriggerBaseException(HANDLER_OUTSIDE_TRIGGER_MESSAGE);

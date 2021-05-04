@@ -707,7 +707,7 @@ private class MetadataTriggerHandlerTest {
 			myException = e;
 		}
 		Test.stopTest();
-		system.assertEquals(null, myException);
+		System.assertEquals(null, myException);
 		System.assert(
 			MetadataTriggerHandler.bypassedActions.contains(TEST_BEFORE_INSERT)
 		);
@@ -724,7 +724,7 @@ private class MetadataTriggerHandlerTest {
 			myException = e;
 		}
 		Test.stopTest();
-		system.assertEquals(null, myException);
+		System.assertEquals(null, myException);
 		System.assert(
 			!MetadataTriggerHandler.bypassedActions.contains(TEST_BEFORE_INSERT)
 		);
@@ -742,7 +742,7 @@ private class MetadataTriggerHandlerTest {
 			myException = e;
 		}
 		Test.stopTest();
-		system.assertEquals(null, myException);
+		System.assertEquals(null, myException);
 		System.assertEquals(true, isBypassed);
 	}
 
@@ -757,7 +757,7 @@ private class MetadataTriggerHandlerTest {
 			myException = e;
 		}
 		Test.stopTest();
-		system.assertEquals(null, myException);
+		System.assertEquals(null, myException);
 		System.assertEquals(0, MetadataTriggerHandler.bypassedActions.size());
 	}
 
