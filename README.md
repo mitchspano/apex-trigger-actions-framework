@@ -123,9 +123,9 @@ To enable this flow, simply insert a trigger action record with Apex Class Name 
 
 The Trigger Actions Framework supports standard objects, custom objects, and objects from installed packages. To use the framework with an object from an installed package, separate the Object API Name from the Object Namespace on the sObject Trigger Setting itself. For example, if you want to use the Trigger Actions Framework on an sObject called `Acme__Explosives__c`, configure the sObject Trigger Setting like this:
 
-| Object API Name | Object API Name |
-| --------------- | --------------- |
-| Acme            | Explosives\_\_c |
+| Object Namespace | Object API Name |
+| ---------------- | --------------- |
+| Acme             | Explosives\_\_c |
 
 ---
 
