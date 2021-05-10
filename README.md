@@ -14,6 +14,8 @@ This project is meant to demonstrate an Apex Trigger Framework which is built wi
 6. Configuration from Setup Menu
 7. Adherance to SOLID Principles
 
+---
+
 ## Metadata Driven Trigger Actions
 
 In order to use this trigger framework, we start with the `MetadataTriggerHandler` class which is included in this project.
@@ -35,7 +37,7 @@ Trigger OpportunityTrigger on Opportunity (
 To define a specific action, we write an individual class which implements the correct context interface.
 
 ```java
-public class ta_Opportunity_StageInsertRules implements TriggerAction.BeforeInsert {
+public class TA_Opportunity_StageInsertRules implements TriggerAction.BeforeInsert {
 
   @TestVisible
   private static final String PROSPECTING = 'Prospecting';
@@ -71,7 +73,7 @@ Now, as future development work gets completed, we won't need to keep modifying 
 
 Note that if an Apex class is specified in metadata and it does not exist or does not implement the correct interface, a runtime error will occur.
 
-With this multiplicity of Apex classes, it would be wise to follow a naming convention such as `ta_ObjectName_Description` and utilize the `sfdx-project.json` file to partition your application into multiple directories.
+With this multiplicity of Apex classes, it would be wise to follow a naming convention such as `TA_ObjectName_Description` and utilize the `sfdx-project.json` file to partition your application into multiple directories.
 
 ```javascript
 {
@@ -90,6 +92,8 @@ With this multiplicity of Apex classes, it would be wise to follow a naming conv
   "sourceApiVersion": "50.0"
 }
 ```
+
+---
 
 ## Support for Flows
 
@@ -113,18 +117,24 @@ To enable this flow, simply insert a trigger action record with Apex Class Name 
 
 ![Flow Trigger Action](images/flowTriggerAction.png)
 
-You can also call the `TriggerActionFlowAddError.AddError` invocable Apex method to add a nicely formatted error message to a record during flow execution.
+---
 
-![Flow Trigger Action Error](images/flow_error_constant.png)
-![Flow Trigger Action Error](images/add_error_flow.png)
-![Flow Trigger Action Error](images/flow_error_UI.png)
+## Compatibility with sObjects from Installed Packages
+
+The Trigger Actions Framework supports standard objects, custom objects, and objects from installed packages. To use the framework with an object from an installed package, separate the Object API Name from the Object Namespace on the sObject Trigger Setting itself. For example, if you want to use the Trigger Actions Framework on an sObject called `Acme__Explosives__c`, configure the sObject Trigger Setting like this:
+
+| Object API Name | Object API Name |
+| --------------- | --------------- |
+| Acme            | Explosives\_\_c |
+
+---
 
 ## Recursion Prevention
 
 Use the `TriggerBase.idToNumberOfTimesSeenBeforeUpdate` and `TriggerBase.idToNumberOfTimesSeenAfterUpdate` to prevent recursively processing the same record(s).
 
 ```java
-public class ta_Opportunity_RecalculateCategory implements TriggerAction.AfterUpdate {
+public class TA_Opportunity_RecalculateCategory implements TriggerAction.AfterUpdate {
 
   public void afterUpdate(List<Opportunity> newList, List<Opportunity> oldList) {
     Map<Id,Opportunity> oldMap = new Map<Id,Opportunity>(oldList);
@@ -148,8 +158,9 @@ public class ta_Opportunity_RecalculateCategory implements TriggerAction.AfterUp
   }
 
 }
-
 ```
+
+---
 
 ## Bypass Mechanisms
 
@@ -183,9 +194,9 @@ public void updateAccountsNoTrigger(List<Account> accountsToUpdate) {
 
 ```java
 public void insertOpportunitiesNoRules(List<Opportunity> opportunitiesToInsert) {
-  MetadataTriggerHandler.bypass('ta_Opportunity_StageInsertRules');
+  MetadataTriggerHandler.bypass('TA_Opportunity_StageInsertRules');
   insert opportunitiesToInsert;
-  MetadataTriggerHandler.clearBypass('ta_Opportunity_StageInsertRules');
+  MetadataTriggerHandler.clearBypass('TA_Opportunity_StageInsertRules');
 }
 ```
 
@@ -220,29 +231,31 @@ Developers can enter the API name of a permission in the `Bypass_Permission__c` 
 
 Developers can enter the API name of a permission in the `Required_Permission__c` field. If this field has a value, then the trigger/action will only exectute if the running user has the custom permission identified. This can be allow for new functionality to be released to a subset of users.
 
+---
+
 ## Avoid Repeated Queries
 
 It could be the case that multiple triggered actions on the same sObject require results from a query to implement their logic. In order to avoid making duplicative queries to fetch similar data, use the singleton pattern to fetch and store query results once then use them in multiple individual action classes.
 
 ```java
-public class ta_Opportunity_Queries {
-  private static ta_Opportunity_Queries instance;
+public class TA_Opportunity_Queries {
+  private static TA_Opportunity_Queries instance;
 
-  private ta_Opportunity_Queries() {
+  private TA_Opportunity_Queries() {
   }
 
-  public static ta_Opportunity_Queries getInstance() {
-    if (ta_Opportunity_Queries.instance == null) {
-      ta_Opportunity_Queries.instance = new ta_Opportunity_Queries();
+  public static TA_Opportunity_Queries getInstance() {
+    if (TA_Opportunity_Queries.instance == null) {
+      TA_Opportunity_Queries.instance = new TA_Opportunity_Queries();
     }
-    return ta_Opportunity_Queries.instance;
+    return TA_Opportunity_Queries.instance;
   }
 
   public Map<Id, Account> beforeAccountMap { get; private set; }
 
   public class Service implements TriggerAction.BeforeInsert {
     public void beforeInsert(List<Opportunity> newList) {
-      ta_Opportunity_Queries.getInstance().beforeAccountMap = getAccountMapFromOpportunities(
+      TA_Opportunity_Queries.getInstance().beforeAccountMap = getAccountMapFromOpportunities(
         newList
       );
     }
@@ -268,9 +281,9 @@ Now configure the queries to be the first action to be executed within the given
 ![Query Setup](images/queriesSetup.png)
 
 ```java
-public class ta_Opportunity_StandardizeName implements TriggerAction.BeforeInsert {
+public class TA_Opportunity_StandardizeName implements TriggerAction.BeforeInsert {
   public void beforeInsert(List<Opportunity> newList) {
-    Map<Id, Account> accountIdToAccount = ta_Opportunity_Queries.getInstance()
+    Map<Id, Account> accountIdToAccount = TA_Opportunity_Queries.getInstance()
       .beforeAccountMap;
     for (Opportunity myOpp : newList) {
       String accountName = accountIdToAccount.get(myOpp.AccountId)?.Name;
@@ -282,6 +295,8 @@ public class ta_Opportunity_StandardizeName implements TriggerAction.BeforeInser
 }
 
 ```
+
+---
 
 ## Use of Trigger Maps
 
@@ -296,6 +311,8 @@ public void beforeUpdate(List<Opportunity> newList, List<Opportunity> oldList) {
 ```
 
 This will help the transition process if you are migrating an existing Salesforce application to this new trigger actions framework.
+
+---
 
 ## DML-Less Trigger Testing
 
@@ -317,7 +334,7 @@ public class TestUtility {
 
 We can also use `getErrors()` method to test the `addError(errorMsg)` method of the `SObject` class.
 
-Take a look at how both of these are used in the `ta_Opportunity_StageChangeRulesTest` class:
+Take a look at how both of these are used in the `TA_Opportunity_StageChangeRulesTest` class:
 
 ```java
 @IsTest
@@ -329,7 +346,7 @@ private static void beforeUpdate_test() {
   newList.add(new Opportunity(Id = myRecordId, StageName = Constants.OPPORTUNITY_STAGENAME_CLOSED_WON));
   oldList.add(new Opportunity(Id = myRecordId, StageName = Constants.OPPORTUNITY_STAGENAME_QUALIFICATION));
   Test.startTest();
-  new ta_Opportunity_StageChangeRules().beforeUpdate(newList, oldList);
+  new TA_Opportunity_StageChangeRules().beforeUpdate(newList, oldList);
   Test.stopTest();
   //Use getErrors() SObject method to get errors from addError without performing DML
   System.assertEquals(true, newList[0].hasErrors());
@@ -337,7 +354,7 @@ private static void beforeUpdate_test() {
   System.assertEquals(
     newList[0].getErrors()[0].getMessage(),
     String.format(
-      ta_Opportunity_StageChangeRules.INVALID_STAGE_CHANGE_ERROR,
+      TA_Opportunity_StageChangeRules.INVALID_STAGE_CHANGE_ERROR,
       new String[] {
         Constants.OPPORTUNITY_STAGENAME_QUALIFICATION,
         Constants.OPPORTUNITY_STAGENAME_CLOSED_WON
