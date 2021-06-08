@@ -365,7 +365,3 @@ private static void beforeUpdate_test() {
 ```
 
 Notice how we performed _zero_ DML operations yet we were able to cover all of the logic of our class in this particular test. This can help save a lot of computational time and allow for much faster execution of Apex tests.
-
-Updates:
-
-Slight improvement to performance by replacing if-else blocks in MetadataTriggerHandler class with switch-case statements.This also reduces the cognitive complexity of the class as identified by Apex PMD.
