@@ -31,6 +31,11 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 	private static final String INVALID_REQUEST = 'You can only pass one getOldRecordRequest into TriggerActionFlow.getOldRecord()';
 	@testVisible
 	private static final String NEW_LIST_AFTER_FLOW_NOT_POPULATED_CORRECTLY = 'You must pass ALL records back to the newListAfterFlow in order to apply values to record before insert/update';
+	@testVisible
+	private static final List<Schema.DisplayType> PICKLIST_TYPES = new List<Schema.DisplayType>{
+		Schema.DisplayType.MULTIPICKLIST,
+		Schema.DisplayType.PICKLIST
+	};
 	public static final String OBJECT_STRING = 'Object';
 	public static final String APEX_STRING = 'Apex';
 	public static final String FLOW_STRING = 'Flow';
@@ -216,7 +221,7 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 					NEW_LIST_AFTER_FLOW_NOT_POPULATED_CORRECTLY
 				);
 			}
-			List<String> editableFields = new List<String>();
+			List<Schema.DescribeFieldResult> editableFields = new List<Schema.DescribeFieldResult>();
 			for (
 				Schema.SObjectField fieldRef : newList[0]
 					.getSObjectType()
@@ -226,13 +231,29 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 			) {
 				Schema.DescribeFieldResult fieldResult = fieldRef.getDescribe();
 				if (fieldResult.isUpdateable()) {
-					editableFields.add(fieldResult.getName());
+					editableFields.add(fieldResult);
 				}
 			}
 			for (Integer i = 0; i < newList.size(); i++) {
-				for (String fieldName : editableFields) {
+				for (Schema.DescribeFieldResult field : editableFields) {
+					String fieldName = field.getName();
 					if (newList[i].get(fieldName) != newListAfterFlow[i].get(fieldName)) {
-						newList[i].put(fieldName, newListAfterFlow[i].get(fieldName));
+						if (!PICKLIST_TYPES.contains(field.getType())) {
+							newList[i].put(fieldName, newListAfterFlow[i].get(fieldName));
+						} else {
+							String newValue = String.valueOf(
+								newListAfterFlow[i].get(fieldName)
+							);
+							if (!String.isBlank(newValue)) {
+								newList[i]
+									.put(
+										fieldName,
+										newValue.remove('[').remove(']').replace(', ', ';')
+									);
+							} else {
+								newList[i].put(fieldName, null);
+							}
+						}
 					}
 				}
 			}
