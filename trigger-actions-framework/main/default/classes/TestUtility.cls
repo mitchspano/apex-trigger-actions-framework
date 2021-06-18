@@ -22,6 +22,6 @@ public class TestUtility {
 		String result = String.valueOf(myNumber++);
 		return (Id) (sObjectType.getDescribe().getKeyPrefix() +
 		'0'.repeat(12 - result.length()) +
-		String.valueOf(myNumber++));
+		result);
 	}
 }
