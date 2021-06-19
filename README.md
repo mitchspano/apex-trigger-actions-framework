@@ -111,7 +111,7 @@ To make your flows usable, they must be auto-launched flows and you need to crea
 
 > :warning: **Trigger Action Flow Performance Impacts**
 >
-> Trigger action flows can consume a lot of CPU time; especially if you are operating in bulk and require multiple apex invocations or interact with the database in your flow. In general, flows are great for sending emails and Apex is recommended for interacting with the database. To help address these performance concerns and expand the utility of flows on the Salesforce plaftorm, please consider upvoting this [idea](https://trailblazer.salesforce.com/ideaView?id=0874V000000EMZRQA4).
+> Trigger action flows can consume a lot of CPU time if you are operating in bulk and require multiple apex invocations or interact with the database in your flow. In general, flows are great for sending emails and Apex is recommended for interacting with the database. To help address these performance concerns and expand the utility of flows on the Salesforce plaftorm, please consider upvoting this [idea](https://trailblazer.salesforce.com/ideaView?id=0874V000000EMZRQA4).
 
 ---
 
