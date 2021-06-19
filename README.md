@@ -107,6 +107,14 @@ To make your flows usable, they must be auto-launched flows and you need to crea
 | oldList          | Record Collection | yes                 | no                   | Used to store the Trigger.old records                           |
 | newListAfterFlow | Record Collection | no                  | yes                  | Used to apply record values back during before insert or update |
 
+---
+
+> :warning: **Trigger Action Flow Performance Impacts**
+>
+> Trigger action flows can consume a lot of CPU time; especially if you are operating in bulk and require multiple apex invocations or interact with the database in your flow. In general, flows are great for sending emails and Apex is recommended for interacting with the database. To help address these performance concerns and expand the utility of flows on the Salesforce plaftorm, please consider upvoting this [idea](https://trailblazer.salesforce.com/ideaView?id=0874V000000EMZRQA4).
+
+---
+
 You can use the `TriggerActionFlow.getOldRecord` invocable method to get the old version of a record and see which values have changed. In order to modify field values before insert or update, we must assign all records back to the `newListAfterFlow` collection variable.
 
 Here is an example of an auto-launched flow that checks if a Case's status has changed and if so it sets the Case's description to a default value.
