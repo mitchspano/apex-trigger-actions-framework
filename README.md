@@ -99,7 +99,7 @@ With this multiplicity of Apex classes, it would be wise to follow a naming conv
 
 The trigger action framework can also allow you to invoke a flow by name, and determine the order of the flow's execution amongst other trigger actions in a given trigger context.
 
-Here is an example of a trigger action flow that checks if a Case's status has changed and if so it sets the Case's description to a default value.
+Here is an example of a trigger action flow that checks if a record's status has changed and if so it sets the record's description to a default value.
 
 ![Sample Flow](images/sampleFlow.png)
 
@@ -108,20 +108,20 @@ Here is an example of a trigger action flow that checks if a Case's status has c
 To enable Trigger Action Flows on a given sObject, you must first author a class which creates an Apex defined data type to be referenced in flows and can generate the required input to launch the flow from a trigger context. This class must extend `FlowTriggerRecord`, provide @AuraEnabled properties for interacting with the old and new versions of the records within flow, and support a zero-argument constructor.
 
 ```java
-public with sharing class CaseTriggerRecord extends FlowTriggerRecord {
+public with sharing class OpportunityTriggerRecord extends FlowTriggerRecord {
 
-  public CaseTriggerRecord() {
+  public OpportunityTriggerRecord() {
     super();
   }
 
-  public CaseTriggerRecord(Case newRecord, Case oldRecord, Integer newRecordIndex) {
+  public OpportunityTriggerRecord(Opportunity newRecord, Opportunity oldRecord, Integer newRecordIndex) {
     super(newRecord, oldRecord, newRecordIndex);
   }
 
   @AuraEnabled
-  public Case newRecord {
+  public Opportunity newRecord {
     get {
-      return (Case) this.newSObject;
+      return (Opportunity) this.newSObject;
     }
     set {
       this.newSObject = value;
@@ -129,9 +129,9 @@ public with sharing class CaseTriggerRecord extends FlowTriggerRecord {
   }
 
   @AuraEnabled
-  public Case oldRecord {
+  public Opportunity oldRecord {
     get {
-      return (Case) this.oldSObject;
+      return (Opportunity) this.oldSObject;
     }
   }
 
@@ -140,11 +140,11 @@ public with sharing class CaseTriggerRecord extends FlowTriggerRecord {
     List<SObject> oldList
   ) {
     List<SObject> collection = newList != null ? newList : oldList;
-    List<CaseTriggerRecord> triggerRecords = new List<CaseTriggerRecord>();
+    List<OpportunityTriggerRecord> triggerRecords = new List<OpportunityTriggerRecord>();
     for (Integer i = 0; i < collection.size(); i++) {
-      Case newCase = newList != null ? (Case) newList.get(i) : null;
-      Case oldCase = oldList != null ? (Case) oldList.get(i) : null;
-      triggerRecords.add(new CaseTriggerRecord(newCase, oldCase, i));
+      Opportunity newOpportunity = newList != null ? (Opportunity) newList.get(i) : null;
+      Opportunity oldOpportunity = oldList != null ? (Opportunity) oldList.get(i) : null;
+      triggerRecords.add(new OpportunityTriggerRecord(newOpportunity, oldOpportunity, i));
     }
     return new Map<String, Object>{
       TriggerActionFlow.TRIGGER_RECORDS_VARIABLE => triggerRecords
