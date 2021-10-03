@@ -97,9 +97,7 @@ With this multiplicity of Apex classes, it would be wise to follow a naming conv
 
 ## Support for Flows
 
-The trigger action framework can also allow you to invoke a flow by name, and determine the order of the flow's execution amongst other trigger actions in a given trigger context.
-
-Here is an example of a trigger action flow that checks if a record's status has changed and if so it sets the record's description to a default value.
+The trigger actions framework can also allow you to invoke a flow by name, and determine the order of the flow's execution amongst other trigger actions in a given trigger context. Here is an example of a trigger action flow that checks if a record's status has changed and if so it sets the record's description to a default value.
 
 ![Sample Flow](images/sampleFlow.png)
 
