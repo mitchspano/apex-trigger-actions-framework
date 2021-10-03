@@ -99,29 +99,76 @@ With this multiplicity of Apex classes, it would be wise to follow a naming conv
 
 The trigger action framework can also allow you to invoke a flow by name, and determine the order of the flow's execution amongst other trigger actions in a given trigger context.
 
-To make your flows usable, they must be auto-launched flows and you need to create the following flow resource variables depending on which context the flow is meant to be called in:
-
-| Variable Name    | Variable Type     | Available for Input | Available for Output | Description                                                     |
-| ---------------- | ----------------- | ------------------- | -------------------- | --------------------------------------------------------------- |
-| newList          | Record Collection | yes                 | no                   | Used to store the Trigger.new records                           |
-| oldList          | Record Collection | yes                 | no                   | Used to store the Trigger.old records                           |
-| newListAfterFlow | Record Collection | no                  | yes                  | Used to apply record values back during before insert or update |
-
----
-
-> :warning: **Trigger Action Flow Performance Impacts**
->
-> Trigger action flows can consume a lot of CPU time if you are operating in bulk and require multiple apex invocations or interact with the database in your flow. In general, flows are great for sending emails and Apex is recommended for interacting with the database. To help address these performance concerns and expand the utility of flows on the Salesforce plaftorm, please consider upvoting this [idea](https://trailblazer.salesforce.com/ideaView?id=0874V000000EMZRQA4).
-
----
-
-You can use the `TriggerActionFlow.getOldRecord` invocable method to get the old version of a record and see which values have changed. In order to modify field values before insert or update, we must assign all records back to the `newListAfterFlow` collection variable.
-
 Here is an example of an auto-launched flow that checks if a Case's status has changed and if so it sets the Case's description to a default value.
 
 ![Sample Flow](images/sampleFlow.png)
 
-To enable this flow, simply insert a trigger action record with Apex Class Name equal to "TriggerActionFlow" and set the Flow Name field with the API name of the flow itself. You can select the "Allow Flow Recursion" checkbox to allow flows to run recursively (advanced).
+### Enable Flows for an SObject
+
+To enable Trigger Action Flows on a given sObject, you must first author a class which creates an Apex defined data type to be referenced in flows and can generate the required input to launch the flow from a trigger context. This class must extend `TriggerRecord`, implement `TriggerActionFlow.GenerateTriggerFlowInput`, and support a zero-argument constructor.
+
+Note: The generation of this code could be removed if Salesforce ever supports [this idea](https://trailblazer.salesforce.com/ideaView?id=0874V000000EMZRQA4).
+
+```java
+public with sharing class CaseTriggerRecord extends TriggerRecord implements TriggerActionFlow.GenerateTriggerFlowInput {
+
+  public CaseTriggerRecord() {
+    super();
+  }
+
+  public CaseTriggerRecord(Case newRecord, Case oldRecord) {
+    super(newRecord, oldRecord);
+  }
+
+  @AuraEnabled
+  public Case newRecord {
+    get {
+      return (Case) this.newSObject;
+    }
+    set {
+      this.newSObject = value;
+    }
+  }
+
+  @AuraEnabled
+  public Case oldRecord {
+    get {
+      return (Case) this.oldSObject;
+    }
+  }
+
+  public Map<String, Object> getFlowInput(
+    List<SObject> newList,
+    List<SObject> oldList
+  ) {
+    List<SObject> collection = newList != null ? newList : oldList;
+    List<CaseTriggerRecord> triggerRecords = new List<CaseTriggerRecord>();
+    for (Integer i = 0; i < collection.size(); i++) {
+      Case newCase = newList != null ? (Case) newList.get(i) : null;
+      Case oldCase = oldList != null ? (Case) oldList.get(i) : null;
+      triggerRecords.add(new CaseTriggerRecord(newCase, oldCase));
+    }
+    return new Map<String, Object>{
+      TriggerActionFlow.TRIGGER_RECORDS_VARIABLE => triggerRecords
+    };
+  }
+}
+```
+
+Once this class is defined, the name of the class must be specified on the `SObject_Trigger_Setting` custom
+metadata type row for the given sObject in the `Flow_Input_Generator_Class_Name__c` field:
+
+![Set Flow Input Generator Name](images/flowInputGeneratorName.png)
+
+### Define a Flow
+
+To make your flows usable, they must be auto-launched flows and you need to create the following flow resource variable:
+
+| Variable Name  | Variable Type                                                        | Available for Input | Available for Output | Description                                           |
+| -------------- | -------------------------------------------------------------------- | ------------------- | -------------------- | ----------------------------------------------------- |
+| triggerRecords | Variable Collection of Apex Defined Type which extends TriggerRecord | yes                 | no                   | Used to store the Trigger.new and Trigger.old records |
+
+To enable this flow, simply insert a trigger action record with Apex Class Name equal to `TriggerActionFlow` and set the Flow Name field with the API name of the flow itself. You can select the `Allow_Flow_Recursion__c` checkbox to allow flows to run recursively (advanced).
 
 ![Flow Trigger Action](images/flowTriggerAction.png)
 
