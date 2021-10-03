@@ -1,4 +1,4 @@
-# Salesforce Trigger Actions Framework
+# Apex Trigger Actions Framework
 
 <a href="https://githubsfdeploy.herokuapp.com?owner=mitchspano&amp;repo=apex-trigger-actions-framework">
   <img src="https://raw.githubusercontent.com/afawcett/githubsfdeploy/master/src/main/webapp/resources/img/deploy.png" alt="Deploy to Salesforce" />
@@ -99,13 +99,13 @@ With this multiplicity of Apex classes, it would be wise to follow a naming conv
 
 The trigger action framework can also allow you to invoke a flow by name, and determine the order of the flow's execution amongst other trigger actions in a given trigger context.
 
-Here is an example of an auto-launched flow that checks if a Case's status has changed and if so it sets the Case's description to a default value.
+Here is an example of a trigger action flow that checks if a Case's status has changed and if so it sets the Case's description to a default value.
 
 ![Sample Flow](images/sampleFlow.png)
 
 ### Enable Flows for an sObject
 
-To enable Trigger Action Flows on a given sObject, you must first author a class which creates an Apex defined data type to be referenced in flows and can generate the required input to launch the flow from a trigger context. This class must extend `FlowTriggerRecord`, provide some @AuraEnabled properties for interacting with the records within flow, and support a zero-argument constructor.
+To enable Trigger Action Flows on a given sObject, you must first author a class which creates an Apex defined data type to be referenced in flows and can generate the required input to launch the flow from a trigger context. This class must extend `FlowTriggerRecord`, provide @AuraEnabled properties for interacting with the old and new versions of the records within flow, and support a zero-argument constructor.
 
 ```java
 public with sharing class CaseTriggerRecord extends FlowTriggerRecord {
@@ -162,9 +162,9 @@ metadata type row for the given sObject in the `FlowTriggerRecord_Class_Name__c`
 
 To make your flows usable, they must be auto-launched flows and you need to create the following flow resource variable:
 
-| Variable Name  | Variable Type                                                        | Available for Input | Available for Output | Description                                           |
-| -------------- | -------------------------------------------------------------------- | ------------------- | -------------------- | ----------------------------------------------------- |
-| triggerRecords | Variable Collection of Apex Defined Type which extends TriggerRecord | yes                 | no                   | Used to store the Trigger.new and Trigger.old records |
+| Variable Name  | Variable Type                                                            | Available for Input | Available for Output | Description                                           |
+| -------------- | ------------------------------------------------------------------------ | ------------------- | -------------------- | ----------------------------------------------------- |
+| triggerRecords | Variable Collection of Apex Defined Type which extends FlowTriggerRecord | yes                 | no                   | Used to store the Trigger.new and Trigger.old records |
 
 To enable this flow, simply insert a trigger action record with Apex Class Name equal to `TriggerActionFlow` and set the Flow Name field with the API name of the flow itself. You can select the `Allow_Flow_Recursion__c` checkbox to allow flows to run recursively (advanced).
 
