@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Flow_Input_Generator_Class_Name__c</fullName>
-    <description>The name of the class which extends TriggerActionFlow.GenerateTriggerFlowInput that will generate the input for trigger action flows on this sObject.</description>
+    <description>The name of the class which implements TriggerActionFlow.GenerateTriggerFlowInput that will generate the input for trigger action flows on this sObject.</description>
     <externalId>false</externalId>
     <fieldManageability>DeveloperControlled</fieldManageability>
-    <inlineHelpText>The name of the class which extends TriggerActionFlow.GenerateTriggerFlowInput that will generate the input for trigger action flows on this sObject.</inlineHelpText>
+    <inlineHelpText>The name of the class which implements TriggerActionFlow.GenerateTriggerFlowInput that will generate the input for trigger action flows on this sObject.</inlineHelpText>
     <label>Flow Input Generator Class Name</label>
     <length>100</length>
     <required>false</required>

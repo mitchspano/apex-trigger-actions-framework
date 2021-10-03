@@ -103,9 +103,9 @@ Here is an example of an auto-launched flow that checks if a Case's status has c
 
 ![Sample Flow](images/sampleFlow.png)
 
-### Enable Flows for an SObject
+### Enable Flows for an sObject
 
-To enable Trigger Action Flows on a given sObject, you must first author a class which creates an Apex defined data type to be referenced in flows and can generate the required input to launch the flow from a trigger context. This class must extend `TriggerRecord`, implement `TriggerActionFlow.GenerateTriggerFlowInput`, and support a zero-argument constructor.
+To enable Trigger Action Flows on a given sObject, you must first author a class which creates an Apex defined data type to be referenced in flows and can generate the required input to launch the flow from a trigger context. This class must extend `TriggerRecord`, implement `TriggerActionFlow.GenerateTriggerFlowInput`, support a zero-argument constructor, and support a three-argument constructor.
 
 Note: The generation of this code could be removed if Salesforce ever supports [this idea](https://trailblazer.salesforce.com/ideaView?id=0874V000000EMZRQA4).
 
@@ -116,8 +116,8 @@ public with sharing class CaseTriggerRecord extends TriggerRecord implements Tri
     super();
   }
 
-  public CaseTriggerRecord(Case newRecord, Case oldRecord) {
-    super(newRecord, oldRecord);
+  public CaseTriggerRecord(Case newRecord, Case oldRecord, Integer newRecordIndex) {
+    super(newRecord, oldRecord, newRecordIndex);
   }
 
   @AuraEnabled
@@ -146,7 +146,7 @@ public with sharing class CaseTriggerRecord extends TriggerRecord implements Tri
     for (Integer i = 0; i < collection.size(); i++) {
       Case newCase = newList != null ? (Case) newList.get(i) : null;
       Case oldCase = oldList != null ? (Case) oldList.get(i) : null;
-      triggerRecords.add(new CaseTriggerRecord(newCase, oldCase));
+      triggerRecords.add(new CaseTriggerRecord(newCase, oldCase, i));
     }
     return new Map<String, Object>{
       TriggerActionFlow.TRIGGER_RECORDS_VARIABLE => triggerRecords
