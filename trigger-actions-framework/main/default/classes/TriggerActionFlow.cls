@@ -19,8 +19,8 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 	public static final String FLOW_STRING = 'Flow';
 	public static final String INVALID_BYPASS_REQUEST = 'You can only pass one request into {0}';
 	public static final String INVALID_FLOW_NAME = 'You must provide the name of a flow to execute';
-	public static final String INVALD_FLOW_INPUT = 'The Flow Input Generator must provide a map which contains "triggerRecords" as a key that is mapped to a list of TriggerRecord.';
-	public static final String INVALID_INPUT_GENERATOR = ' is not a valid name of a class that implements TriggerActionFlow.GenerateTriggerFlowInput';
+	public static final String INVALD_FLOW_INPUT = 'The Flow Input Generator must provide a map which contains "triggerRecords" as a key that is mapped to a list of FlowTriggerRecord.';
+	public static final String INVALID_FLOW_TRIGGER_RECORD_CLASS = ' is not a valid name of a class that extends FlowTriggerRecord';
 	public static final String INVALID_TYPE = 'The bypassType must equal Object, Apex, or Flow';
 	public static final String OBJECT_STRING = 'Object';
 	public static final String TRIGGER_RECORDS_VARIABLE = 'triggerRecords';
@@ -34,7 +34,7 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 
 	public String flowName;
 	public Boolean allowRecursion;
-	public String inputGeneratorClassName;
+	public String flowTriggerRecordClassName;
 
 	static {
 		bypassedFlows = new Set<String>();
@@ -163,8 +163,7 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 		List<sObject> newList,
 		List<sObject> oldList
 	) {
-		GenerateTriggerFlowInput inputGenerator = getInputGenerator();
-		Map<String, Object> generatedInput = getInputGenerator()
+		Map<String, Object> generatedInput = getFlowTriggerRecord()
 			.getFlowInput(newList, oldList);
 		verifyInput(generatedInput);
 		return generatedInput;
@@ -176,11 +175,11 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 			generatedInput.containsKey(TRIGGER_RECORDS_VARIABLE) ||
 			!(generatedInput.get(
 				TRIGGER_RECORDS_VARIABLE
-			) instanceof List<TriggerRecord>)
+			) instanceof List<FlowTriggerRecord>)
 		) {
-			List<TriggerRecord> triggerRecords;
+			List<FlowTriggerRecord> triggerRecords;
 			try {
-				triggerRecords = (List<TriggerRecord>) generatedInput.get(
+				triggerRecords = (List<FlowTriggerRecord>) generatedInput.get(
 					TRIGGER_RECORDS_VARIABLE
 				);
 			} catch (Exception e) {
@@ -205,7 +204,7 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 		}
 		for (Integer i = 0; i < newList.size(); i++) {
 			SObject recordInNewList = newList[i];
-			SObject recordAfterFlowIsComplete = TriggerRecord.newRecordIndexToNewRecord.get(
+			SObject recordAfterFlowIsComplete = FlowTriggerRecord.newRecordIndexToNewRecord.get(
 				i
 			);
 			if (recordAfterFlowIsComplete != null) {
@@ -222,30 +221,25 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 				}
 			}
 		}
-		TriggerRecord.newRecordIndexToNewRecord = new Map<Integer, SObject>();
+		FlowTriggerRecord.newRecordIndexToNewRecord = new Map<Integer, SObject>();
 	}
 
-	GenerateTriggerFlowInput getInputGenerator() {
-		GenerateTriggerFlowInput result;
-		if (inputGeneratorClassName == null) {
-			throw new TriggerActionFlowException(INVALID_INPUT_GENERATOR);
+	FlowTriggerRecord getFlowTriggerRecord() {
+		FlowTriggerRecord result;
+		if (flowTriggerRecordClassName == null) {
+			throw new TriggerActionFlowException(
+				flowTriggerRecordClassName + INVALID_FLOW_TRIGGER_RECORD_CLASS
+			);
 		}
 		try {
-			result = (GenerateTriggerFlowInput) Type.forName(inputGeneratorClassName)
+			result = (FlowTriggerRecord) Type.forName(flowTriggerRecordClassName)
 				.newInstance();
 		} catch (Exception e) {
 			throw new TriggerActionFlowException(
-				inputGeneratorClassName + INVALID_INPUT_GENERATOR
+				flowTriggerRecordClassName + INVALID_FLOW_TRIGGER_RECORD_CLASS
 			);
 		}
 		return result;
-	}
-
-	public interface GenerateTriggerFlowInput {
-		Map<String, Object> getFlowInput(
-			List<SObject> newList,
-			List<SObject> oldList
-		);
 	}
 
 	@TestVisible

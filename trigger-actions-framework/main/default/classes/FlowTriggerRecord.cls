@@ -13,17 +13,16 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-public virtual class TriggerRecord {
+public abstract class FlowTriggerRecord {
 	static final String NEW_RECORD_INDEX_REQUIRED = 'The index of the newRecord in the newList is required.';
 	public static Map<Integer, SObject> newRecordIndexToNewRecord = new Map<Integer, SObject>();
-	@AuraEnabled
-	public Integer newRecordIndex;
+	private Integer newRecordIndex;
 
-	public TriggerRecord() {
+	public FlowTriggerRecord() {
 		// no argument constructor necessary to use Type.ForName
 	}
 
-	public TriggerRecord(
+	protected FlowTriggerRecord(
 		SObject newSobject,
 		SObject oldSObject,
 		Integer newRecordIndex
@@ -33,8 +32,12 @@ public virtual class TriggerRecord {
 		this.oldSobject = oldSobject;
 	}
 
-	@AuraEnabled
-	public SObject newSobject {
+	public abstract Map<String, Object> getFlowInput(
+		List<SObject> newList,
+		List<SObject> oldList
+	);
+
+	protected SObject newSobject {
 		get {
 			return newSobject;
 		}
@@ -43,10 +46,12 @@ public virtual class TriggerRecord {
 			if (this.newRecordIndex == null) {
 				throw new IllegalArgumentException(NEW_RECORD_INDEX_REQUIRED);
 			}
-			TriggerRecord.newRecordIndexToNewRecord.put(this.newRecordIndex, newSobject);
+			FlowTriggerRecord.newRecordIndexToNewRecord.put(
+				this.newRecordIndex,
+				newSobject
+			);
 		}
 	}
 
-	@AuraEnabled
-	public SObject oldSobject;
+	protected SObject oldSobject;
 }

@@ -105,12 +105,10 @@ Here is an example of an auto-launched flow that checks if a Case's status has c
 
 ### Enable Flows for an sObject
 
-To enable Trigger Action Flows on a given sObject, you must first author a class which creates an Apex defined data type to be referenced in flows and can generate the required input to launch the flow from a trigger context. This class must extend `TriggerRecord`, implement `TriggerActionFlow.GenerateTriggerFlowInput`, support a zero-argument constructor, and support a three-argument constructor.
-
-Note: The generation of this code could be removed if Salesforce ever supports [this idea](https://trailblazer.salesforce.com/ideaView?id=0874V000000EMZRQA4).
+To enable Trigger Action Flows on a given sObject, you must first author a class which creates an Apex defined data type to be referenced in flows and can generate the required input to launch the flow from a trigger context. This class must extend `FlowTriggerRecord`, provide some @AuraEnabled properties for interacting with the records within flow, and support a zero-argument constructor.
 
 ```java
-public with sharing class CaseTriggerRecord extends TriggerRecord implements TriggerActionFlow.GenerateTriggerFlowInput {
+public with sharing class CaseTriggerRecord extends FlowTriggerRecord {
 
   public CaseTriggerRecord() {
     super();
@@ -137,7 +135,7 @@ public with sharing class CaseTriggerRecord extends TriggerRecord implements Tri
     }
   }
 
-  public Map<String, Object> getFlowInput(
+  public override Map<String, Object> getFlowInput(
     List<SObject> newList,
     List<SObject> oldList
   ) {
@@ -156,9 +154,9 @@ public with sharing class CaseTriggerRecord extends TriggerRecord implements Tri
 ```
 
 Once this class is defined, the name of the class must be specified on the `SObject_Trigger_Setting` custom
-metadata type row for the given sObject in the `Flow_Input_Generator_Class_Name__c` field:
+metadata type row for the given sObject in the `FlowTriggerRecord_Class_Name__c` field:
 
-![Set Flow Input Generator Name](images/flowInputGeneratorName.png)
+![Set FlowTriggerRecord Class Name](images/flowTriggerRecordName.png)
 
 ### Define a Flow
 

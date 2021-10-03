@@ -35,7 +35,7 @@ private class TriggerActionFlowTest {
 	static {
 		actionFlow = new TriggerActionFlow();
 		actionFlow.flowName = SAMPLE_FLOW_NAME;
-		actionFlow.inputGeneratorClassName = INPUT_GENERATOR_CLASS_NAME;
+		actionFlow.flowTriggerRecordClassName = INPUT_GENERATOR_CLASS_NAME;
 		actionFlow.allowRecursion = true;
 	}
 
@@ -163,7 +163,7 @@ private class TriggerActionFlowTest {
 		Exception myException;
 		Test.startTest();
 		try {
-			actionFlow.inputGeneratorClassName = null;
+			actionFlow.flowTriggerRecordClassName = null;
 			actionFlow.beforeInsert(newList);
 		} catch (TriggerActionFlow.TriggerActionFlowException e) {
 			myException = e;
@@ -181,7 +181,7 @@ private class TriggerActionFlowTest {
 		Exception myException;
 		Test.startTest();
 		try {
-			actionFlow.inputGeneratorClassName = BOGUS;
+			actionFlow.flowTriggerRecordClassName = BOGUS;
 			actionFlow.beforeInsert(newList);
 		} catch (TriggerActionFlow.TriggerActionFlowException e) {
 			myException = e;
@@ -199,7 +199,7 @@ private class TriggerActionFlowTest {
 		Exception myException;
 		Test.startTest();
 		try {
-			actionFlow.inputGeneratorClassName = INPUT_GENERATOR_CLASS_NAME_WRONG_VARIABLE;
+			actionFlow.flowTriggerRecordClassName = INPUT_GENERATOR_CLASS_NAME_WRONG_VARIABLE;
 			actionFlow.beforeInsert(newList);
 		} catch (TriggerActionFlow.TriggerActionFlowException e) {
 			myException = e;
@@ -217,7 +217,7 @@ private class TriggerActionFlowTest {
 		Exception myException;
 		Test.startTest();
 		try {
-			actionFlow.inputGeneratorClassName = INPUT_GENERATOR_CLASS_NAME_WRONG_TYPE;
+			actionFlow.flowTriggerRecordClassName = INPUT_GENERATOR_CLASS_NAME_WRONG_TYPE;
 			actionFlow.beforeInsert(newList);
 		} catch (TriggerActionFlow.TriggerActionFlowException e) {
 			myException = e;
@@ -278,7 +278,7 @@ private class TriggerActionFlowTest {
 		);
 	}
 
-	public class AccountTriggerRecord extends TriggerRecord implements TriggerActionFlow.GenerateTriggerFlowInput {
+	public class AccountTriggerRecord extends FlowTriggerRecord {
 		public AccountTriggerRecord() {
 			super();
 		}
@@ -304,7 +304,7 @@ private class TriggerActionFlowTest {
 				return (Account) this.oldSObject;
 			}
 		}
-		public Map<String, Object> getFlowInput(
+		public override Map<String, Object> getFlowInput(
 			List<SObject> newList,
 			List<SObject> oldList
 		) {
@@ -321,8 +321,8 @@ private class TriggerActionFlowTest {
 		}
 	}
 
-	private class BadInputWrongVariable implements TriggerActionFlow.GenerateTriggerFlowInput {
-		public Map<String, Object> getFlowInput(
+	private class BadInputWrongVariable extends FlowTriggerRecord {
+		public override Map<String, Object> getFlowInput(
 			List<SObject> newList,
 			List<SObject> oldList
 		) {
@@ -332,8 +332,8 @@ private class TriggerActionFlowTest {
 		}
 	}
 
-	private class BadInputWrongReturnType implements TriggerActionFlow.GenerateTriggerFlowInput {
-		public Map<String, Object> getFlowInput(
+	private class BadInputWrongReturnType extends FlowTriggerRecord {
+		public override Map<String, Object> getFlowInput(
 			List<SObject> newList,
 			List<SObject> oldList
 		) {
