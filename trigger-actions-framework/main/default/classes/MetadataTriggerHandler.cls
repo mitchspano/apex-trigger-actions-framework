@@ -81,7 +81,8 @@ public with sharing class MetadataTriggerHandler extends TriggerBase implements 
 				'Required_Permission__c,',
 				'Allow_Flow_Recursion__c,',
 				'{0}__r.Bypass_Permission__c,',
-				'{0}__r.Required_Permission__c',
+				'{0}__r.Required_Permission__c,',
+				'{0}__r.FlowTriggerRecord_Class_Name__c',
 				'FROM Trigger_Action__mdt',
 				'WHERE',
 				'{0}__c != NULL',
@@ -194,6 +195,11 @@ public with sharing class MetadataTriggerHandler extends TriggerBase implements 
 						.flowName = triggerMetadata.Flow_Name__c;
 					((TriggerActionFlow) triggerAction)
 						.allowRecursion = triggerMetadata.Allow_Flow_Recursion__c;
+					((TriggerActionFlow) triggerAction)
+						.flowTriggerRecordClassName = ((sObject_Trigger_Setting__mdt) triggerMetadata.getSObject(
+							context.name() + '__r'
+						))
+						.FlowTriggerRecord_Class_Name__c;
 				}
 			} catch (System.NullPointerException e) {
 				handleException(
