@@ -18,18 +18,19 @@
 private class TriggerActionFlowAddErrorTest {
 	private static final String MY_STRING = 'MY_STRING';
 	private static final String NAME = 'Name';
+	private static List<TriggerActionFlowAddError.Request> requests = new List<TriggerActionFlowAddError.Request>();
+	private static TriggerActionFlowAddError.Request request = new TriggerActionFlowAddError.Request();
+	private static Exception myException;
 
 	@IsTest
-	private static void error() {
-		Test.startTest();
-		List<TriggerActionFlowAddError.Request> requests = new List<TriggerActionFlowAddError.Request>();
-		TriggerActionFlowAddError.Request request = new TriggerActionFlowAddError.Request();
+	private static void addErrorShouldSucceedWithValidRequest() {
 		Account account = new Account();
 		request.errorMessage = MY_STRING;
 		request.record = account;
 		requests.add(request);
+
 		TriggerActionFlowAddError.addError(requests);
-		Test.stopTest();
+
 		System.assertEquals(
 			true,
 			account.hasErrors(),
@@ -48,17 +49,15 @@ private class TriggerActionFlowAddErrorTest {
 	}
 
 	@IsTest
-	private static void fieldError() {
-		Test.startTest();
-		List<TriggerActionFlowAddError.Request> requests = new List<TriggerActionFlowAddError.Request>();
-		TriggerActionFlowAddError.Request request = new TriggerActionFlowAddError.Request();
+	private static void addErrorShouldAddAnErrorAtTheFieldSpecified() {
 		Account account = new Account();
 		request.errorMessage = MY_STRING;
 		request.fieldName = NAME;
 		request.record = account;
 		requests.add(request);
+
 		TriggerActionFlowAddError.addError(requests);
-		Test.stopTest();
+
 		System.assertEquals(
 			true,
 			account.hasErrors(),
@@ -77,9 +76,7 @@ private class TriggerActionFlowAddErrorTest {
 	}
 
 	@IsTest
-	private static void invalidRequest() {
-		Exception myException;
-		Test.startTest();
+	private static void addErrorShouldFailWithInvlaidRequest() {
 		try {
 			TriggerActionFlowAddError.addError(
 				new List<TriggerActionFlowAddError.Request>()
@@ -87,7 +84,7 @@ private class TriggerActionFlowAddErrorTest {
 		} catch (Exception e) {
 			myException = e;
 		}
-		Test.stopTest();
+
 		System.assertNotEquals(
 			null,
 			myException,

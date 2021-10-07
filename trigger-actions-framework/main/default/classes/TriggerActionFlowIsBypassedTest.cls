@@ -17,17 +17,18 @@
 @isTest
 private class TriggerActionFlowIsBypassedTest {
 	private static final String MY_STRING = 'MY_STRING';
+	private static List<TriggerActionFlowIsBypassed.Request> requests = new List<TriggerActionFlowIsBypassed.Request>();
+	private static TriggerActionFlowIsBypassed.Request request = new TriggerActionFlowIsBypassed.Request();
+	private static Exception myException;
 
 	@IsTest
-	private static void object() {
-		Test.startTest();
-		List<TriggerActionFlowIsBypassed.Request> requests = new List<TriggerActionFlowIsBypassed.Request>();
-		TriggerActionFlowIsBypassed.Request request = new TriggerActionFlowIsBypassed.Request();
+	private static void isBypassedObjectShouldSucceedWithValidRequest() {
 		request.Name = MY_STRING;
 		request.bypassType = TriggerActionFlow.OBJECT_STRING;
 		requests.add(request);
+
 		List<Boolean> isBypassed = TriggerActionFlowIsBypassed.isBypassed(requests);
-		Test.stopTest();
+
 		System.assertEquals(
 			1,
 			isBypassed.size(),
@@ -41,16 +42,13 @@ private class TriggerActionFlowIsBypassedTest {
 	}
 
 	@IsTest
-	private static void apex() {
-		Exception myException;
-		Test.startTest();
-		List<TriggerActionFlowIsBypassed.Request> requests = new List<TriggerActionFlowIsBypassed.Request>();
-		TriggerActionFlowIsBypassed.Request request = new TriggerActionFlowIsBypassed.Request();
+	private static void isBypassedApexShouldSucceedWithValidRequest() {
 		request.Name = MY_STRING;
 		request.bypassType = TriggerActionFlow.APEX_STRING;
 		requests.add(request);
+
 		List<Boolean> isBypassed = TriggerActionFlowIsBypassed.isBypassed(requests);
-		Test.stopTest();
+
 		System.assertEquals(
 			1,
 			isBypassed.size(),
@@ -64,16 +62,13 @@ private class TriggerActionFlowIsBypassedTest {
 	}
 
 	@IsTest
-	private static void flow() {
-		Exception myException;
-		Test.startTest();
-		List<TriggerActionFlowIsBypassed.Request> requests = new List<TriggerActionFlowIsBypassed.Request>();
-		TriggerActionFlowIsBypassed.Request request = new TriggerActionFlowIsBypassed.Request();
+	private static void isBypassedFlowShouldSucceedWithValidRequest() {
 		request.Name = MY_STRING;
 		request.bypassType = TriggerActionFlow.FLOW_STRING;
 		requests.add(request);
+
 		List<Boolean> isBypassed = TriggerActionFlowIsBypassed.isBypassed(requests);
-		Test.stopTest();
+
 		System.assertEquals(
 			1,
 			isBypassed.size(),
@@ -87,9 +82,7 @@ private class TriggerActionFlowIsBypassedTest {
 	}
 
 	@IsTest
-	private static void invalidRequest() {
-		Exception myException;
-		Test.startTest();
+	private static void isBypassedShouldFailWithInvalidRequest() {
 		try {
 			List<Boolean> isBypassed = TriggerActionFlowIsBypassed.isBypassed(
 				new List<TriggerActionFlowIsBypassed.Request>()
@@ -97,7 +90,7 @@ private class TriggerActionFlowIsBypassedTest {
 		} catch (Exception e) {
 			myException = e;
 		}
-		Test.stopTest();
+
 		System.assertNotEquals(
 			null,
 			myException,
@@ -115,14 +108,11 @@ private class TriggerActionFlowIsBypassedTest {
 	}
 
 	@IsTest
-	private static void invalidBypassType() {
-		Exception myException;
-		Test.startTest();
-		List<TriggerActionFlowIsBypassed.Request> requests = new List<TriggerActionFlowIsBypassed.Request>();
-		TriggerActionFlowIsBypassed.Request request = new TriggerActionFlowIsBypassed.Request();
+	private static void isBypassedShouldFailWithInvalidType() {
 		request.Name = MY_STRING;
 		request.bypassType = MY_STRING;
 		requests.add(request);
+
 		try {
 			List<Boolean> isBypassed = TriggerActionFlowIsBypassed.isBypassed(
 				requests
@@ -130,7 +120,7 @@ private class TriggerActionFlowIsBypassedTest {
 		} catch (Exception e) {
 			myException = e;
 		}
-		Test.stopTest();
+
 		System.assertNotEquals(
 			null,
 			myException,

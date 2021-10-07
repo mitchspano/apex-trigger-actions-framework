@@ -16,15 +16,13 @@
 
 public with sharing class MetadataTriggerHandler extends TriggerBase implements TriggerAction.BeforeInsert, TriggerAction.AfterInsert, TriggerAction.BeforeUpdate, TriggerAction.AfterUpdate, TriggerAction.BeforeDelete, TriggerAction.AfterDelete, TriggerAction.AfterUndelete {
 	@TestVisible
-	private static Set<String> bypassedActions;
-	static Map<String, Boolean> permissionMap;
-	static Map<String, Map<String, List<Trigger_Action__mdt>>> sObjectToContextToActions;
-
-	static {
-		bypassedActions = new Set<String>();
-		permissionMap = new Map<String, Boolean>();
-		sObjectToContextToActions = new Map<String, Map<String, List<Trigger_Action__mdt>>>();
-	}
+	private static final String INVALID_TYPE_ERROR = 'Please check the Trigger Action Custom Metadata for the {1} context on the {2} sObject. The {0} class does not implement the Trigger Action interface specified for the {1} context.';
+	@TestVisible
+	private static final String INVALID_CLASS_ERROR = 'Please check the Trigger Action Custom Metadata for the {1} context on the {2} sObject. The {0} class does not exist.';
+	@TestVisible
+	private static Set<String> bypassedActions = new Set<String>();
+	private static Map<String, Boolean> permissionMap = new Map<String, Boolean>();
+	private static Map<String, Map<String, List<Trigger_Action__mdt>>> sObjectToContextToActions = new Map<String, Map<String, List<Trigger_Action__mdt>>>();
 
 	public void beforeInsert(List<SObject> newList) {
 		this.executeActions(TriggerOperation.BEFORE_INSERT, newList, null);
@@ -406,12 +404,6 @@ public with sharing class MetadataTriggerHandler extends TriggerBase implements 
 		MetadataTriggerHandler.bypassedActions.clear();
 	}
 
-	@TestVisible
-	private static final String INVALID_TYPE_ERROR = 'Please check the Trigger Action Custom Metadata for the {1} context on the {2} sObject. The {0} class does not implement the Trigger Action interface specified for the {1} context.';
-
-	@TestVisible
-	private static final String INVALID_CLASS_ERROR = 'Please check the Trigger Action Custom Metadata for the {1} context on the {2} sObject. The {0} class does not exist.';
-
-	class MetadataTriggerHandlerException extends Exception {
+	private class MetadataTriggerHandlerException extends Exception {
 	}
 }

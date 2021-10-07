@@ -14,7 +14,7 @@
    limitations under the License.
  */
 
-@IsTest
+@IsTest(isParallel=true)
 private class TriggerBaseTest {
 	private static final String ACCOUNT = 'Account';
 	private static final Account MY_ACCOUNT = new Account(
@@ -22,267 +22,334 @@ private class TriggerBaseTest {
 		Name = 'My Account'
 	);
 	private static BaseTest base = new BaseTest();
+	private static Exception myException;
 
 	@IsTest
-	private static void beforeInsert_success() {
+	private static void beforeInsertShouldSucceed() {
 		MY_ACCOUNT.Id = null;
-		Exception myException;
-		Test.startTest();
 		base.context = System.TriggerOperation.BEFORE_INSERT;
 		base.triggerNew = new List<SObject>{ MY_ACCOUNT };
+
 		try {
 			base.run();
 		} catch (Exception e) {
 			myException = e;
 		}
-		Test.stopTest();
-		System.assertEquals(null, myException);
+
+		System.assertEquals(
+			null,
+			myException,
+			'We should not encounter an exception'
+		);
 	}
 
 	@IsTest
-	private static void afterInsert_success() {
-		Exception myException;
-		Test.startTest();
+	private static void afterInsertShouldSucceed() {
 		base.context = System.TriggerOperation.AFTER_INSERT;
 		base.triggerNew = new List<SObject>{ MY_ACCOUNT };
+
 		try {
 			base.run();
 		} catch (Exception e) {
 			myException = e;
 		}
-		Test.stopTest();
-		System.assertEquals(null, myException);
+
+		System.assertEquals(
+			null,
+			myException,
+			'We should not encounter an exception'
+		);
 	}
 
 	@IsTest
-	private static void beforeUpdate_success() {
-		Exception myException;
-		Test.startTest();
+	private static void beforeUpdateShouldSucceed() {
 		base.context = System.TriggerOperation.BEFORE_UPDATE;
 		base.triggerNew = new List<SObject>{ MY_ACCOUNT };
 		base.triggerOld = new List<SObject>{ MY_ACCOUNT };
+
 		try {
 			base.run();
 		} catch (Exception e) {
 			myException = e;
 		}
-		Test.stopTest();
-		System.assertEquals(null, myException);
+
+		System.assertEquals(
+			null,
+			myException,
+			'We should not encounter an exception'
+		);
 	}
 
 	@IsTest
-	private static void afterUpdate_success() {
-		Exception myException;
-		Test.startTest();
+	private static void afterUpdateShouldSucceed() {
 		base.context = System.TriggerOperation.After_UPDATE;
 		base.triggerNew = new List<SObject>{ MY_ACCOUNT };
 		base.triggerOld = new List<SObject>{ MY_ACCOUNT };
+
 		try {
 			base.run();
 		} catch (Exception e) {
 			myException = e;
 		}
-		Test.stopTest();
-		System.assertEquals(null, myException);
+
+		System.assertEquals(
+			null,
+			myException,
+			'We should not encounter an exception'
+		);
 	}
 
 	@IsTest
-	private static void beforeDelete_success() {
-		Exception myException;
-		Test.startTest();
+	private static void beforeDeleteShouldSucceed() {
 		base.context = System.TriggerOperation.BEFORE_DELETE;
 		base.triggerOld = new List<SObject>{ MY_ACCOUNT };
+
 		try {
 			base.run();
 		} catch (Exception e) {
 			myException = e;
 		}
-		Test.stopTest();
-		System.assertEquals(null, myException);
+
+		System.assertEquals(
+			null,
+			myException,
+			'We should not encounter an exception'
+		);
 	}
 
 	@IsTest
-	private static void afterDelete_success() {
-		Exception myException;
-		Test.startTest();
+	private static void afterDeleteShouldSucceed() {
 		base.context = System.TriggerOperation.AFTER_DELETE;
 		base.triggerOld = new List<SObject>{ MY_ACCOUNT };
+
 		try {
 			base.run();
 		} catch (Exception e) {
 			myException = e;
 		}
-		Test.stopTest();
-		System.assertEquals(null, myException);
+
+		System.assertEquals(
+			null,
+			myException,
+			'We should not encounter an exception'
+		);
 	}
 
 	@IsTest
-	private static void afterUndelete_success() {
-		Exception myException;
-		Test.startTest();
+	private static void afterUndeleteShouldSucceed() {
 		base.context = System.TriggerOperation.AFTER_UNDELETE;
 		base.triggerNew = new List<SObject>{ MY_ACCOUNT };
+
 		try {
 			base.run();
 		} catch (Exception e) {
 			myException = e;
 		}
-		Test.stopTest();
-		System.assertEquals(null, myException);
+
+		System.assertEquals(
+			null,
+			myException,
+			'We should not encounter an exception'
+		);
 	}
 
 	@IsTest
 	private static void idToNumberOfTimesSeenBeforeUpdate() {
-		Exception myException;
-		Test.startTest();
 		base.context = System.TriggerOperation.BEFORE_UPDATE;
 		base.triggerNew = new List<SObject>{ MY_ACCOUNT };
 		base.triggerOld = new List<SObject>{ MY_ACCOUNT };
+
 		try {
 			base.run();
 			base.run();
 		} catch (Exception e) {
 			myException = e;
 		}
-		Test.stopTest();
+
 		System.assertEquals(
 			2,
-			TriggerBase.idToNumberOfTimesSeenBeforeUpdate.get(MY_ACCOUNT.Id)
+			TriggerBase.idToNumberOfTimesSeenBeforeUpdate.get(MY_ACCOUNT.Id),
+			'The number of time seen should be populated properly'
 		);
-		System.assertEquals(null, myException);
+		System.assertEquals(
+			null,
+			myException,
+			'We should not encounter an exception'
+		);
 	}
 
 	@IsTest
 	private static void idToNumberOfTimesSeenAfterUpdate() {
-		Exception myException;
-		Test.startTest();
 		base.context = System.TriggerOperation.AFTER_UPDATE;
 		base.triggerNew = new List<SObject>{ MY_ACCOUNT };
 		base.triggerOld = new List<SObject>{ MY_ACCOUNT };
+
 		try {
 			base.run();
 			base.run();
 		} catch (Exception e) {
 			myException = e;
 		}
-		Test.stopTest();
+
 		System.assertEquals(
 			2,
-			TriggerBase.idToNumberOfTimesSeenAfterUpdate.get(MY_ACCOUNT.Id)
+			TriggerBase.idToNumberOfTimesSeenAfterUpdate.get(MY_ACCOUNT.Id),
+			'The number of time seen should be populated properly'
 		);
-		System.assertEquals(null, myException);
+		System.assertEquals(
+			null,
+			myException,
+			'We should not encounter an exception'
+		);
 	}
 
 	@IsTest
-	private static void run_fail() {
-		Exception myException;
-		Test.startTest();
+	private static void runShouldFailWhenCalledOutsidetrigger() {
 		try {
 			base.run();
 		} catch (Exception e) {
 			myException = e;
 		}
-		Test.stopTest();
-		System.assertNotEquals(null, myException);
+
+		System.assertNotEquals(null, myException, 'An exception should be thrown');
 		System.assert(
 			myException.getMessage()
-				.contains(TriggerBase.HANDLER_OUTSIDE_TRIGGER_MESSAGE)
+				.contains(TriggerBase.HANDLER_OUTSIDE_TRIGGER_MESSAGE),
+			'The exception should be the one we are looking for'
 		);
 	}
 
 	@IsTest
-	private static void run_true() {
+	private static void runShouldSucceed() {
 		MY_ACCOUNT.Id = null;
-		Exception myException;
 		base.context = System.TriggerOperation.BEFORE_INSERT;
 		base.triggerNew = new List<SObject>{ MY_ACCOUNT };
-		Test.startTest();
+
 		try {
 			base.run();
 		} catch (Exception e) {
 			myException = e;
 		}
-		Test.stopTest();
-		System.assertEquals(null, myException);
-		System.assertEquals(true, base.hasBeenExecuted);
+
+		System.assertEquals(
+			null,
+			myException,
+			'We should not encounter an exception'
+		);
+		System.assertEquals(
+			true,
+			base.hasBeenExecuted,
+			'The base should have executed'
+		);
 	}
 
 	@IsTest
-	private static void run_false() {
+	private static void runShouldDoNothingWhenBypassed() {
 		MY_ACCOUNT.Id = null;
 		TriggerBase.bypass(ACCOUNT);
-		Exception myException;
 		base.context = System.TriggerOperation.BEFORE_INSERT;
 		base.triggerNew = new List<SObject>{ MY_ACCOUNT };
-		Test.startTest();
+
 		try {
 			base.run();
 		} catch (Exception e) {
 			myException = e;
 		}
-		Test.stopTest();
-		System.assertEquals(null, myException);
-		System.assertEquals(false, base.hasBeenExecuted);
+
+		System.assertEquals(
+			null,
+			myException,
+			'We should not encounter an exception'
+		);
+		System.assertEquals(
+			false,
+			base.hasBeenExecuted,
+			'The base should not have executed'
+		);
 	}
 
 	@IsTest
-	private static void bypass_success() {
-		Exception myException;
-		Test.startTest();
+	private static void bypassShouldSucceed() {
 		try {
 			TriggerBase.bypass(ACCOUNT);
 		} catch (Exception e) {
 			myException = e;
 		}
-		Test.stopTest();
-		System.assertEquals(null, myException);
-		System.assert(TriggerBase.bypassedObjects.contains(ACCOUNT));
+
+		System.assertEquals(
+			null,
+			myException,
+			'We should not encounter an exception'
+		);
+		System.assert(
+			TriggerBase.bypassedObjects.contains(ACCOUNT),
+			'The bypasses should be configured correctly'
+		);
 	}
 
 	@IsTest
-	private static void clearBypass_success() {
-		Exception myException;
-		Test.startTest();
+	private static void clearBypassShouldSucceed() {
 		try {
 			TriggerBase.bypass(ACCOUNT);
 			TriggerBase.clearBypass(ACCOUNT);
 		} catch (Exception e) {
 			myException = e;
 		}
-		Test.stopTest();
-		System.assertEquals(null, myException);
-		System.assert(!TriggerBase.bypassedObjects.contains(ACCOUNT));
+
+		System.assertEquals(
+			null,
+			myException,
+			'We should not encounter an exception'
+		);
+		System.assert(
+			!TriggerBase.bypassedObjects.contains(ACCOUNT),
+			'The bypasses should be configured correctly'
+		);
 	}
 
 	@IsTest
-	private static void isBypassed_success() {
+	private static void isBypassedShouldSucceed() {
 		Boolean isBypassed;
 		TriggerBase.bypass(ACCOUNT);
-		Exception myException;
-		Test.startTest();
+
 		try {
 			isBypassed = TriggerBase.isBypassed(ACCOUNT);
 		} catch (Exception e) {
 			myException = e;
 		}
-		Test.stopTest();
-		System.assertEquals(null, myException);
-		System.assertEquals(true, isBypassed);
+
+		System.assertEquals(
+			null,
+			myException,
+			'We should not encounter an exception'
+		);
+		System.assertEquals(
+			true,
+			isBypassed,
+			'The bypasses should be configured correctly'
+		);
 	}
 
 	@IsTest
-	private static void clearAllBypasses_success() {
+	private static void clearAllBypassesShouldSucceed() {
 		TriggerBase.bypass(ACCOUNT);
-		Exception myException;
-		Test.startTest();
+
 		try {
 			TriggerBase.clearAllBypasses();
 		} catch (Exception e) {
 			myException = e;
 		}
-		Test.stopTest();
-		System.assertEquals(null, myException);
-		System.assertEquals(0, TriggerBase.bypassedObjects.size());
+
+		System.assertEquals(
+			null,
+			myException,
+			'We should not encounter an exception'
+		);
+		System.assertEquals(
+			0,
+			TriggerBase.bypassedObjects.size(),
+			'The bypasses should be configured correctly'
+		);
 	}
 
 	class BaseTest extends TriggerBase implements TriggerAction.BeforeInsert, TriggerAction.AfterInsert, TriggerAction.BeforeUpdate, TriggerAction.AfterUpdate, TriggerAction.BeforeDelete, TriggerAction.AfterDelete, TriggerAction.AfterUndelete {
