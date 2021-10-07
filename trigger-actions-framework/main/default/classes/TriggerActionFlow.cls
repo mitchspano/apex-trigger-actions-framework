@@ -30,15 +30,12 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 		FLOW_STRING
 	};
 	@TestVisible
-	static Set<String> bypassedFlows;
+	private static Set<String> bypassedFlows = new Set<String>();
+	private static Map<Schema.SObjectType, List<String>> sObjectToEditableFields = new Map<Schema.SObjectType, List<String>>();
 
 	public String flowName;
 	public Boolean allowRecursion;
 	public String flowTriggerRecordClassName;
-
-	static {
-		bypassedFlows = new Set<String>();
-	}
 
 	public void beforeInsert(List<SObject> newList) {
 		if (!thisFlowIsBypassed()) {
@@ -159,17 +156,18 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 		return TriggerActionFlow.isBypassed(flowName);
 	}
 
-	Map<String, Object> getFlowInput(
+	private Map<String, Object> getFlowInput(
 		List<sObject> newList,
 		List<sObject> oldList
 	) {
+		FlowTriggerRecord.newRecordIndexToNewRecord.clear();
 		Map<String, Object> generatedInput = getFlowTriggerRecord()
 			.getFlowInput(newList, oldList);
 		verifyInput(generatedInput);
 		return generatedInput;
 	}
 
-	void verifyInput(Map<String, Object> generatedInput) {
+	private void verifyInput(Map<String, Object> generatedInput) {
 		if (
 			generatedInput == null ||
 			generatedInput.containsKey(TRIGGER_RECORDS_VARIABLE) ||
@@ -189,10 +187,42 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 	}
 
 	private void applyFlowValues(List<sObject> newList) {
+		Schema.SObjectType newRecordSObjectType = newList[0].getSObjectType();
+		List<String> editableFields = new List<String>();
+
+		if (sObjectToEditableFields.containsKey(newRecordSObjectType)) {
+			editableFields = sObjectToEditableFields.get(newRecordSObjectType);
+		} else {
+			editableFields = getEditableFields(newRecordSObjectType);
+			sObjectToEditableFields.put(newRecordSObjectType, editableFields);
+		}
+
+		for (Integer i = 0; i < newList.size(); i++) {
+			SObject recordInNewList = newList[i];
+			SObject recordAfterFlowIsComplete = FlowTriggerRecord.newRecordIndexToNewRecord.get(
+				i
+			);
+			for (String fieldName : editableFields) {
+				if (
+					recordInNewList.get(fieldName) !=
+					recordAfterFlowIsComplete.get(fieldName)
+				) {
+					recordInNewList.put(
+						fieldName,
+						recordAfterFlowIsComplete.get(fieldName)
+					);
+				}
+			}
+		}
+		FlowTriggerRecord.newRecordIndexToNewRecord = new Map<Integer, SObject>();
+	}
+
+	private List<String> getEditableFields(
+		Schema.SObjectType newRecordSObjectType
+	) {
 		List<String> editableFields = new List<String>();
 		for (
-			Schema.SObjectField fieldRef : newList[0]
-				.getSObjectType()
+			Schema.SObjectField fieldRef : newRecordSObjectType
 				.getDescribe()
 				.fields.getMap()
 				.values()
@@ -202,29 +232,10 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 				editableFields.add(fieldResult.getName());
 			}
 		}
-		for (Integer i = 0; i < newList.size(); i++) {
-			SObject recordInNewList = newList[i];
-			SObject recordAfterFlowIsComplete = FlowTriggerRecord.newRecordIndexToNewRecord.get(
-				i
-			);
-			if (recordAfterFlowIsComplete != null) {
-				for (String fieldName : editableFields) {
-					if (
-						recordInNewList.get(fieldName) !=
-						recordAfterFlowIsComplete.get(fieldName)
-					) {
-						recordInNewList.put(
-							fieldName,
-							recordAfterFlowIsComplete.get(fieldName)
-						);
-					}
-				}
-			}
-		}
-		FlowTriggerRecord.newRecordIndexToNewRecord = new Map<Integer, SObject>();
+		return editableFields;
 	}
 
-	FlowTriggerRecord getFlowTriggerRecord() {
+	private FlowTriggerRecord getFlowTriggerRecord() {
 		FlowTriggerRecord result;
 		if (flowTriggerRecordClassName == null) {
 			throw new TriggerActionFlowException(
@@ -243,6 +254,6 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 	}
 
 	@TestVisible
-	class TriggerActionFlowException extends Exception {
+	private class TriggerActionFlowException extends Exception {
 	}
 }

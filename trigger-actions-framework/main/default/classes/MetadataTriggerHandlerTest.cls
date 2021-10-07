@@ -14,17 +14,17 @@
    limitations under the License.
  */
 
-@IsTest
+@IsTest(isParallel=true)
 private class MetadataTriggerHandlerTest {
 	private static final String MY_ACCOUNT = 'My Account';
 	private static final String ACCOUNT = 'Account';
-	private static final String TEST_BEFORE_INSERT = 'MetadataTriggerHandlerTest.BeforeInsert';
-	private static final String TEST_AFTER_INSERT = 'MetadataTriggerHandlerTest.AfterInsert';
-	private static final String TEST_BEFORE_UPDATE = 'MetadataTriggerHandlerTest.BeforeUpdate';
-	private static final String TEST_AFTER_UPDATE = 'MetadataTriggerHandlerTest.AfterUpdate';
-	private static final String TEST_BEFORE_DELETE = 'MetadataTriggerHandlerTest.BeforeDelete';
-	private static final String TEST_AFTER_DELETE = 'MetadataTriggerHandlerTest.AfterDelete';
-	private static final String TEST_AFTER_UNDELETE = 'MetadataTriggerHandlerTest.AfterUndelete';
+	private static final String TEST_BEFORE_INSERT = 'MetadataTriggerHandlerTest.TestBeforeInsert';
+	private static final String TEST_AFTER_INSERT = 'MetadataTriggerHandlerTest.TestAfterInsert';
+	private static final String TEST_BEFORE_UPDATE = 'MetadataTriggerHandlerTest.TestBeforeUpdate';
+	private static final String TEST_AFTER_UPDATE = 'MetadataTriggerHandlerTest.TestAfterUpdate';
+	private static final String TEST_BEFORE_DELETE = 'MetadataTriggerHandlerTest.TestBeforeDelete';
+	private static final String TEST_AFTER_DELETE = 'MetadataTriggerHandlerTest.TestAfterDelete';
+	private static final String TEST_AFTER_UNDELETE = 'MetadataTriggerHandlerTest.TestAfterUndelete';
 	private static final String BOGUS_CLASS_NAME = 'Bogus';
 	private static final String REQUIRED_PERMISSION = 'Bogus_Required_Permission';
 	private static final String BYPASS_PERMISSION = 'Bogus_Bypass_Permission';
@@ -37,9 +37,12 @@ private class MetadataTriggerHandlerTest {
 		Id = TestUtility.getFakeId(Schema.sObject_Trigger_Setting__mdt.SObjectType)
 	);
 	private static MetadataTriggerHandler handler = new MetadataTriggerHandler();
+	private static Boolean executed = false;
+	private static Exception myException;
 
 	@IsTest
-	private static void beforeInsert_success() {
+	private static void beforeInsertShouldSucceed() {
+		executed = false;
 		handler.triggerNew = new List<Account>{ myAccount };
 		Trigger_Action__mdt action = new Trigger_Action__mdt(
 			Apex_Class_Name__c = TEST_BEFORE_INSERT,
@@ -51,19 +54,14 @@ private class MetadataTriggerHandlerTest {
 		handler.beforeInsertActionMetadata = new List<Trigger_Action__mdt>{
 			action
 		};
-		Exception myException;
-		Test.startTest();
-		try {
-			handler.beforeInsert(handler.triggerNew);
-		} catch (Exception e) {
-			myException = e;
-		}
-		Test.stopTest();
-		System.assertEquals(null, myException);
+
+		handler.beforeInsert(handler.triggerNew);
+
+		System.assertEquals(true, executed, 'We expect the action to be executed');
 	}
 
 	@IsTest
-	private static void beforeInsert_fail_incorrect_type() {
+	private static void beforeInsertShouldFailWithIncorrectType() {
 		handler.triggerNew = new List<Account>{ myAccount };
 		Trigger_Action__mdt action = new Trigger_Action__mdt(
 			Apex_Class_Name__c = TEST_AFTER_INSERT,
@@ -75,15 +73,14 @@ private class MetadataTriggerHandlerTest {
 		handler.beforeInsertActionMetadata = new List<Trigger_Action__mdt>{
 			action
 		};
-		Exception myException;
-		Test.startTest();
+
 		try {
 			handler.beforeInsert(handler.triggerNew);
 		} catch (Exception e) {
 			myException = e;
 		}
-		Test.stopTest();
-		System.assertNotEquals(null, myException);
+
+		System.assertNotEquals(null, myException, 'An exception should be thrown');
 		System.assertEquals(
 			myException.getMessage(),
 			String.format(
@@ -93,12 +90,13 @@ private class MetadataTriggerHandlerTest {
 					String.valueOf(System.TriggerOperation.BEFORE_INSERT),
 					ACCOUNT
 				}
-			)
+			),
+			'The exception should be of the correct type'
 		);
 	}
 
 	@IsTest
-	private static void beforeInsert_fail_incorrect_class() {
+	private static void beforeInsertShouldFailWithIncorrectClass() {
 		handler.triggerNew = new List<Account>{ myAccount };
 		Trigger_Action__mdt action = new Trigger_Action__mdt(
 			Apex_Class_Name__c = BOGUS_CLASS_NAME,
@@ -110,15 +108,14 @@ private class MetadataTriggerHandlerTest {
 		handler.beforeInsertActionMetadata = new List<Trigger_Action__mdt>{
 			action
 		};
-		Exception myException;
-		Test.startTest();
+
 		try {
 			handler.beforeInsert(handler.triggerNew);
 		} catch (Exception e) {
 			myException = e;
 		}
-		Test.stopTest();
-		System.assertNotEquals(null, myException);
+
+		System.assertNotEquals(null, myException, 'An exception should be thrown');
 		System.assertEquals(
 			myException.getMessage(),
 			String.format(
@@ -128,12 +125,14 @@ private class MetadataTriggerHandlerTest {
 					String.valueOf(System.TriggerOperation.BEFORE_INSERT),
 					ACCOUNT
 				}
-			)
+			),
+			'The exception should be of the correct type'
 		);
 	}
 
 	@IsTest
-	private static void afterInsert_success() {
+	private static void afterInsertShouldSucceed() {
+		executed = false;
 		handler.triggerNew = new List<Account>{ myAccount };
 		Trigger_Action__mdt action = new Trigger_Action__mdt(
 			Apex_Class_Name__c = TEST_AFTER_INSERT,
@@ -143,19 +142,14 @@ private class MetadataTriggerHandlerTest {
 			Bypass_Execution__c = false
 		);
 		handler.afterInsertActionMetadata = new List<Trigger_Action__mdt>{ action };
-		Exception myException;
-		Test.startTest();
-		try {
-			handler.afterInsert(handler.triggerNew);
-		} catch (Exception e) {
-			myException = e;
-		}
-		Test.stopTest();
-		System.assertEquals(null, myException);
+
+		handler.afterInsert(handler.triggerNew);
+
+		System.assertEquals(true, executed, 'We expect the action to be executed');
 	}
 
 	@IsTest
-	private static void afterInsert_fail_incorrect_type() {
+	private static void afterInsertShouldFailWithIncorrectType() {
 		handler.triggerNew = new List<Account>{ myAccount };
 		Trigger_Action__mdt action = new Trigger_Action__mdt(
 			Apex_Class_Name__c = TEST_BEFORE_INSERT,
@@ -165,15 +159,14 @@ private class MetadataTriggerHandlerTest {
 			Bypass_Execution__c = false
 		);
 		handler.afterInsertActionMetadata = new List<Trigger_Action__mdt>{ action };
-		Exception myException;
-		Test.startTest();
+
 		try {
 			handler.afterInsert(handler.triggerNew);
 		} catch (Exception e) {
 			myException = e;
 		}
-		Test.stopTest();
-		System.assertNotEquals(null, myException);
+
+		System.assertNotEquals(null, myException, 'An exception should be thrown');
 		System.assertEquals(
 			myException.getMessage(),
 			String.format(
@@ -183,12 +176,13 @@ private class MetadataTriggerHandlerTest {
 					String.valueOf(System.TriggerOperation.AFTER_INSERT),
 					ACCOUNT
 				}
-			)
+			),
+			'The exception should be of the correct type'
 		);
 	}
 
 	@IsTest
-	private static void afterInsert_fail_incorrect_class() {
+	private static void afterInsertShouldFailWithIncorrectClass() {
 		handler.triggerNew = new List<Account>{ myAccount };
 		Trigger_Action__mdt action = new Trigger_Action__mdt(
 			Apex_Class_Name__c = BOGUS_CLASS_NAME,
@@ -198,15 +192,14 @@ private class MetadataTriggerHandlerTest {
 			Bypass_Execution__c = false
 		);
 		handler.afterInsertActionMetadata = new List<Trigger_Action__mdt>{ action };
-		Exception myException;
-		Test.startTest();
+
 		try {
 			handler.afterInsert(handler.triggerNew);
 		} catch (Exception e) {
 			myException = e;
 		}
-		Test.stopTest();
-		System.assertNotEquals(null, myException);
+
+		System.assertNotEquals(null, myException, 'An exception should be thrown');
 		System.assertEquals(
 			myException.getMessage(),
 			String.format(
@@ -216,12 +209,14 @@ private class MetadataTriggerHandlerTest {
 					String.valueOf(System.TriggerOperation.AFTER_INSERT),
 					ACCOUNT
 				}
-			)
+			),
+			'The exception should be of the correct type'
 		);
 	}
 
 	@IsTest
-	private static void beforeUpdate_success() {
+	private static void beforeUpdateShouldSucceed() {
+		executed = false;
 		handler.triggerNew = new List<Account>{ myAccount };
 		handler.triggerOld = new List<Account>{ myAccount };
 		Trigger_Action__mdt action = new Trigger_Action__mdt(
@@ -234,19 +229,14 @@ private class MetadataTriggerHandlerTest {
 		handler.beforeUpdateActionMetadata = new List<Trigger_Action__mdt>{
 			action
 		};
-		Exception myException;
-		Test.startTest();
-		try {
-			handler.beforeUpdate(handler.triggerNew, handler.triggerOld);
-		} catch (Exception e) {
-			myException = e;
-		}
-		Test.stopTest();
-		System.assertEquals(null, myException);
+
+		handler.beforeUpdate(handler.triggerNew, handler.triggerOld);
+
+		System.assertEquals(true, executed, 'We expect the action to be executed');
 	}
 
 	@IsTest
-	private static void beforeUpdate_fail_incorrect_type() {
+	private static void beforeUpdateShouldFailWithIncorrectType() {
 		handler.triggerNew = new List<Account>{ myAccount };
 		handler.triggerOld = new List<Account>{ myAccount };
 		Trigger_Action__mdt action = new Trigger_Action__mdt(
@@ -259,15 +249,14 @@ private class MetadataTriggerHandlerTest {
 		handler.beforeUpdateActionMetadata = new List<Trigger_Action__mdt>{
 			action
 		};
-		Exception myException;
-		Test.startTest();
+
 		try {
 			handler.beforeUpdate(handler.triggerNew, handler.triggerOld);
 		} catch (Exception e) {
 			myException = e;
 		}
-		Test.stopTest();
-		System.assertNotEquals(null, myException);
+
+		System.assertNotEquals(null, myException, 'An exception should be thrown');
 		System.assertEquals(
 			myException.getMessage(),
 			String.format(
@@ -277,12 +266,13 @@ private class MetadataTriggerHandlerTest {
 					String.valueOf(System.TriggerOperation.BEFORE_UPDATE),
 					ACCOUNT
 				}
-			)
+			),
+			'The exception should be of the correct type'
 		);
 	}
 
 	@IsTest
-	private static void beforeUpdate_fail_incorrect_class() {
+	private static void beforeUpdateShouldFailWithIncorrectClass() {
 		handler.triggerNew = new List<Account>{ myAccount };
 		handler.triggerOld = new List<Account>{ myAccount };
 		Trigger_Action__mdt action = new Trigger_Action__mdt(
@@ -295,15 +285,14 @@ private class MetadataTriggerHandlerTest {
 		handler.beforeUpdateActionMetadata = new List<Trigger_Action__mdt>{
 			action
 		};
-		Exception myException;
-		Test.startTest();
+
 		try {
 			handler.beforeUpdate(handler.triggerNew, handler.triggerOld);
 		} catch (Exception e) {
 			myException = e;
 		}
-		Test.stopTest();
-		System.assertNotEquals(null, myException);
+
+		System.assertNotEquals(null, myException, 'An exception should be thrown');
 		System.assertEquals(
 			myException.getMessage(),
 			String.format(
@@ -313,12 +302,14 @@ private class MetadataTriggerHandlerTest {
 					String.valueOf(System.TriggerOperation.BEFORE_UPDATE),
 					ACCOUNT
 				}
-			)
+			),
+			'The exception should be of the correct type'
 		);
 	}
 
 	@IsTest
-	private static void afterUpdate_success() {
+	private static void afterUpdateShouldSucceed() {
+		executed = false;
 		handler.triggerNew = new List<Account>{ myAccount };
 		handler.triggerOld = new List<Account>{ myAccount };
 		Trigger_Action__mdt action = new Trigger_Action__mdt(
@@ -329,19 +320,14 @@ private class MetadataTriggerHandlerTest {
 			Bypass_Execution__c = false
 		);
 		handler.afterUpdateActionMetadata = new List<Trigger_Action__mdt>{ action };
-		Exception myException;
-		Test.startTest();
-		try {
-			handler.afterUpdate(handler.triggerNew, handler.triggerOld);
-		} catch (Exception e) {
-			myException = e;
-		}
-		Test.stopTest();
-		System.assertEquals(null, myException);
+
+		handler.afterUpdate(handler.triggerNew, handler.triggerOld);
+
+		System.assertEquals(true, executed, 'We expect the action to be executed');
 	}
 
 	@IsTest
-	private static void afterUpdate_fail_incorrect_type() {
+	private static void afterUpdateShouldFailWithIncorrectType() {
 		handler.triggerNew = new List<Account>{ myAccount };
 		handler.triggerOld = new List<Account>{ myAccount };
 		Trigger_Action__mdt action = new Trigger_Action__mdt(
@@ -352,15 +338,14 @@ private class MetadataTriggerHandlerTest {
 			Bypass_Execution__c = false
 		);
 		handler.afterUpdateActionMetadata = new List<Trigger_Action__mdt>{ action };
-		Exception myException;
-		Test.startTest();
+
 		try {
 			handler.afterUpdate(handler.triggerNew, handler.triggerOld);
 		} catch (Exception e) {
 			myException = e;
 		}
-		Test.stopTest();
-		System.assertNotEquals(null, myException);
+
+		System.assertNotEquals(null, myException, 'An exception should be thrown');
 		System.assertEquals(
 			myException.getMessage(),
 			String.format(
@@ -370,12 +355,13 @@ private class MetadataTriggerHandlerTest {
 					String.valueOf(System.TriggerOperation.AFTER_UPDATE),
 					ACCOUNT
 				}
-			)
+			),
+			'The exception should be of the correct type'
 		);
 	}
 
 	@IsTest
-	private static void afterUpdate_fail_incorrect_class() {
+	private static void afterUpdateShouldFailWithIncorrectClass() {
 		handler.triggerNew = new List<Account>{ myAccount };
 		handler.triggerOld = new List<Account>{ myAccount };
 		Trigger_Action__mdt action = new Trigger_Action__mdt(
@@ -386,15 +372,14 @@ private class MetadataTriggerHandlerTest {
 			Bypass_Execution__c = false
 		);
 		handler.afterUpdateActionMetadata = new List<Trigger_Action__mdt>{ action };
-		Exception myException;
-		Test.startTest();
+
 		try {
 			handler.afterUpdate(handler.triggerNew, handler.triggerOld);
 		} catch (Exception e) {
 			myException = e;
 		}
-		Test.stopTest();
-		System.assertNotEquals(null, myException);
+
+		System.assertNotEquals(null, myException, 'An exception should be thrown');
 		System.assertEquals(
 			myException.getMessage(),
 			String.format(
@@ -404,12 +389,14 @@ private class MetadataTriggerHandlerTest {
 					String.valueOf(System.TriggerOperation.AFTER_UPDATE),
 					ACCOUNT
 				}
-			)
+			),
+			'The exception should be of the correct type'
 		);
 	}
 
 	@IsTest
-	private static void beforeDelete_success() {
+	private static void beforeDeleteShouldSucceed() {
+		executed = false;
 		handler.triggerOld = new List<Account>{ myAccount };
 		Trigger_Action__mdt action = new Trigger_Action__mdt(
 			Apex_Class_Name__c = TEST_BEFORE_DELETE,
@@ -421,19 +408,14 @@ private class MetadataTriggerHandlerTest {
 		handler.beforeDeleteActionMetadata = new List<Trigger_Action__mdt>{
 			action
 		};
-		Exception myException;
-		Test.startTest();
-		try {
-			handler.beforeDelete(handler.triggerOld);
-		} catch (Exception e) {
-			myException = e;
-		}
-		Test.stopTest();
-		System.assertEquals(null, myException);
+
+		handler.beforeDelete(handler.triggerOld);
+
+		System.assertEquals(true, executed, 'We expect the action to be executed');
 	}
 
 	@IsTest
-	private static void beforeDelete_fail_incorrect_type() {
+	private static void beforeDeleteShouldFailWithIncorrectType() {
 		handler.triggerOld = new List<Account>{ myAccount };
 		Trigger_Action__mdt action = new Trigger_Action__mdt(
 			Apex_Class_Name__c = TEST_BEFORE_INSERT,
@@ -445,15 +427,14 @@ private class MetadataTriggerHandlerTest {
 		handler.beforeDeleteActionMetadata = new List<Trigger_Action__mdt>{
 			action
 		};
-		Exception myException;
-		Test.startTest();
+
 		try {
 			handler.beforeDelete(handler.triggerOld);
 		} catch (Exception e) {
 			myException = e;
 		}
-		Test.stopTest();
-		System.assertNotEquals(null, myException);
+
+		System.assertNotEquals(null, myException, 'An exception should be thrown');
 		System.assertEquals(
 			myException.getMessage(),
 			String.format(
@@ -463,12 +444,13 @@ private class MetadataTriggerHandlerTest {
 					String.valueOf(System.TriggerOperation.BEFORE_DELETE),
 					ACCOUNT
 				}
-			)
+			),
+			'The exception should be of the correct type'
 		);
 	}
 
 	@IsTest
-	private static void beforeDelete_fail_incorrect_class() {
+	private static void beforeDeleteShouldFailWithIncorrectClass() {
 		handler.triggerOld = new List<Account>{ myAccount };
 		Trigger_Action__mdt action = new Trigger_Action__mdt(
 			Apex_Class_Name__c = BOGUS_CLASS_NAME,
@@ -480,15 +462,14 @@ private class MetadataTriggerHandlerTest {
 		handler.beforeDeleteActionMetadata = new List<Trigger_Action__mdt>{
 			action
 		};
-		Exception myException;
-		Test.startTest();
+
 		try {
 			handler.beforeDelete(handler.triggerOld);
 		} catch (Exception e) {
 			myException = e;
 		}
-		Test.stopTest();
-		System.assertNotEquals(null, myException);
+
+		System.assertNotEquals(null, myException, 'An exception should be thrown');
 		System.assertEquals(
 			myException.getMessage(),
 			String.format(
@@ -498,12 +479,14 @@ private class MetadataTriggerHandlerTest {
 					String.valueOf(System.TriggerOperation.BEFORE_DELETE),
 					ACCOUNT
 				}
-			)
+			),
+			'The exception should be of the correct type'
 		);
 	}
 
 	@IsTest
-	private static void afterDelete_success() {
+	private static void afterDeleteShouldSucceed() {
+		executed = false;
 		handler.triggerOld = new List<Account>{ myAccount };
 		Trigger_Action__mdt action = new Trigger_Action__mdt(
 			Apex_Class_Name__c = TEST_AFTER_DELETE,
@@ -513,19 +496,14 @@ private class MetadataTriggerHandlerTest {
 			Bypass_Execution__c = false
 		);
 		handler.afterDeleteActionMetadata = new List<Trigger_Action__mdt>{ action };
-		Exception myException;
-		Test.startTest();
-		try {
-			handler.afterDelete(handler.triggerOld);
-		} catch (Exception e) {
-			myException = e;
-		}
-		Test.stopTest();
-		System.assertEquals(null, myException);
+
+		handler.afterDelete(handler.triggerOld);
+
+		System.assertEquals(true, executed, 'We expect the action to be executed');
 	}
 
 	@IsTest
-	private static void afterDelete_fail_incorrect_type() {
+	private static void afterDeleteShouldFailWithIncorrectType() {
 		handler.triggerOld = new List<Account>{ myAccount };
 		Trigger_Action__mdt action = new Trigger_Action__mdt(
 			Apex_Class_Name__c = TEST_BEFORE_INSERT,
@@ -535,15 +513,14 @@ private class MetadataTriggerHandlerTest {
 			Bypass_Execution__c = false
 		);
 		handler.afterDeleteActionMetadata = new List<Trigger_Action__mdt>{ action };
-		Exception myException;
-		Test.startTest();
+
 		try {
 			handler.afterDelete(handler.triggerOld);
 		} catch (Exception e) {
 			myException = e;
 		}
-		Test.stopTest();
-		System.assertNotEquals(null, myException);
+
+		System.assertNotEquals(null, myException, 'An exception should be thrown');
 		System.assertEquals(
 			myException.getMessage(),
 			String.format(
@@ -553,12 +530,13 @@ private class MetadataTriggerHandlerTest {
 					String.valueOf(System.TriggerOperation.AFTER_DELETE),
 					ACCOUNT
 				}
-			)
+			),
+			'The exception should be of the correct type'
 		);
 	}
 
 	@IsTest
-	private static void afterDelete_fail_incorrect_class() {
+	private static void afterDeleteShouldFailWithIncorrectClass() {
 		handler.triggerOld = new List<Account>{ myAccount };
 		Trigger_Action__mdt action = new Trigger_Action__mdt(
 			Apex_Class_Name__c = BOGUS_CLASS_NAME,
@@ -568,15 +546,14 @@ private class MetadataTriggerHandlerTest {
 			Bypass_Execution__c = false
 		);
 		handler.afterDeleteActionMetadata = new List<Trigger_Action__mdt>{ action };
-		Exception myException;
-		Test.startTest();
+
 		try {
 			handler.afterDelete(handler.triggerOld);
 		} catch (Exception e) {
 			myException = e;
 		}
-		Test.stopTest();
-		System.assertNotEquals(null, myException);
+
+		System.assertNotEquals(null, myException, 'An exception should be thrown');
 		System.assertEquals(
 			myException.getMessage(),
 			String.format(
@@ -586,12 +563,14 @@ private class MetadataTriggerHandlerTest {
 					String.valueOf(System.TriggerOperation.AFTER_DELETE),
 					ACCOUNT
 				}
-			)
+			),
+			'The exception should be of the correct type'
 		);
 	}
 
 	@IsTest
-	private static void afterUndelete_success() {
+	private static void afterUndeleteShouldSucceed() {
+		executed = false;
 		handler.triggerOld = new List<Account>{ myAccount };
 		Trigger_Action__mdt action = new Trigger_Action__mdt(
 			Apex_Class_Name__c = TEST_AFTER_UNDELETE,
@@ -603,19 +582,14 @@ private class MetadataTriggerHandlerTest {
 		handler.afterUndeleteActionMetadata = new List<Trigger_Action__mdt>{
 			action
 		};
-		Exception myException;
-		Test.startTest();
-		try {
-			handler.afterUndelete(handler.triggerOld);
-		} catch (Exception e) {
-			myException = e;
-		}
-		Test.stopTest();
-		System.assertEquals(null, myException);
+
+		handler.afterUndelete(handler.triggerOld);
+
+		System.assertEquals(true, executed, 'We expect the action to be executed');
 	}
 
 	@IsTest
-	private static void afterUndelete_fail_incorrect_type() {
+	private static void afterUndeleteShouldFailWithIncorrectType() {
 		handler.triggerOld = new List<Account>{ myAccount };
 		Trigger_Action__mdt action = new Trigger_Action__mdt(
 			Apex_Class_Name__c = TEST_BEFORE_INSERT,
@@ -627,15 +601,14 @@ private class MetadataTriggerHandlerTest {
 		handler.afterUndeleteActionMetadata = new List<Trigger_Action__mdt>{
 			action
 		};
-		Exception myException;
-		Test.startTest();
+
 		try {
 			handler.afterUndelete(handler.triggerOld);
 		} catch (Exception e) {
 			myException = e;
 		}
-		Test.stopTest();
-		System.assertNotEquals(null, myException);
+
+		System.assertNotEquals(null, myException, 'An exception should be thrown');
 		System.assertEquals(
 			myException.getMessage(),
 			String.format(
@@ -645,12 +618,13 @@ private class MetadataTriggerHandlerTest {
 					String.valueOf(System.TriggerOperation.AFTER_UNDELETE),
 					ACCOUNT
 				}
-			)
+			),
+			'The exception should be of the correct type'
 		);
 	}
 
 	@IsTest
-	private static void afterUndelete_fail_incorrect_class() {
+	private static void afterUndeleteShouldFailWithIncorrectClass() {
 		handler.triggerOld = new List<Account>{ myAccount };
 		Trigger_Action__mdt action = new Trigger_Action__mdt(
 			Apex_Class_Name__c = BOGUS_CLASS_NAME,
@@ -662,15 +636,14 @@ private class MetadataTriggerHandlerTest {
 		handler.afterUndeleteActionMetadata = new List<Trigger_Action__mdt>{
 			action
 		};
-		Exception myException;
-		Test.startTest();
+
 		try {
 			handler.afterUndelete(handler.triggerOld);
 		} catch (Exception e) {
 			myException = e;
 		}
-		Test.stopTest();
-		System.assertNotEquals(null, myException);
+
+		System.assertNotEquals(null, myException, 'An exception should be thrown');
 		System.assertEquals(
 			myException.getMessage(),
 			String.format(
@@ -680,113 +653,133 @@ private class MetadataTriggerHandlerTest {
 					String.valueOf(System.TriggerOperation.AFTER_UNDELETE),
 					ACCOUNT
 				}
-			)
+			),
+			'The exception should be of the correct type'
 		);
 	}
 
 	@IsTest
-	private static void actionMetadata() {
+	private static void actionMetadataShouldConstruct() {
 		handler.triggerNew = new List<Account>{ myAccount };
 		handler.triggerOld = new List<Account>{ myAccount };
-		System.assertNotEquals(null, handler.beforeInsertActionMetadata);
-		System.assertNotEquals(null, handler.afterInsertActionMetadata);
-		System.assertNotEquals(null, handler.beforeUpdateActionMetadata);
-		System.assertNotEquals(null, handler.afterUpdateActionMetadata);
-		System.assertNotEquals(null, handler.beforeDeleteActionMetadata);
-		System.assertNotEquals(null, handler.afterDeleteActionMetadata);
-		System.assertNotEquals(null, handler.afterUndeleteActionMetadata);
-	}
-
-	@IsTest
-	private static void bypass_success() {
-		Exception myException;
-		Test.startTest();
-		try {
-			MetadataTriggerHandler.bypass(TEST_BEFORE_INSERT);
-		} catch (Exception e) {
-			myException = e;
-		}
-		Test.stopTest();
-		System.assertEquals(null, myException);
-		System.assert(
-			MetadataTriggerHandler.bypassedActions.contains(TEST_BEFORE_INSERT)
+		System.assertNotEquals(
+			null,
+			handler.beforeInsertActionMetadata,
+			'The metadata should be populated properly'
+		);
+		System.assertNotEquals(
+			null,
+			handler.afterInsertActionMetadata,
+			'The metadata should be populated properly'
+		);
+		System.assertNotEquals(
+			null,
+			handler.beforeUpdateActionMetadata,
+			'The metadata should be populated properly'
+		);
+		System.assertNotEquals(
+			null,
+			handler.afterUpdateActionMetadata,
+			'The metadata should be populated properly'
+		);
+		System.assertNotEquals(
+			null,
+			handler.beforeDeleteActionMetadata,
+			'The metadata should be populated properly'
+		);
+		System.assertNotEquals(
+			null,
+			handler.afterDeleteActionMetadata,
+			'The metadata should be populated properly'
+		);
+		System.assertNotEquals(
+			null,
+			handler.afterUndeleteActionMetadata,
+			'The metadata should be populated properly'
 		);
 	}
 
 	@IsTest
-	private static void clearBypass_success() {
-		Exception myException;
-		Test.startTest();
-		try {
-			MetadataTriggerHandler.bypass(TEST_BEFORE_INSERT);
-			MetadataTriggerHandler.clearBypass(TEST_BEFORE_INSERT);
-		} catch (Exception e) {
-			myException = e;
-		}
-		Test.stopTest();
-		System.assertEquals(null, myException);
+	private static void bypassShouldSucceed() {
+		MetadataTriggerHandler.bypass(TEST_BEFORE_INSERT);
+
 		System.assert(
-			!MetadataTriggerHandler.bypassedActions.contains(TEST_BEFORE_INSERT)
+			MetadataTriggerHandler.bypassedActions.contains(TEST_BEFORE_INSERT),
+			'All bypasses should be configured correctly'
 		);
 	}
 
 	@IsTest
-	private static void isBypassed_success() {
+	private static void clearBypassShouldSucceed() {
+		MetadataTriggerHandler.bypass(TEST_BEFORE_INSERT);
+		MetadataTriggerHandler.clearBypass(TEST_BEFORE_INSERT);
+
+		System.assert(
+			!MetadataTriggerHandler.bypassedActions.contains(TEST_BEFORE_INSERT),
+			'All bypasses should be configured correctly'
+		);
+	}
+
+	@IsTest
+	private static void isBypassedShouldSucceed() {
 		Boolean isBypassed;
 		MetadataTriggerHandler.bypass(TEST_BEFORE_INSERT);
-		Exception myException;
-		Test.startTest();
-		try {
-			isBypassed = MetadataTriggerHandler.isBypassed(TEST_BEFORE_INSERT);
-		} catch (Exception e) {
-			myException = e;
-		}
-		Test.stopTest();
-		System.assertEquals(null, myException);
-		System.assertEquals(true, isBypassed);
+
+		isBypassed = MetadataTriggerHandler.isBypassed(TEST_BEFORE_INSERT);
+
+		System.assertEquals(
+			true,
+			isBypassed,
+			'All bypasses should be configured correctly'
+		);
 	}
 
 	@IsTest
-	private static void clearAllBypasses_success() {
+	private static void clearAllBypassesShouldSucceed() {
 		MetadataTriggerHandler.bypass(TEST_BEFORE_INSERT);
-		Exception myException;
-		Test.startTest();
-		try {
-			MetadataTriggerHandler.clearAllBypasses();
-		} catch (Exception e) {
-			myException = e;
-		}
-		Test.stopTest();
-		System.assertEquals(null, myException);
-		System.assertEquals(0, MetadataTriggerHandler.bypassedActions.size());
+
+		MetadataTriggerHandler.clearAllBypasses();
+
+		System.assertEquals(
+			0,
+			MetadataTriggerHandler.bypassedActions.size(),
+			'All bypasses should be configured correctly'
+		);
 	}
 
-	public class BeforeInsert implements TriggerAction.BeforeInsert {
+	public class TestBeforeInsert implements TriggerAction.BeforeInsert {
 		public void beforeInsert(List<SObject> newList) {
+			MetadataTriggerHandlerTest.executed = true;
 		}
 	}
-	public class AfterInsert implements TriggerAction.AfterInsert {
+	public class TestAfterInsert implements TriggerAction.AfterInsert {
 		public void afterInsert(List<SObject> newList) {
+			MetadataTriggerHandlerTest.executed = true;
 		}
 	}
-	public class BeforeUpdate implements TriggerAction.BeforeUpdate {
+	public class TestBeforeUpdate implements TriggerAction.BeforeUpdate {
 		public void beforeUpdate(List<SObject> newList, List<SObject> oldList) {
+			MetadataTriggerHandlerTest.executed = true;
 		}
 	}
-	public class AfterUpdate implements TriggerAction.AfterUpdate {
+	public class TestAfterUpdate implements TriggerAction.AfterUpdate {
 		public void afterUpdate(List<SObject> newList, List<SObject> oldList) {
+			MetadataTriggerHandlerTest.executed = true;
 		}
 	}
-	public class BeforeDelete implements TriggerAction.BeforeDelete {
+	public class TestBeforeDelete implements TriggerAction.BeforeDelete {
 		public void beforeDelete(List<SObject> oldList) {
+			MetadataTriggerHandlerTest.executed = true;
 		}
 	}
-	public class AfterDelete implements TriggerAction.AfterDelete {
+	public class TestAfterDelete implements TriggerAction.AfterDelete {
 		public void afterDelete(List<SObject> newList) {
+			MetadataTriggerHandlerTest.executed = true;
 		}
 	}
-	public class AfterUndelete implements TriggerAction.AfterUndelete {
+	public class TestAfterUndelete implements TriggerAction.AfterUndelete {
 		public void afterUndelete(List<SObject> newList) {
+			MetadataTriggerHandlerTest.executed = true;
 		}
 	}
 }

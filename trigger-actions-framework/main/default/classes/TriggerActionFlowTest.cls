@@ -14,23 +14,27 @@
    limitations under the License.
  */
 
-@IsTest
+@IsTest(isParallel=true)
 private class TriggerActionFlowTest {
-	static final String MY_ACCOUNT = 'My Account';
-	static final String OLD_NAME = 'Old Name';
-	static final String BOGUS = 'Bogus';
-	static final String SAMPLE_FLOW_NAME = 'TriggerActionFlowTest';
-	static final String INPUT_GENERATOR_CLASS_NAME = 'TriggerActionFlowTest.AccountTriggerRecord';
-	static final String INPUT_GENERATOR_CLASS_NAME_WRONG_VARIABLE = 'TriggerActionFlowTest.BadInputWrongVariable';
-	static final String INPUT_GENERATOR_CLASS_NAME_WRONG_TYPE = 'TriggerActionFlowTest.BadInputWrongReturnType';
-	static Account myAccount = new Account(
+	private static final String MY_ACCOUNT = 'My Account';
+	private static final String OLD_NAME = 'Old Name';
+	private static final String BOGUS = 'Bogus';
+	private static final String SAMPLE_FLOW_NAME = 'TriggerActionFlowTest';
+	private static final String INPUT_GENERATOR_CLASS_NAME = 'TriggerActionFlowTest.AccountTriggerRecord';
+	private static final String INPUT_GENERATOR_CLASS_NAME_WRONG_VARIABLE = 'TriggerActionFlowTest.BadInputWrongVariable';
+	private static final String INPUT_GENERATOR_CLASS_NAME_WRONG_TYPE = 'TriggerActionFlowTest.BadInputWrongReturnType';
+	private static Account myAccount = new Account(
 		Name = MY_ACCOUNT,
 		Id = TestUtility.getFakeId(Schema.Account.SObjectType)
 	);
-	static Account oldAccount = new Account(Name = OLD_NAME, Id = myAccount.Id);
-	static List<SObject> newList = new List<SObject>{ myAccount };
-	static List<SObject> oldList = new List<SObject>{ oldAccount };
-	static TriggerActionFlow actionFlow;
+	private static Account oldAccount = new Account(
+		Name = OLD_NAME,
+		Id = myAccount.Id
+	);
+	private static List<SObject> newList = new List<SObject>{ myAccount };
+	private static List<SObject> oldList = new List<SObject>{ oldAccount };
+	private static TriggerActionFlow actionFlow;
+	private static Exception myException;
 
 	static {
 		actionFlow = new TriggerActionFlow();
@@ -40,15 +44,13 @@ private class TriggerActionFlowTest {
 	}
 
 	@IsTest
-	static void beforeInsertShouldSucceed() {
-		Exception myException;
-		Test.startTest();
+	private static void beforeInsertShouldSucceed() {
 		try {
 			actionFlow.beforeInsert(newList);
 		} catch (Exception e) {
 			myException = e;
 		}
-		Test.stopTest();
+
 		System.assertEquals(
 			null,
 			myException,
@@ -57,15 +59,13 @@ private class TriggerActionFlowTest {
 	}
 
 	@IsTest
-	static void afterInsertShouldSucceed() {
-		Exception myException;
-		Test.startTest();
+	private static void afterInsertShouldSucceed() {
 		try {
 			actionFlow.afterInsert(newList);
 		} catch (Exception e) {
 			myException = e;
 		}
-		Test.stopTest();
+
 		System.assertEquals(
 			null,
 			myException,
@@ -74,15 +74,13 @@ private class TriggerActionFlowTest {
 	}
 
 	@IsTest
-	static void beforeUpdateShouldSucceed() {
-		Exception myException;
-		Test.startTest();
+	private static void beforeUpdateShouldSucceed() {
 		try {
 			actionFlow.beforeUpdate(newList, oldList);
 		} catch (Exception e) {
 			myException = e;
 		}
-		Test.stopTest();
+
 		System.assertEquals(
 			null,
 			myException,
@@ -91,15 +89,13 @@ private class TriggerActionFlowTest {
 	}
 
 	@IsTest
-	static void afterUpdateShouldSucceed() {
-		Exception myException;
-		Test.startTest();
+	private static void afterUpdateShouldSucceed() {
 		try {
 			actionFlow.afterUpdate(newList, oldList);
 		} catch (Exception e) {
 			myException = e;
 		}
-		Test.stopTest();
+
 		System.assertEquals(
 			null,
 			myException,
@@ -108,15 +104,13 @@ private class TriggerActionFlowTest {
 	}
 
 	@IsTest
-	static void beforeDeleteShouldSucceed() {
-		Exception myException;
-		Test.startTest();
+	private static void beforeDeleteShouldSucceed() {
 		try {
 			actionFlow.beforeDelete(newList);
 		} catch (Exception e) {
 			myException = e;
 		}
-		Test.stopTest();
+
 		System.assertEquals(
 			null,
 			myException,
@@ -125,15 +119,13 @@ private class TriggerActionFlowTest {
 	}
 
 	@IsTest
-	static void afterDeleteShouldSucceed() {
-		Exception myException;
-		Test.startTest();
+	private static void afterDeleteShouldSucceed() {
 		try {
 			actionFlow.afterDelete(newList);
 		} catch (Exception e) {
 			myException = e;
 		}
-		Test.stopTest();
+
 		System.assertEquals(
 			null,
 			myException,
@@ -142,15 +134,13 @@ private class TriggerActionFlowTest {
 	}
 
 	@IsTest
-	static void afterUndeleteShouldSucceed() {
-		Exception myException;
-		Test.startTest();
+	private static void afterUndeleteShouldSucceed() {
 		try {
 			actionFlow.afterUndelete(oldList);
 		} catch (Exception e) {
 			myException = e;
 		}
-		Test.stopTest();
+
 		System.assertEquals(
 			null,
 			myException,
@@ -159,16 +149,14 @@ private class TriggerActionFlowTest {
 	}
 
 	@IsTest
-	static void beforeInputShouldFailWithNullInputGenerator() {
-		Exception myException;
-		Test.startTest();
+	private static void beforeInputShouldFailWithNullInputGenerator() {
 		try {
 			actionFlow.flowTriggerRecordClassName = null;
 			actionFlow.beforeInsert(newList);
 		} catch (TriggerActionFlow.TriggerActionFlowException e) {
 			myException = e;
 		}
-		Test.stopTest();
+
 		System.assertNotEquals(
 			null,
 			myException,
@@ -177,16 +165,14 @@ private class TriggerActionFlowTest {
 	}
 
 	@IsTest
-	static void beforeInputShouldFailWithInvalidInputGenerator() {
-		Exception myException;
-		Test.startTest();
+	private static void beforeInputShouldFailWithInvalidInputGenerator() {
 		try {
 			actionFlow.flowTriggerRecordClassName = BOGUS;
 			actionFlow.beforeInsert(newList);
 		} catch (TriggerActionFlow.TriggerActionFlowException e) {
 			myException = e;
 		}
-		Test.stopTest();
+
 		System.assertNotEquals(
 			null,
 			myException,
@@ -195,16 +181,14 @@ private class TriggerActionFlowTest {
 	}
 
 	@IsTest
-	static void beforeInputShouldFailWithInvalidInputMissingKey() {
-		Exception myException;
-		Test.startTest();
+	private static void beforeInputShouldFailWithInvalidInputMissingKey() {
 		try {
 			actionFlow.flowTriggerRecordClassName = INPUT_GENERATOR_CLASS_NAME_WRONG_VARIABLE;
 			actionFlow.beforeInsert(newList);
 		} catch (TriggerActionFlow.TriggerActionFlowException e) {
 			myException = e;
 		}
-		Test.stopTest();
+
 		System.assertNotEquals(
 			null,
 			myException,
@@ -213,16 +197,14 @@ private class TriggerActionFlowTest {
 	}
 
 	@IsTest
-	static void beforeInputShouldFailWithInvalidInputWrongDataType() {
-		Exception myException;
-		Test.startTest();
+	private static void beforeInputShouldFailWithInvalidInputWrongDataType() {
 		try {
 			actionFlow.flowTriggerRecordClassName = INPUT_GENERATOR_CLASS_NAME_WRONG_TYPE;
 			actionFlow.beforeInsert(newList);
 		} catch (TriggerActionFlow.TriggerActionFlowException e) {
 			myException = e;
 		}
-		Test.stopTest();
+
 		System.assertNotEquals(
 			null,
 			myException,
@@ -282,6 +264,7 @@ private class TriggerActionFlowTest {
 		public AccountTriggerRecord() {
 			super();
 		}
+
 		public AccountTriggerRecord(
 			Account newRecord,
 			Account oldRecord,
@@ -289,6 +272,7 @@ private class TriggerActionFlowTest {
 		) {
 			super(newRecord, oldRecord, newRecordIndex);
 		}
+
 		@AuraEnabled
 		public Account newRecord {
 			get {
@@ -298,12 +282,14 @@ private class TriggerActionFlowTest {
 				this.newSObject = value;
 			}
 		}
+
 		@AuraEnabled
 		public Account oldRecord {
 			get {
 				return (Account) this.oldSObject;
 			}
 		}
+
 		public override Map<String, Object> getFlowInput(
 			List<SObject> newList,
 			List<SObject> oldList

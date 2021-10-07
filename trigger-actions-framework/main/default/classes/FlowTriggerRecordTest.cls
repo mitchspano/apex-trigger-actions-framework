@@ -1,5 +1,5 @@
 /*
-   Copyright 2022 Google LLC
+   Copyright 2021 Google LLC
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
    limitations under the License.
  */
 
-@IsTest
+@IsTest(isParallel=true)
 private class FlowTriggerRecordTest {
 	static Account myAccount = new Account(
 		Name = 'My Account',
@@ -22,7 +22,7 @@ private class FlowTriggerRecordTest {
 	);
 
 	@IsTest
-	static void triggerRecordsShouldBeUpdatedSuccessfully() {
+	private static void triggerRecordsShouldBeUpdated() {
 		FlowTriggerRecordTest.AccountTriggerRecord testTriggerRecord = new FlowTriggerRecordTest.AccountTriggerRecord(
 			myAccount,
 			myAccount,
@@ -44,7 +44,7 @@ private class FlowTriggerRecordTest {
 	}
 
 	@IsTest
-	static void triggerRecordsShouldThrowExceptionIfTheNewValueIsSetWithoutAnIndex() {
+	private static void triggerRecordsShouldThrowExceptionIfTheNewValueIsSetWithoutAnIndex() {
 		Exception myException;
 		try {
 			FlowTriggerRecordTest.AccountTriggerRecord testTriggerRecord = new FlowTriggerRecordTest.AccountTriggerRecord(
@@ -55,6 +55,7 @@ private class FlowTriggerRecordTest {
 		} catch (Exception e) {
 			myException = e;
 		}
+
 		System.assertNotEquals(
 			null,
 			myException,
@@ -66,6 +67,7 @@ private class FlowTriggerRecordTest {
 		public AccountTriggerRecord() {
 			super();
 		}
+
 		public AccountTriggerRecord(
 			Account newRecord,
 			Account oldRecord,
@@ -73,6 +75,7 @@ private class FlowTriggerRecordTest {
 		) {
 			super(newRecord, oldRecord, newRecordIndex);
 		}
+
 		@AuraEnabled
 		public Account newRecord {
 			get {
@@ -82,12 +85,14 @@ private class FlowTriggerRecordTest {
 				this.newSObject = value;
 			}
 		}
+
 		@AuraEnabled
 		public Account oldRecord {
 			get {
 				return (Account) this.oldSObject;
 			}
 		}
+
 		public override Map<String, Object> getFlowInput(
 			List<SObject> newList,
 			List<SObject> oldList

@@ -1,5 +1,5 @@
 /*
-   Copyright 2022 Google LLC
+   Copyright 2021 Google LLC
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -13,9 +13,11 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
+
+@SuppressWarnings('PMD.EmptyStatementBlock')
 public abstract class FlowTriggerRecord {
-	static final String NEW_RECORD_INDEX_REQUIRED = 'The index of the newRecord in the newList is required.';
 	public static Map<Integer, SObject> newRecordIndexToNewRecord = new Map<Integer, SObject>();
+	private static final String NEW_RECORD_INDEX_REQUIRED = 'The index of the newRecord in the newList is required.';
 	private Integer newRecordIndex;
 
 	public FlowTriggerRecord() {
