@@ -16,9 +16,12 @@
 
 @SuppressWarnings('PMD.EmptyStatementBlock')
 public abstract class FlowTriggerRecord {
-	public static Map<Integer, SObject> newRecordIndexToNewRecord = new Map<Integer, SObject>();
-	private static final String NEW_RECORD_INDEX_REQUIRED = 'The index of the newRecord in the newList is required.';
-	private Integer newRecordIndex;
+	public static Map<String, SObject> triggerActionFlowIdAndIndexToNewRecord = new Map<String, SObject>();
+	private static final String INVALID_INPUT = 'The index of new list and the Flow identifier are required.';
+	@TestVisible
+	private static final String PIPE = '|';
+	private Integer newListIndex;
+	private Integer triggerActionFlowId;
 
 	public FlowTriggerRecord() {
 		// no argument constructor necessary to use Type.ForName
@@ -27,16 +30,19 @@ public abstract class FlowTriggerRecord {
 	protected FlowTriggerRecord(
 		SObject newSobject,
 		SObject oldSObject,
-		Integer newRecordIndex
+		Integer newListIndex,
+		Integer triggerActionFlowId
 	) {
-		this.newRecordIndex = newRecordIndex;
+		this.newListIndex = newListIndex;
+		this.triggerActionFlowId = triggerActionFlowId;
 		this.newSobject = newSobject;
 		this.oldSobject = oldSobject;
 	}
 
 	public abstract Map<String, Object> getFlowInput(
 		List<SObject> newList,
-		List<SObject> oldList
+		List<SObject> oldList,
+		Integer triggerActionFlowId
 	);
 
 	protected SObject newSobject {
@@ -44,12 +50,14 @@ public abstract class FlowTriggerRecord {
 			return newSobject;
 		}
 		set {
-			this.newSobject = value;
-			if (this.newRecordIndex == null) {
-				throw new IllegalArgumentException(NEW_RECORD_INDEX_REQUIRED);
+			if (this.newListIndex == null || triggerActionFlowId == null) {
+				throw new IllegalArgumentException(INVALID_INPUT);
 			}
-			FlowTriggerRecord.newRecordIndexToNewRecord.put(
-				this.newRecordIndex,
+			this.newSobject = value;
+			FlowTriggerRecord.triggerActionFlowIdAndIndexToNewRecord.put(
+				this.triggerActionFlowId +
+				PIPE +
+				this.newListIndex,
 				newSobject
 			);
 		}

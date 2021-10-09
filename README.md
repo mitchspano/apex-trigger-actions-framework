@@ -112,8 +112,13 @@ public with sharing class OpportunityTriggerRecord extends FlowTriggerRecord {
     super();
   }
 
-  public OpportunityTriggerRecord(Opportunity newRecord, Opportunity oldRecord, Integer newRecordIndex) {
-    super(newRecord, oldRecord, newRecordIndex);
+  public OpportunityTriggerRecord(
+    Opportunity newRecord,
+    Opportunity oldRecord,
+    Integer newRecordIndex,
+    Integer triggerActionFlowIdentifier
+  ) {
+    super(newRecord, oldRecord, newRecordIndex, triggerActionFlowIdentifier);
   }
 
   @AuraEnabled
@@ -135,14 +140,22 @@ public with sharing class OpportunityTriggerRecord extends FlowTriggerRecord {
 
   public override Map<String, Object> getFlowInput(
     List<SObject> newList,
-    List<SObject> oldList
+    List<SObject> oldList,
+    Integer triggerActionFlowIdentifier
   ) {
     List<SObject> collection = newList != null ? newList : oldList;
     List<OpportunityTriggerRecord> triggerRecords = new List<OpportunityTriggerRecord>();
     for (Integer i = 0; i < collection.size(); i++) {
-      Opportunity newOpportunity = newList != null ? (Opportunity) newList.get(i) : null;
-      Opportunity oldOpportunity = oldList != null ? (Opportunity) oldList.get(i) : null;
-      triggerRecords.add(new OpportunityTriggerRecord(newOpportunity, oldOpportunity, i));
+      Opportunity newRecord = newList != null ? (Opportunity) newList.get(i) : null;
+      Opportunity oldRecord = oldList != null ? (Opportunity) oldList.get(i) : null;
+      triggerRecords.add(
+        new OpportunityTriggerRecord(
+          newRecord,
+          oldRecord,
+          i,
+          triggerActionFlowIdentifier
+        )
+      );
     }
     return new Map<String, Object>{
       TriggerActionFlow.TRIGGER_RECORDS_VARIABLE => triggerRecords

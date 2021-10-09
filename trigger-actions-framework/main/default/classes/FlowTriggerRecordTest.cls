@@ -21,25 +21,37 @@ private class FlowTriggerRecordTest {
 		Id = TestUtility.getFakeId(Schema.Account.SObjectType)
 	);
 
+	static Integer i = 0;
+
 	@IsTest
 	private static void triggerRecordsShouldBeUpdated() {
-		FlowTriggerRecordTest.AccountTriggerRecord testTriggerRecord = new FlowTriggerRecordTest.AccountTriggerRecord(
+		TriggerActionFlowTest.AccountTriggerRecord testTriggerRecord = new TriggerActionFlowTest.AccountTriggerRecord(
 			myAccount,
 			myAccount,
-			0
+			0,
+			i
 		);
 		System.assertEquals(
 			true,
-			FlowTriggerRecord.newRecordIndexToNewRecord.containsKey(0),
-			'The index of the newRecord should be stored in the newRecordIndexToNewRecord map'
+			FlowTriggerRecord.triggerActionFlowIdAndIndexToNewRecord.containsKey(
+				i +
+				FlowTriggerRecord.PIPE +
+				0
+			),
+			'The index of the newRecord should be stored in the triggerActionFlowIdAndIndexToNewRecord map'
 		);
 
 		testTriggerRecord.newRecord.Id = null;
 
 		System.assertEquals(
 			null,
-			FlowTriggerRecord.newRecordIndexToNewRecord.get(0).Id,
-			'Modifications to the newRecord should persist through the newRecordIndexToNewRecord map'
+			FlowTriggerRecord.triggerActionFlowIdAndIndexToNewRecord.get(
+					i +
+					FlowTriggerRecord.PIPE +
+					0
+				)
+				.Id,
+			'Modifications to the newRecord should persist through the triggerActionFlowIdAndIndexToNewRecord map'
 		);
 	}
 
@@ -47,10 +59,11 @@ private class FlowTriggerRecordTest {
 	private static void triggerRecordsShouldThrowExceptionIfTheNewValueIsSetWithoutAnIndex() {
 		Exception myException;
 		try {
-			FlowTriggerRecordTest.AccountTriggerRecord testTriggerRecord = new FlowTriggerRecordTest.AccountTriggerRecord(
+			TriggerActionFlowTest.AccountTriggerRecord testTriggerRecord = new TriggerActionFlowTest.AccountTriggerRecord(
 				myAccount,
 				myAccount,
-				null
+				null,
+				i
 			);
 		} catch (Exception e) {
 			myException = e;
@@ -63,50 +76,24 @@ private class FlowTriggerRecordTest {
 		);
 	}
 
-	public class AccountTriggerRecord extends FlowTriggerRecord {
-		public AccountTriggerRecord() {
-			super();
+	@IsTest
+	private static void triggerRecordsShouldThrowExceptionIfTheNewValueIsSetWithoutATriggerActionFlowIdentifier() {
+		Exception myException;
+		try {
+			TriggerActionFlowTest.AccountTriggerRecord testTriggerRecord = new TriggerActionFlowTest.AccountTriggerRecord(
+				myAccount,
+				myAccount,
+				0,
+				null
+			);
+		} catch (Exception e) {
+			myException = e;
 		}
 
-		public AccountTriggerRecord(
-			Account newRecord,
-			Account oldRecord,
-			Integer newRecordIndex
-		) {
-			super(newRecord, oldRecord, newRecordIndex);
-		}
-
-		@AuraEnabled
-		public Account newRecord {
-			get {
-				return (Account) this.newSObject;
-			}
-			set {
-				this.newSObject = value;
-			}
-		}
-
-		@AuraEnabled
-		public Account oldRecord {
-			get {
-				return (Account) this.oldSObject;
-			}
-		}
-
-		public override Map<String, Object> getFlowInput(
-			List<SObject> newList,
-			List<SObject> oldList
-		) {
-			List<SObject> collection = newList != null ? newList : oldList;
-			List<AccountTriggerRecord> triggerRecords = new List<AccountTriggerRecord>();
-			for (Integer i = 0; i < collection.size(); i++) {
-				Account newRecord = newList != null ? (Account) newList.get(i) : null;
-				Account oldRecord = oldList != null ? (Account) oldList.get(i) : null;
-				triggerRecords.add(new AccountTriggerRecord(newRecord, oldRecord, i));
-			}
-			return new Map<String, Object>{
-				TriggerActionFlow.TRIGGER_RECORDS_VARIABLE => triggerRecords
-			};
-		}
+		System.assertNotEquals(
+			null,
+			myException,
+			'Setting the value of the new sObject should fail without the identifer of the trigger action flow'
+		);
 	}
 }

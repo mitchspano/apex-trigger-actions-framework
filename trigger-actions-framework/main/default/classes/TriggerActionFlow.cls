@@ -29,13 +29,47 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 		APEX_STRING,
 		FLOW_STRING
 	};
+	private static final String PIPE = '|';
 	@TestVisible
 	private static Set<String> bypassedFlows = new Set<String>();
 	private static Map<Schema.SObjectType, List<String>> sObjectToEditableFields = new Map<Schema.SObjectType, List<String>>();
+	private static Set<Integer> usedIdentifiers = new Set<Integer>();
 
 	public String flowName;
 	public Boolean allowRecursion;
 	public String flowTriggerRecordClassName;
+
+	private Integer identifier;
+
+	public static void bypass(String flowName) {
+		TriggerActionFlow.bypassedFlows.add(flowName);
+	}
+
+	public static void clearBypass(String flowName) {
+		TriggerActionFlow.bypassedFlows.remove(flowName);
+	}
+
+	public static Boolean isBypassed(String flowName) {
+		return TriggerActionFlow.bypassedFlows.contains(flowName);
+	}
+
+	public static void clearAllBypasses() {
+		TriggerActionFlow.bypassedFlows.clear();
+	}
+
+	public TriggerActionFlow() {
+		boolean foundNovelIdentifier = false;
+		while (foundNovelIdentifier == false) {
+			Integer random = Crypto.getRandomInteger();
+			if (usedIdentifiers.contains(random)) {
+				continue;
+			} else {
+				identifier = random;
+				usedIdentifiers.add(identifier);
+                foundNovelIdentifier = true;
+			}
+		}
+	}
 
 	public void beforeInsert(List<SObject> newList) {
 		if (!thisFlowIsBypassed()) {
@@ -133,22 +167,6 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 		}
 	}
 
-	public static void bypass(String flowName) {
-		TriggerActionFlow.bypassedFlows.add(flowName);
-	}
-
-	public static void clearBypass(String flowName) {
-		TriggerActionFlow.bypassedFlows.remove(flowName);
-	}
-
-	public static Boolean isBypassed(String flowName) {
-		return TriggerActionFlow.bypassedFlows.contains(flowName);
-	}
-
-	public static void clearAllBypasses() {
-		TriggerActionFlow.bypassedFlows.clear();
-	}
-
 	private Boolean thisFlowIsBypassed() {
 		if (String.isBlank(flowName)) {
 			throw new TriggerActionFlowException(INVALID_FLOW_NAME);
@@ -160,9 +178,8 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 		List<sObject> newList,
 		List<sObject> oldList
 	) {
-		FlowTriggerRecord.newRecordIndexToNewRecord.clear();
 		Map<String, Object> generatedInput = getFlowTriggerRecord()
-			.getFlowInput(newList, oldList);
+			.getFlowInput(newList, oldList, this.identifier);
 		verifyInput(generatedInput);
 		return generatedInput;
 	}
@@ -199,7 +216,9 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 
 		for (Integer i = 0; i < newList.size(); i++) {
 			SObject recordInNewList = newList[i];
-			SObject recordAfterFlowIsComplete = FlowTriggerRecord.newRecordIndexToNewRecord.get(
+			SObject recordAfterFlowIsComplete = FlowTriggerRecord.triggerActionFlowIdAndIndexToNewRecord.get(
+				this.identifier +
+				PIPE +
 				i
 			);
 			for (String fieldName : editableFields) {
@@ -214,7 +233,6 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 				}
 			}
 		}
-		FlowTriggerRecord.newRecordIndexToNewRecord = new Map<Integer, SObject>();
 	}
 
 	private List<String> getEditableFields(
