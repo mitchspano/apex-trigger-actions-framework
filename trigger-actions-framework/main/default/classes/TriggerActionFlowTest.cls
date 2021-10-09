@@ -15,7 +15,7 @@
  */
 
 @IsTest(isParallel=true)
-private class TriggerActionFlowTest {
+public class TriggerActionFlowTest {
 	private static final String MY_ACCOUNT = 'My Account';
 	private static final String OLD_NAME = 'Old Name';
 	private static final String BOGUS = 'Bogus';
@@ -268,9 +268,10 @@ private class TriggerActionFlowTest {
 		public AccountTriggerRecord(
 			Account newRecord,
 			Account oldRecord,
-			Integer newRecordIndex
+			Integer newRecordIndex,
+			Integer triggerActionFlowIdentifier
 		) {
-			super(newRecord, oldRecord, newRecordIndex);
+			super(newRecord, oldRecord, newRecordIndex, triggerActionFlowIdentifier);
 		}
 
 		@AuraEnabled
@@ -292,14 +293,22 @@ private class TriggerActionFlowTest {
 
 		public override Map<String, Object> getFlowInput(
 			List<SObject> newList,
-			List<SObject> oldList
+			List<SObject> oldList,
+			Integer triggerActionFlowIdentifier
 		) {
 			List<SObject> collection = newList != null ? newList : oldList;
 			List<AccountTriggerRecord> triggerRecords = new List<AccountTriggerRecord>();
 			for (Integer i = 0; i < collection.size(); i++) {
 				Account newRecord = newList != null ? (Account) newList.get(i) : null;
 				Account oldRecord = oldList != null ? (Account) oldList.get(i) : null;
-				triggerRecords.add(new AccountTriggerRecord(newRecord, oldRecord, i));
+				triggerRecords.add(
+					new AccountTriggerRecord(
+						newRecord,
+						oldRecord,
+						i,
+						triggerActionFlowIdentifier
+					)
+				);
 			}
 			return new Map<String, Object>{
 				TriggerActionFlow.TRIGGER_RECORDS_VARIABLE => triggerRecords
@@ -310,7 +319,8 @@ private class TriggerActionFlowTest {
 	private class BadInputWrongVariable extends FlowTriggerRecord {
 		public override Map<String, Object> getFlowInput(
 			List<SObject> newList,
-			List<SObject> oldList
+			List<SObject> oldList,
+			Integer triggerActionFlowIdentifier
 		) {
 			return new Map<String, Object>{
 				BOGUS => new List<AccountTriggerRecord>()
@@ -321,7 +331,8 @@ private class TriggerActionFlowTest {
 	private class BadInputWrongReturnType extends FlowTriggerRecord {
 		public override Map<String, Object> getFlowInput(
 			List<SObject> newList,
-			List<SObject> oldList
+			List<SObject> oldList,
+			Integer triggerActionFlowIdentifier
 		) {
 			return new Map<String, Object>{
 				TriggerActionFlow.TRIGGER_RECORDS_VARIABLE => BOGUS
