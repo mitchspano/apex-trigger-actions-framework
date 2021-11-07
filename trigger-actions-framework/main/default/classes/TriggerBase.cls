@@ -15,7 +15,7 @@ public inherited sharing virtual class TriggerBase {
 	@TestVisible
 	private static final String HANDLER_OUTSIDE_TRIGGER_MESSAGE = 'Trigger handler called outside of Trigger execution';
 	@TestVisible
-	private static Set<String> bypassedObjects;
+	private static Set<String> bypassedObjects = new Set<String>();
 	@TestVisible
 	public static Map<Id, Integer> idToNumberOfTimesSeenBeforeUpdate {
 		get;
@@ -28,7 +28,6 @@ public inherited sharing virtual class TriggerBase {
 	}
 
 	static {
-		bypassedObjects = new Set<String>();
 		idToNumberOfTimesSeenBeforeUpdate = new Map<Id, Integer>();
 		idToNumberOfTimesSeenAfterUpdate = new Map<Id, Integer>();
 	}
@@ -175,6 +174,7 @@ public inherited sharing virtual class TriggerBase {
 		private set;
 	}
 
-	public class TriggerBaseException extends Exception {
+	@TestVisible
+	private class TriggerBaseException extends Exception {
 	}
 }
