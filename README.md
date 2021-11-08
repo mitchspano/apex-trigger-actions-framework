@@ -380,7 +380,11 @@ This will help the transition process if you are migrating an existing Salesforc
 
 ## DML-Less Trigger Testing
 
-Peforming DML operations is extremely computationally intensive and can really slow down the speed of your unit tests. We want to avoid this at all costs. Traditionally, this has not been possible with existing Apex Trigger frameworks, but this Trigger Action approach makes it much easier. Included in this project is a `TestUtility` class which allows us to generate fake record Ids.
+Peforming DML operations is extremely computationally intensive and can really slow down the speed of your unit tests. We want to avoid this at all costs. Traditionally, this has not been possible with existing Apex Trigger frameworks, but this Trigger Action approach makes it much easier.
+
+### Mocking Record Ids
+
+Included in this project is a `TestUtility` class which allows us to generate fake record Ids.
 
 ```java
 @IsTest
@@ -395,6 +399,8 @@ public class TestUtility {
 
 }
 ```
+
+### DML-Less Check for Custom Apex Validation Rules
 
 We can also use `getErrors()` method to test the `addError(errorMsg)` method of the `SObject` class.
 
@@ -448,3 +454,73 @@ private static void beforeUpdateTest() {
 ```
 
 Notice how we performed _zero_ DML operations yet we were able to cover all of the logic of our class in this particular test. This can help save a lot of computational time and allow for much faster execution of Apex tests.
+
+### DML-Less Data Creation and Data Loading in General
+
+Creating data in Salesforce is often easier than writing code. To create test data, we can combine data creation in Salesforce and coding using the following approach:
+
+- Create data in Salesforce
+- Get data as JSON, i.e.:
+  - Query data as JSON using the REST API
+  - Use `System.debug(JSON.serialize(...))`
+- Save JSON as static resource and use the following method `loadJSON` to load data.
+
+```java
+@IsTest
+public class TestUtility {
+
+  public static String loadJSON(String staticResourceName) {
+    StaticResourceCalloutMock mock = new StaticResourceCalloutMock();
+    mock.setStaticResource(staticResourceName);
+    Test.setMock(HttpCalloutMock.class, mock);
+    return (new Http()).send(new HttpRequest()).getBody();
+  }
+
+}
+```
+
+At first glance, this method looks a bit strange, since the original idea of this pattern is to mock REST webservice responses. But more in general, we can use this method to load every single static resource. The following example shows how we can load an Account record into our Apex tests.
+
+```json
+[
+	{
+		"attributes": {
+			"type": "Account",
+			"url": "/services/data/v51.0/sobjects/Account/0015r00000JJTjJAAX"
+		},
+		"Id": "0015r00000JJTjJAAX",
+		"Name": "My Account"
+	}
+]
+```
+
+```java
+@isTest
+private class TestClass_XYZ {
+  @isTest
+  private static testMethod() {
+    List<Account> accounts = loadAccounts();
+    ...
+  }
+
+  private static List<Account> loadAccounts() {
+    String jsonString = TestUtility.loadJSON('Account_for_TestClass_XYZ');
+    return (List<Account>) JSON.deserialize(
+      jsonString,
+      List<Account>.class
+    );
+  }
+}
+```
+
+As it turns out, this approach can be used to do many things in a very comfortable way:
+
+- load a list of Salesforce records
+  - mock values for read-only fields, i.e. system fields, formula fields
+  - mock child records
+  - mock parent value of record
+  - mock SOQL query returns
+  - mock results after DML statements
+- load Apex defined objects
+
+Notice how we performed _zero_ DML operations and _zero_ SOQL queries to mock data.
