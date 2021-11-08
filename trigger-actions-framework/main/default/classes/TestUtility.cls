@@ -24,4 +24,11 @@ public class TestUtility {
 		'0'.repeat(12 - result.length()) +
 		result);
 	}
+
+	public static String loadJSON(String staticResourceName) {
+		StaticResourceCalloutMock mock = new StaticResourceCalloutMock();
+		mock.setStaticResource(staticResourceName);
+		Test.setMock(HttpCalloutMock.class, mock);
+		return (new Http()).send(new HttpRequest()).getBody();
+	}
 }

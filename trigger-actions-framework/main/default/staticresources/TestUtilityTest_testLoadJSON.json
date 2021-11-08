@@ -1,0 +1,40 @@
+[
+	{
+		"attributes": {
+			"type": "Account",
+			"url": "/services/data/v51.0/sobjects/Account/0015r00000JJTjJAAX"
+		},
+		"Id": "0015r00000JJTjJAAX",
+		"Name": "My Account",
+		"Contacts": {
+			"totalSize": 3,
+			"done": true,
+			"records": [
+				{
+					"attributes": {
+						"type": "Contact",
+						"url": "/services/data/v51.0/sobjects/Contact/0035r00000GhsXmAAJ"
+					},
+					"Id": "0035r00000GhsXmAAJ",
+					"LastName": "My Contact 1"
+				},
+				{
+					"attributes": {
+						"type": "Contact",
+						"url": "/services/data/v51.0/sobjects/Contact/0035r00000GhsXrAAJ"
+					},
+					"Id": "0035r00000GhsXrAAJ",
+					"LastName": "My Contact 2"
+				},
+				{
+					"attributes": {
+						"type": "Contact",
+						"url": "/services/data/v51.0/sobjects/Contact/0035r00000GhsXsAAJ"
+					},
+					"Id": "0035r00000GhsXsAAJ",
+					"LastName": "My Contact 3"
+				}
+			]
+		}
+	}
+]
