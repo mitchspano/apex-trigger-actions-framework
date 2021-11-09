@@ -385,14 +385,14 @@ Peforming DML operations is extremely computationally intensive and can really s
 ```java
 @IsTest
 public class TestUtility {
-
   static Integer myNumber = 1;
 
-  public static Id getFakeId(Schema.SObjectType sObjectType)  {
+  public static Id getFakeId(Schema.SObjectType sObjectType) {
     String result = String.valueOf(myNumber++);
-    return (Id)(sObjectType.getDescribe().getKeyPrefix() + '0'.repeat(12-result.length()) + String.valueOf(myNumber++));
+    return (Id) (sObjectType.getDescribe().getKeyPrefix() +
+    '0'.repeat(12 - result.length()) +
+    result);
   }
-
 }
 ```
 
