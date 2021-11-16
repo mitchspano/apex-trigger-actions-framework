@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <Flow xmlns="http://soap.sforce.com/2006/04/metadata">
-    <apiVersion>51.0</apiVersion>
+    <apiVersion>53.0</apiVersion>
     <assignments>
         <name>Add_to_newListAfterFlow</name>
         <label>Add to newListAfterFlow</label>
@@ -17,10 +17,8 @@
             <targetReference>For_Each_Record</targetReference>
         </connector>
     </assignments>
-    <description
-	>This is meant for test coverage for the TriggerActionFlow class.</description>
-    <interviewLabel
-	>TriggerActionFlowTest {!$Flow.CurrentDateTime}</interviewLabel>
+    <description>This is meant for test coverage for the TriggerActionFlow class.</description>
+    <interviewLabel>TriggerActionFlowTest {!$Flow.CurrentDateTime}</interviewLabel>
     <label>Trigger Action Flow Test</label>
     <loops>
         <name>For_Each_Record</name>
