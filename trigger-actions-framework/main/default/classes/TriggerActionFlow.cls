@@ -32,11 +32,7 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 	private static final String PIPE = '|';
 	@TestVisible
 	private static Set<String> bypassedFlows = new Set<String>();
-	private static Map<Schema.SObjectType, List<Schema.DescribeFieldResult>> sObjectToEditableFields = new Map<Schema.SObjectType, List<Schema.DescribeFieldResult>>();
-	public static final List<Schema.DisplayType> PICKLIST_TYPES = new List<Schema.DisplayType>{
-		Schema.DisplayType.MULTIPICKLIST,
-		Schema.DisplayType.PICKLIST
-	};
+	private static Map<Schema.SObjectType, List<String>> sObjectToEditableFields = new Map<Schema.SObjectType, List<String>>();
 	private static Set<Integer> usedIdentifiers = new Set<Integer>();
 
 	public String flowName;
@@ -62,7 +58,7 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 	}
 
 	public TriggerActionFlow() {
-		Boolean foundNovelIdentifier = false;
+		boolean foundNovelIdentifier = false;
 		while (foundNovelIdentifier == false) {
 			Integer random = Crypto.getRandomInteger();
 			if (usedIdentifiers.contains(random)) {
@@ -98,10 +94,10 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 
 	public void beforeUpdate(List<SObject> newList, List<SObject> oldList) {
 		if (!thisFlowIsBypassed()) {
-			List<SObject> recordsNotYetProcessed = new List<SObject>();
-			List<SObject> oldRecordsNotYetProcessed = new List<SObject>();
+			List<sObject> recordsNotYetProcessed = new List<sObject>();
+			List<sObject> oldRecordsNotYetProcessed = new List<sObject>();
 			for (Integer i = 0; i < newList.size(); i++) {
-				SObject record = newList[i];
+				sObject record = newList[i];
 				if (
 					TriggerBase.idToNumberOfTimesSeenBeforeUpdate.get(record.id) == 1 ||
 					(allowRecursion == true)
@@ -121,10 +117,10 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 
 	public void afterUpdate(List<SObject> newList, List<SObject> oldList) {
 		if (!thisFlowIsBypassed()) {
-			List<SObject> recordsNotYetProcessed = new List<SObject>();
-			List<SObject> oldRecordsNotYetProcessed = new List<SObject>();
+			List<sObject> recordsNotYetProcessed = new List<sObject>();
+			List<sObject> oldRecordsNotYetProcessed = new List<sObject>();
 			for (Integer i = 0; i < newList.size(); i++) {
-				SObject record = newList[i];
+				sObject record = newList[i];
 				if (
 					TriggerBase.idToNumberOfTimesSeenBeforeUpdate.get(record.id) == 1 ||
 					(allowRecursion == true)
@@ -179,8 +175,8 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 	}
 
 	private Map<String, Object> getFlowInput(
-		List<SObject> newList,
-		List<SObject> oldList
+		List<sObject> newList,
+		List<sObject> oldList
 	) {
 		Map<String, Object> generatedInput = getFlowTriggerRecord()
 			.getFlowInput(newList, oldList, this.identifier);
@@ -207,9 +203,9 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 		}
 	}
 
-	private void applyFlowValues(List<SObject> newList) {
+	private void applyFlowValues(List<sObject> newList) {
 		Schema.SObjectType newRecordSObjectType = newList[0].getSObjectType();
-		List<Schema.DescribeFieldResult> editableFields = new List<Schema.DescribeFieldResult>();
+		List<String> editableFields = new List<String>();
 
 		if (sObjectToEditableFields.containsKey(newRecordSObjectType)) {
 			editableFields = sObjectToEditableFields.get(newRecordSObjectType);
@@ -225,17 +221,7 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 				PIPE +
 				i
 			);
-			for (Schema.DescribeFieldResult field : editableFields) {
-				String fieldName = field.getName();
-				System.debug('------------------------------------------');
-				System.debug('fieldName: ' + fieldName);
-				System.debug(
-					'recordInNewList.get(fieldName): ' + recordInNewList.get(fieldName)
-				);
-				System.debug(
-					'recordAfterFlowIsComplete.get(fieldName): ' +
-					recordAfterFlowIsComplete.get(fieldName)
-				);
+			for (String fieldName : editableFields) {
 				if (
 					recordInNewList.get(fieldName) !=
 					recordAfterFlowIsComplete.get(fieldName)
@@ -244,34 +230,15 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 						fieldName,
 						recordAfterFlowIsComplete.get(fieldName)
 					);
-					// if (!PICKLIST_TYPES.contains(field.getType())) {
-					// 	recordInNewList.put(
-					// 		fieldName,
-					// 		recordAfterFlowIsComplete.get(fieldName)
-					// 	);
-					// } else {
-					// 	String newValue = String.valueOf(
-					// 		recordAfterFlowIsComplete.get(fieldName)
-					// 	);
-					// 	System.debug('newValue: ' + newValue);
-					// 	if (!String.isBlank(newValue)) {
-					// 		recordInNewList.put(
-					// 			fieldName,
-					// 			newValue.remove('[').remove(']').replace(', ', ';')
-					// 		);
-					// 	} else {
-					// 		recordInNewList.put(fieldName, null);
-					// 	}
-					// }
 				}
 			}
 		}
 	}
 
-	private List<Schema.DescribeFieldResult> getEditableFields(
+	private List<String> getEditableFields(
 		Schema.SObjectType newRecordSObjectType
 	) {
-		List<Schema.DescribeFieldResult> editableFields = new List<Schema.DescribeFieldResult>();
+		List<String> editableFields = new List<String>();
 		for (
 			Schema.SObjectField fieldRef : newRecordSObjectType
 				.getDescribe()
@@ -280,7 +247,7 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 		) {
 			Schema.DescribeFieldResult fieldResult = fieldRef.getDescribe();
 			if (fieldResult.isUpdateable()) {
-				editableFields.add(fieldResult);
+				editableFields.add(fieldResult.getName());
 			}
 		}
 		return editableFields;
