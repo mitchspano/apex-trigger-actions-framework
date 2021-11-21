@@ -28,6 +28,7 @@ private class MetadataTriggerHandlerTest {
 	private static final String BOGUS_CLASS_NAME = 'Bogus';
 	private static final String REQUIRED_PERMISSION = 'Bogus_Required_Permission';
 	private static final String BYPASS_PERMISSION = 'Bogus_Bypass_Permission';
+
 	private static Account myAccount = new Account(
 		Name = MY_ACCOUNT,
 		Id = TestUtility.getFakeId(Schema.Account.SObjectType)
@@ -40,10 +41,14 @@ private class MetadataTriggerHandlerTest {
 	private static Boolean executed = false;
 	private static Exception myException;
 
+	static {
+		handler.triggerNew = new List<Account>{ myAccount };
+		handler.triggerOld = new List<Account>{ myAccount };
+	}
+
 	@IsTest
 	private static void beforeInsertShouldSucceed() {
 		executed = false;
-		handler.triggerNew = new List<Account>{ myAccount };
 		Trigger_Action__mdt action = new Trigger_Action__mdt(
 			Apex_Class_Name__c = TEST_BEFORE_INSERT,
 			Before_Insert__r = setting,
@@ -62,7 +67,6 @@ private class MetadataTriggerHandlerTest {
 
 	@IsTest
 	private static void beforeInsertShouldFailWithIncorrectType() {
-		handler.triggerNew = new List<Account>{ myAccount };
 		Trigger_Action__mdt action = new Trigger_Action__mdt(
 			Apex_Class_Name__c = TEST_AFTER_INSERT,
 			Before_Insert__r = setting,
@@ -97,7 +101,6 @@ private class MetadataTriggerHandlerTest {
 
 	@IsTest
 	private static void beforeInsertShouldFailWithIncorrectClass() {
-		handler.triggerNew = new List<Account>{ myAccount };
 		Trigger_Action__mdt action = new Trigger_Action__mdt(
 			Apex_Class_Name__c = BOGUS_CLASS_NAME,
 			Before_Insert__r = setting,
@@ -133,7 +136,6 @@ private class MetadataTriggerHandlerTest {
 	@IsTest
 	private static void afterInsertShouldSucceed() {
 		executed = false;
-		handler.triggerNew = new List<Account>{ myAccount };
 		Trigger_Action__mdt action = new Trigger_Action__mdt(
 			Apex_Class_Name__c = TEST_AFTER_INSERT,
 			After_Insert__r = setting,
@@ -150,7 +152,6 @@ private class MetadataTriggerHandlerTest {
 
 	@IsTest
 	private static void afterInsertShouldFailWithIncorrectType() {
-		handler.triggerNew = new List<Account>{ myAccount };
 		Trigger_Action__mdt action = new Trigger_Action__mdt(
 			Apex_Class_Name__c = TEST_BEFORE_INSERT,
 			After_Insert__r = setting,
@@ -183,7 +184,6 @@ private class MetadataTriggerHandlerTest {
 
 	@IsTest
 	private static void afterInsertShouldFailWithIncorrectClass() {
-		handler.triggerNew = new List<Account>{ myAccount };
 		Trigger_Action__mdt action = new Trigger_Action__mdt(
 			Apex_Class_Name__c = BOGUS_CLASS_NAME,
 			After_Insert__r = setting,
@@ -217,8 +217,6 @@ private class MetadataTriggerHandlerTest {
 	@IsTest
 	private static void beforeUpdateShouldSucceed() {
 		executed = false;
-		handler.triggerNew = new List<Account>{ myAccount };
-		handler.triggerOld = new List<Account>{ myAccount };
 		Trigger_Action__mdt action = new Trigger_Action__mdt(
 			Apex_Class_Name__c = TEST_BEFORE_UPDATE,
 			Before_Update__r = setting,
@@ -237,8 +235,6 @@ private class MetadataTriggerHandlerTest {
 
 	@IsTest
 	private static void beforeUpdateShouldFailWithIncorrectType() {
-		handler.triggerNew = new List<Account>{ myAccount };
-		handler.triggerOld = new List<Account>{ myAccount };
 		Trigger_Action__mdt action = new Trigger_Action__mdt(
 			Apex_Class_Name__c = TEST_BEFORE_INSERT,
 			Before_Update__r = setting,
@@ -273,8 +269,6 @@ private class MetadataTriggerHandlerTest {
 
 	@IsTest
 	private static void beforeUpdateShouldFailWithIncorrectClass() {
-		handler.triggerNew = new List<Account>{ myAccount };
-		handler.triggerOld = new List<Account>{ myAccount };
 		Trigger_Action__mdt action = new Trigger_Action__mdt(
 			Apex_Class_Name__c = BOGUS_CLASS_NAME,
 			Before_Update__r = setting,
@@ -310,8 +304,6 @@ private class MetadataTriggerHandlerTest {
 	@IsTest
 	private static void afterUpdateShouldSucceed() {
 		executed = false;
-		handler.triggerNew = new List<Account>{ myAccount };
-		handler.triggerOld = new List<Account>{ myAccount };
 		Trigger_Action__mdt action = new Trigger_Action__mdt(
 			Apex_Class_Name__c = TEST_AFTER_UPDATE,
 			After_Update__r = setting,
@@ -328,8 +320,6 @@ private class MetadataTriggerHandlerTest {
 
 	@IsTest
 	private static void afterUpdateShouldFailWithIncorrectType() {
-		handler.triggerNew = new List<Account>{ myAccount };
-		handler.triggerOld = new List<Account>{ myAccount };
 		Trigger_Action__mdt action = new Trigger_Action__mdt(
 			Apex_Class_Name__c = TEST_BEFORE_INSERT,
 			After_Update__r = setting,
@@ -362,8 +352,6 @@ private class MetadataTriggerHandlerTest {
 
 	@IsTest
 	private static void afterUpdateShouldFailWithIncorrectClass() {
-		handler.triggerNew = new List<Account>{ myAccount };
-		handler.triggerOld = new List<Account>{ myAccount };
 		Trigger_Action__mdt action = new Trigger_Action__mdt(
 			Apex_Class_Name__c = BOGUS_CLASS_NAME,
 			After_Update__r = setting,
@@ -397,7 +385,6 @@ private class MetadataTriggerHandlerTest {
 	@IsTest
 	private static void beforeDeleteShouldSucceed() {
 		executed = false;
-		handler.triggerOld = new List<Account>{ myAccount };
 		Trigger_Action__mdt action = new Trigger_Action__mdt(
 			Apex_Class_Name__c = TEST_BEFORE_DELETE,
 			Before_Delete__r = setting,
@@ -416,7 +403,6 @@ private class MetadataTriggerHandlerTest {
 
 	@IsTest
 	private static void beforeDeleteShouldFailWithIncorrectType() {
-		handler.triggerOld = new List<Account>{ myAccount };
 		Trigger_Action__mdt action = new Trigger_Action__mdt(
 			Apex_Class_Name__c = TEST_BEFORE_INSERT,
 			Before_Delete__r = setting,
@@ -451,7 +437,6 @@ private class MetadataTriggerHandlerTest {
 
 	@IsTest
 	private static void beforeDeleteShouldFailWithIncorrectClass() {
-		handler.triggerOld = new List<Account>{ myAccount };
 		Trigger_Action__mdt action = new Trigger_Action__mdt(
 			Apex_Class_Name__c = BOGUS_CLASS_NAME,
 			Before_Delete__r = setting,
@@ -487,7 +472,6 @@ private class MetadataTriggerHandlerTest {
 	@IsTest
 	private static void afterDeleteShouldSucceed() {
 		executed = false;
-		handler.triggerOld = new List<Account>{ myAccount };
 		Trigger_Action__mdt action = new Trigger_Action__mdt(
 			Apex_Class_Name__c = TEST_AFTER_DELETE,
 			After_Delete__r = setting,
@@ -504,7 +488,6 @@ private class MetadataTriggerHandlerTest {
 
 	@IsTest
 	private static void afterDeleteShouldFailWithIncorrectType() {
-		handler.triggerOld = new List<Account>{ myAccount };
 		Trigger_Action__mdt action = new Trigger_Action__mdt(
 			Apex_Class_Name__c = TEST_BEFORE_INSERT,
 			After_Delete__r = setting,
@@ -537,7 +520,6 @@ private class MetadataTriggerHandlerTest {
 
 	@IsTest
 	private static void afterDeleteShouldFailWithIncorrectClass() {
-		handler.triggerOld = new List<Account>{ myAccount };
 		Trigger_Action__mdt action = new Trigger_Action__mdt(
 			Apex_Class_Name__c = BOGUS_CLASS_NAME,
 			After_Delete__r = setting,
@@ -571,7 +553,6 @@ private class MetadataTriggerHandlerTest {
 	@IsTest
 	private static void afterUndeleteShouldSucceed() {
 		executed = false;
-		handler.triggerOld = new List<Account>{ myAccount };
 		Trigger_Action__mdt action = new Trigger_Action__mdt(
 			Apex_Class_Name__c = TEST_AFTER_UNDELETE,
 			After_Undelete__r = setting,
@@ -590,7 +571,6 @@ private class MetadataTriggerHandlerTest {
 
 	@IsTest
 	private static void afterUndeleteShouldFailWithIncorrectType() {
-		handler.triggerOld = new List<Account>{ myAccount };
 		Trigger_Action__mdt action = new Trigger_Action__mdt(
 			Apex_Class_Name__c = TEST_BEFORE_INSERT,
 			After_Undelete__r = setting,
@@ -625,7 +605,6 @@ private class MetadataTriggerHandlerTest {
 
 	@IsTest
 	private static void afterUndeleteShouldFailWithIncorrectClass() {
-		handler.triggerOld = new List<Account>{ myAccount };
 		Trigger_Action__mdt action = new Trigger_Action__mdt(
 			Apex_Class_Name__c = BOGUS_CLASS_NAME,
 			After_Undelete__r = setting,
@@ -660,8 +639,6 @@ private class MetadataTriggerHandlerTest {
 
 	@IsTest
 	private static void actionMetadataShouldConstruct() {
-		handler.triggerNew = new List<Account>{ myAccount };
-		handler.triggerOld = new List<Account>{ myAccount };
 		System.assertNotEquals(
 			null,
 			handler.beforeInsertActionMetadata,
