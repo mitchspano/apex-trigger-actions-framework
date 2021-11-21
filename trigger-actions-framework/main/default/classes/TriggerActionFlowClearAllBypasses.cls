@@ -23,7 +23,7 @@ public inherited sharing class TriggerActionFlowClearAllBypasses {
 		new List<String>{ CLASS_NAME }
 	);
 
-	@invocableMethod(
+	@InvocableMethod(
 		category='Trigger Action Flow'
 		label='Clear All Bypasses'
 		description='Sets the static bypass to false for all objects, apex actions, or flow actions.'

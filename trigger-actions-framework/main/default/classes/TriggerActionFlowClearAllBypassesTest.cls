@@ -14,18 +14,18 @@
    limitations under the License.
  */
 
-@isTest
+@IsTest(isParallel=true)
 private class TriggerActionFlowClearAllBypassesTest {
 	private static final String MY_STRING = 'MY_STRING';
 
 	@IsTest
-	private static void object() {
+	private static void clearAllBypassObjectShouldSucceedWithValidRequest() {
 		TriggerBase.bypass(MY_STRING);
-		Test.startTest();
+
 		TriggerActionFlowClearAllBypasses.clearAllBypasses(
 			new List<String>{ TriggerActionFlow.OBJECT_STRING }
 		);
-		Test.stopTest();
+
 		System.assertEquals(
 			false,
 			TriggerBase.isBypassed(MY_STRING),
@@ -34,13 +34,13 @@ private class TriggerActionFlowClearAllBypassesTest {
 	}
 
 	@IsTest
-	private static void apex() {
+	private static void clearAllBypassApexShouldSucceedWithValidRequest() {
 		MetadataTriggerHandler.bypass(MY_STRING);
-		Test.startTest();
+
 		TriggerActionFlowClearAllBypasses.clearAllBypasses(
 			new List<String>{ TriggerActionFlow.APEX_STRING }
 		);
-		Test.stopTest();
+
 		System.assertEquals(
 			false,
 			MetadataTriggerHandler.isBypassed(MY_STRING),
@@ -49,13 +49,13 @@ private class TriggerActionFlowClearAllBypassesTest {
 	}
 
 	@IsTest
-	private static void flow() {
+	private static void clearAllBypassFlowShouldSucceedWithValidRequest() {
 		TriggerActionFlow.bypass(MY_STRING);
-		Test.startTest();
+
 		TriggerActionFlowClearAllBypasses.clearAllBypasses(
 			new List<String>{ TriggerActionFlow.FLOW_STRING }
 		);
-		Test.stopTest();
+
 		System.assertEquals(
 			false,
 			TriggerActionFlow.isBypassed(MY_STRING),
@@ -64,15 +64,15 @@ private class TriggerActionFlowClearAllBypassesTest {
 	}
 
 	@IsTest
-	private static void invalidRequest() {
+	private static void clearAllBypassShouldFailWithInvalidRequest() {
 		Exception myException;
-		Test.startTest();
+
 		try {
 			TriggerActionFlowClearAllBypasses.clearAllBypasses(new List<String>());
 		} catch (Exception e) {
 			myException = e;
 		}
-		Test.stopTest();
+
 		System.assertNotEquals(
 			null,
 			myException,
@@ -90,9 +90,9 @@ private class TriggerActionFlowClearAllBypassesTest {
 	}
 
 	@IsTest
-	private static void invalidBypassType() {
+	private static void clearAllBypassShouldFailWithInvalidType() {
 		Exception myException;
-		Test.startTest();
+
 		try {
 			TriggerActionFlowClearAllBypasses.clearAllBypasses(
 				new List<String>{ MY_STRING }
@@ -100,7 +100,7 @@ private class TriggerActionFlowClearAllBypassesTest {
 		} catch (Exception e) {
 			myException = e;
 		}
-		Test.stopTest();
+
 		System.assertNotEquals(
 			null,
 			myException,

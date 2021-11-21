@@ -23,7 +23,7 @@ public inherited sharing class TriggerActionFlowAddError {
 		new List<String>{ CLASS_NAME }
 	);
 
-	@invocableMethod(
+	@InvocableMethod(
 		category='Trigger Action Flow'
 		label='Add Error'
 		description='Adds an error to an sObject'

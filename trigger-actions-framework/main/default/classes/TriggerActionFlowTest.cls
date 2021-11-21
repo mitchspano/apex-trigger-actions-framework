@@ -14,11 +14,15 @@
    limitations under the License.
  */
 
-@IsTest
-private class TriggerActionFlowTest {
+@IsTest(isParallel=true)
+public class TriggerActionFlowTest {
 	private static final String MY_ACCOUNT = 'My Account';
 	private static final String OLD_NAME = 'Old Name';
+	private static final String BOGUS = 'Bogus';
 	private static final String SAMPLE_FLOW_NAME = 'TriggerActionFlowTest';
+	private static final String INPUT_GENERATOR_CLASS_NAME = 'TriggerActionFlowTest.AccountTriggerRecord';
+	private static final String INPUT_GENERATOR_CLASS_NAME_WRONG_VARIABLE = 'TriggerActionFlowTest.BadInputWrongVariable';
+	private static final String INPUT_GENERATOR_CLASS_NAME_WRONG_TYPE = 'TriggerActionFlowTest.BadInputWrongReturnType';
 	private static Account myAccount = new Account(
 		Name = MY_ACCOUNT,
 		Id = TestUtility.getFakeId(Schema.Account.SObjectType)
@@ -27,228 +31,312 @@ private class TriggerActionFlowTest {
 		Name = OLD_NAME,
 		Id = myAccount.Id
 	);
+	private static List<SObject> newList = new List<SObject>{ myAccount };
+	private static List<SObject> oldList = new List<SObject>{ oldAccount };
+	private static TriggerActionFlow actionFlow;
+	private static Exception myException;
+
+	static {
+		actionFlow = new TriggerActionFlow();
+		actionFlow.flowName = SAMPLE_FLOW_NAME;
+		actionFlow.flowTriggerRecordClassName = INPUT_GENERATOR_CLASS_NAME;
+		actionFlow.allowRecursion = true;
+	}
+
 	@IsTest
-	private static void getOldRecord_Success() {
-		List<sObject> result;
-		Exception myException;
-		Test.startTest();
+	private static void beforeInsertShouldSucceed() {
 		try {
-			TriggerActionFlow.OldRecordRequest oldRecordRequest = new TriggerActionFlow.OldRecordRequest();
-			oldRecordRequest.currentRecord = myAccount;
-			oldRecordRequest.oldList = new List<SObject>{ oldAccount };
-			result = TriggerActionFlow.getOldRecord(
-				new List<TriggerActionFlow.OldRecordRequest>{ oldRecordRequest }
-			);
+			actionFlow.beforeInsert(newList);
 		} catch (Exception e) {
 			myException = e;
 		}
-		Test.stopTest();
+
 		System.assertEquals(
 			null,
 			myException,
-			'There should not be an exception called when getOldRecord is called with valid input.'
-		);
-		System.assertEquals(
-			1,
-			result.size(),
-			'There should only ever be one response from oldRecordRequest'
-		);
-		System.assertEquals(
-			OLD_NAME,
-			((Account) result[0]).Name,
-			'The result of the getOldRecord method should always contain the previous values on the record'
+			'There should be no exception thrown when this method is called with a valid flow.'
 		);
 	}
 
 	@IsTest
-	private static void getOldRecord_Failure_InvalidRequest_Empty() {
-		List<sObject> result;
-		Exception myException;
-		Test.startTest();
+	private static void afterInsertShouldSucceed() {
 		try {
-			TriggerActionFlow.OldRecordRequest oldRecordRequest = new TriggerActionFlow.OldRecordRequest();
-			result = TriggerActionFlow.getOldRecord(
-				new List<TriggerActionFlow.OldRecordRequest>()
-			);
+			actionFlow.afterInsert(newList);
 		} catch (Exception e) {
 			myException = e;
 		}
-		Test.stopTest();
+
+		System.assertEquals(
+			null,
+			myException,
+			'There should be no exception thrown when this method is called with a valid flow.'
+		);
+	}
+
+	@IsTest
+	private static void beforeUpdateShouldSucceed() {
+		try {
+			actionFlow.beforeUpdate(newList, oldList);
+		} catch (Exception e) {
+			myException = e;
+		}
+
+		System.assertEquals(
+			null,
+			myException,
+			'There should be no exception thrown when this method is called with a valid flow.'
+		);
+	}
+
+	@IsTest
+	private static void afterUpdateShouldSucceed() {
+		try {
+			actionFlow.afterUpdate(newList, oldList);
+		} catch (Exception e) {
+			myException = e;
+		}
+
+		System.assertEquals(
+			null,
+			myException,
+			'There should be no exception thrown when this method is called with a valid flow.'
+		);
+	}
+
+	@IsTest
+	private static void beforeDeleteShouldSucceed() {
+		try {
+			actionFlow.beforeDelete(newList);
+		} catch (Exception e) {
+			myException = e;
+		}
+
+		System.assertEquals(
+			null,
+			myException,
+			'There should be no exception thrown when this method is called with a valid flow.'
+		);
+	}
+
+	@IsTest
+	private static void afterDeleteShouldSucceed() {
+		try {
+			actionFlow.afterDelete(newList);
+		} catch (Exception e) {
+			myException = e;
+		}
+
+		System.assertEquals(
+			null,
+			myException,
+			'There should be no exception thrown when this method is called with a valid flow.'
+		);
+	}
+
+	@IsTest
+	private static void afterUndeleteShouldSucceed() {
+		try {
+			actionFlow.afterUndelete(oldList);
+		} catch (Exception e) {
+			myException = e;
+		}
+
+		System.assertEquals(
+			null,
+			myException,
+			'There should be no exception thrown when this method is called with a valid flow.'
+		);
+	}
+
+	@IsTest
+	private static void beforeInputShouldFailWithNullInputGenerator() {
+		try {
+			actionFlow.flowTriggerRecordClassName = null;
+			actionFlow.beforeInsert(newList);
+		} catch (TriggerActionFlow.TriggerActionFlowException e) {
+			myException = e;
+		}
+
 		System.assertNotEquals(
 			null,
 			myException,
-			'There should be an exception called when getOldRecord is called with an empty list of requests'
-		);
-		System.assertEquals(
-			TriggerActionFlow.INVALID_REQUEST,
-			myException.getMessage(),
-			'The exception thrown in this scenario should be for an invalid request'
+			'An exception should be thrown when there is no specified input generator class name.'
 		);
 	}
 
 	@IsTest
-	private static void getOldRecord_Failure_InvalidRequest_TooMany() {
-		List<sObject> result;
-		Exception myException;
-		Test.startTest();
+	private static void beforeInputShouldFailWithInvalidInputGenerator() {
 		try {
-			TriggerActionFlow.OldRecordRequest oldRecordRequest = new TriggerActionFlow.OldRecordRequest();
-			oldRecordRequest.currentRecord = myAccount;
-			oldRecordRequest.oldList = new List<SObject>{ myAccount };
-			result = TriggerActionFlow.getOldRecord(
-				new List<TriggerActionFlow.OldRecordRequest>{
-					oldRecordRequest,
-					oldRecordRequest
-				}
-			);
-		} catch (Exception e) {
+			actionFlow.flowTriggerRecordClassName = BOGUS;
+			actionFlow.beforeInsert(newList);
+		} catch (TriggerActionFlow.TriggerActionFlowException e) {
 			myException = e;
 		}
-		Test.stopTest();
+
 		System.assertNotEquals(
 			null,
 			myException,
-			'There should be an exception called when getOldRecord is called with a list of multiple requests'
-		);
-		System.assertEquals(
-			TriggerActionFlow.INVALID_REQUEST,
-			myException.getMessage(),
-			'The exception thrown in this scenario should be for an invalid request'
+			'An exception should be thrown when there is no valid input generator class name.'
 		);
 	}
 
 	@IsTest
-	private static void beforeInsert_Success() {
-		Exception myException;
-		Test.startTest();
-		TriggerActionFlow triggerActionFlow = new TriggerActionFlow();
-		triggerActionFlow.flowName = SAMPLE_FLOW_NAME;
+	private static void beforeInputShouldFailWithInvalidInputMissingKey() {
 		try {
-			triggerActionFlow.beforeInsert(new List<sObject>{ myAccount });
-		} catch (Exception e) {
+			actionFlow.flowTriggerRecordClassName = INPUT_GENERATOR_CLASS_NAME_WRONG_VARIABLE;
+			actionFlow.beforeInsert(newList);
+		} catch (TriggerActionFlow.TriggerActionFlowException e) {
 			myException = e;
 		}
-		Test.stopTest();
-		System.assertEquals(
+
+		System.assertNotEquals(
 			null,
 			myException,
-			'There should be no exception thrown when this method is called with a valid flow.'
+			'An exception should be thrown when the input generated does not contain the key "triggerRecords"'
 		);
 	}
 
 	@IsTest
-	private static void afterInsert_Success() {
-		Exception myException;
-		Test.startTest();
-		TriggerActionFlow triggerActionFlow = new TriggerActionFlow();
-		triggerActionFlow.flowName = SAMPLE_FLOW_NAME;
+	private static void beforeInputShouldFailWithInvalidInputWrongDataType() {
 		try {
-			triggerActionFlow.afterInsert(new List<sObject>{ myAccount });
-		} catch (Exception e) {
+			actionFlow.flowTriggerRecordClassName = INPUT_GENERATOR_CLASS_NAME_WRONG_TYPE;
+			actionFlow.beforeInsert(newList);
+		} catch (TriggerActionFlow.TriggerActionFlowException e) {
 			myException = e;
 		}
-		Test.stopTest();
-		System.assertEquals(
+
+		System.assertNotEquals(
 			null,
 			myException,
-			'There should be no exception thrown when this method is called with a valid flow.'
+			'An exception should be thrown when the input generated has the key "triggerRecords", but it is mapped to a value that is not a list of TriggerRecord'
 		);
 	}
 
 	@IsTest
-	private static void beforeUpdate_Success() {
-		Exception myException;
-		Test.startTest();
-		TriggerActionFlow triggerActionFlow = new TriggerActionFlow();
-		triggerActionFlow.flowName = SAMPLE_FLOW_NAME;
-		try {
-			triggerActionFlow.beforeUpdate(
-				new List<sObject>{ myAccount },
-				new List<sObject>{ myAccount }
-			);
-		} catch (Exception e) {
-			myException = e;
-		}
-		Test.stopTest();
-		System.assertEquals(
-			null,
-			myException,
-			'There should be no exception thrown when this method is called with a valid flow.'
+	private static void bypassShouldSucceed() {
+		TriggerActionFlow.bypass(SAMPLE_FLOW_NAME);
+
+		System.assert(
+			TriggerActionFlow.bypassedFlows.contains(SAMPLE_FLOW_NAME),
+			'Static bypasses should be populated properly'
 		);
 	}
+
 	@IsTest
-	private static void afterUpdate_Success() {
-		Exception myException;
-		Test.startTest();
-		TriggerActionFlow triggerActionFlow = new TriggerActionFlow();
-		triggerActionFlow.flowName = SAMPLE_FLOW_NAME;
-		try {
-			triggerActionFlow.afterUpdate(
-				new List<sObject>{ myAccount },
-				new List<sObject>{ myAccount }
-			);
-		} catch (Exception e) {
-			myException = e;
-		}
-		Test.stopTest();
-		System.assertEquals(
-			null,
-			myException,
-			'There should be no exception thrown when this method is called with a valid flow.'
+	private static void clearBypassShouldSucceed() {
+		TriggerActionFlow.bypass(SAMPLE_FLOW_NAME);
+		TriggerActionFlow.clearBypass(SAMPLE_FLOW_NAME);
+
+		System.assert(
+			!TriggerActionFlow.bypassedFlows.contains(SAMPLE_FLOW_NAME),
+			'Static bypasses should be populated properly'
 		);
 	}
+
 	@IsTest
-	private static void beforeDelete_Success() {
-		Exception myException;
-		Test.startTest();
-		TriggerActionFlow triggerActionFlow = new TriggerActionFlow();
-		triggerActionFlow.flowName = SAMPLE_FLOW_NAME;
-		try {
-			triggerActionFlow.beforeDelete(new List<sObject>{ myAccount });
-		} catch (Exception e) {
-			myException = e;
-		}
-		Test.stopTest();
+	private static void isBypassedShouldSucceed() {
+		Boolean isBypassed;
+		TriggerActionFlow.bypass(SAMPLE_FLOW_NAME);
+
+		isBypassed = TriggerActionFlow.isBypassed(SAMPLE_FLOW_NAME);
+
 		System.assertEquals(
-			null,
-			myException,
-			'There should be no exception thrown when this method is called with a valid flow.'
+			true,
+			isBypassed,
+			'Static bypasses should be populated properly'
 		);
 	}
+
 	@IsTest
-	private static void afterDelete_Success() {
-		Exception myException;
-		Test.startTest();
-		TriggerActionFlow triggerActionFlow = new TriggerActionFlow();
-		triggerActionFlow.flowName = SAMPLE_FLOW_NAME;
-		try {
-			triggerActionFlow.afterDelete(new List<sObject>{ myAccount });
-		} catch (Exception e) {
-			myException = e;
-		}
-		Test.stopTest();
+	private static void clearAllBypassesShouldSucceed() {
+		TriggerActionFlow.bypass(SAMPLE_FLOW_NAME);
+
+		TriggerActionFlow.clearAllBypasses();
+
 		System.assertEquals(
-			null,
-			myException,
-			'There should be no exception thrown when this method is called with a valid flow.'
+			0,
+			TriggerActionFlow.bypassedFlows.size(),
+			'Static bypasses should be populated properly'
 		);
 	}
-	@IsTest
-	private static void afterUndelete_Success() {
-		Exception myException;
-		Test.startTest();
-		TriggerActionFlow triggerActionFlow = new TriggerActionFlow();
-		triggerActionFlow.flowName = SAMPLE_FLOW_NAME;
-		try {
-			triggerActionFlow.afterUndelete(new List<sObject>{ myAccount });
-		} catch (Exception e) {
-			myException = e;
+
+	public class AccountTriggerRecord extends FlowTriggerRecord {
+		public AccountTriggerRecord() {
+			super();
 		}
-		Test.stopTest();
-		System.assertEquals(
-			null,
-			myException,
-			'There should be no exception thrown when this method is called with a valid flow.'
-		);
+
+		public AccountTriggerRecord(
+			Account newRecord,
+			Account oldRecord,
+			Integer newRecordIndex,
+			Integer triggerActionFlowIdentifier
+		) {
+			super(newRecord, oldRecord, newRecordIndex, triggerActionFlowIdentifier);
+		}
+
+		@AuraEnabled
+		public Account newRecord {
+			get {
+				return (Account) this.newSObject;
+			}
+			set {
+				this.newSObject = value;
+			}
+		}
+
+		@AuraEnabled
+		public Account oldRecord {
+			get {
+				return (Account) this.oldSObject;
+			}
+		}
+
+		public override Map<String, Object> getFlowInput(
+			List<SObject> newList,
+			List<SObject> oldList,
+			Integer triggerActionFlowIdentifier
+		) {
+			List<SObject> collection = newList != null ? newList : oldList;
+			List<AccountTriggerRecord> triggerRecords = new List<AccountTriggerRecord>();
+			for (Integer i = 0; i < collection.size(); i++) {
+				Account newRecord = newList != null ? (Account) newList.get(i) : null;
+				Account oldRecord = oldList != null ? (Account) oldList.get(i) : null;
+				triggerRecords.add(
+					new AccountTriggerRecord(
+						newRecord,
+						oldRecord,
+						i,
+						triggerActionFlowIdentifier
+					)
+				);
+			}
+			return new Map<String, Object>{
+				TriggerActionFlow.TRIGGER_RECORDS_VARIABLE => triggerRecords
+			};
+		}
+	}
+
+	private class BadInputWrongVariable extends FlowTriggerRecord {
+		public override Map<String, Object> getFlowInput(
+			List<SObject> newList,
+			List<SObject> oldList,
+			Integer triggerActionFlowIdentifier
+		) {
+			return new Map<String, Object>{
+				BOGUS => new List<AccountTriggerRecord>()
+			};
+		}
+	}
+
+	private class BadInputWrongReturnType extends FlowTriggerRecord {
+		public override Map<String, Object> getFlowInput(
+			List<SObject> newList,
+			List<SObject> oldList,
+			Integer triggerActionFlowIdentifier
+		) {
+			return new Map<String, Object>{
+				TriggerActionFlow.TRIGGER_RECORDS_VARIABLE => BOGUS
+			};
+		}
 	}
 }

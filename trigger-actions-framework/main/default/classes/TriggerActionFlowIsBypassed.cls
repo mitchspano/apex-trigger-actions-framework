@@ -23,7 +23,7 @@ public inherited sharing class TriggerActionFlowIsBypassed {
 		new List<String>{ CLASS_NAME }
 	);
 
-	@invocableMethod(
+	@InvocableMethod(
 		category='Trigger Action Flow'
 		label='Is Bypassed'
 		description='Returns if the bypass for this object, apex action, or flow action is set to true.'
