@@ -66,7 +66,7 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 			} else {
 				identifier = random;
 				usedIdentifiers.add(identifier);
-				foundNovelIdentifier = true;
+                foundNovelIdentifier = true;
 			}
 		}
 	}
