@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>53.0</apiVersion>
+    <assignments>
+        <name>Add_Value_to_Multi_Picklist</name>
+        <label>Add Value to Multi Picklist</label>
+        <locationX>685</locationX>
+        <locationY>252</locationY>
+        <assignmentItems>
+            <assignToReference>For_Each_Record.newRecord.Channel</assignToReference>
+            <operator>AddItem</operator>
+            <value>
+                <stringValue>Portal</stringValue>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <assignments>
+        <name>Add_Values_to_Picklists</name>
+        <label>Add Values to Picklists</label>
+        <locationX>442</locationX>
+        <locationY>253</locationY>
+        <assignmentItems>
+            <assignToReference>For_Each_Record.newRecord.Category</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <stringValue>Greetings</stringValue>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>For_Each_Record.newRecord.Channel</assignToReference>
+            <operator>AddItem</operator>
+            <value>
+                <stringValue>Email</stringValue>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Add_Value_to_Multi_Picklist</targetReference>
+        </connector>
+    </assignments>
+    <description>This is meant for test coverage for the TriggerActionFlow class.</description>
+    <interviewLabel>Trigger Action Flow Picklist Test {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Trigger Action Flow Picklist Test</label>
+    <loops>
+        <name>For_Each_Record</name>
+        <label>For Each Record</label>
+        <locationX>176</locationX>
+        <locationY>256</locationY>
+        <collectionReference>triggerRecords</collectionReference>
+        <iterationOrder>Asc</iterationOrder>
+        <nextValueConnector>
+            <targetReference>Add_Values_to_Picklists</targetReference>
+        </nextValueConnector>
+    </loops>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>FREE_FORM_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <start>
+        <locationX>50</locationX>
+        <locationY>50</locationY>
+        <connector>
+            <targetReference>For_Each_Record</targetReference>
+        </connector>
+    </start>
+    <status>Active</status>
+    <variables>
+        <name>triggerRecords</name>
+        <apexClass>QuickTextTriggerRecord</apexClass>
+        <dataType>Apex</dataType>
+        <isCollection>true</isCollection>
+        <isInput>true</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+</Flow>
