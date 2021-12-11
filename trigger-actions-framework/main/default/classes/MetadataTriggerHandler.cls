@@ -52,7 +52,7 @@ public inherited sharing class MetadataTriggerHandler extends TriggerBase implem
 		this.executeActions(TriggerOperation.AFTER_UNDELETE, newList, null);
 	}
 
-	private list<Trigger_Action__mdt> getActionMetadata(String relationshipName) {
+	private List<Trigger_Action__mdt> getActionMetadata(String relationshipName) {
 		if (!sObjectToContextToActions.containsKey(this.sObjectName)) {
 			sObjectToContextToActions.put(
 				this.sObjectName,
@@ -63,7 +63,7 @@ public inherited sharing class MetadataTriggerHandler extends TriggerBase implem
 			!sObjectToContextToActions.get(this.sObjectName)
 				.containsKey(relationshipName)
 		) {
-			list<Trigger_Action__mdt> result = new List<Trigger_Action__mdt>();
+			List<Trigger_Action__mdt> result = new List<Trigger_Action__mdt>();
 			String sObjectLocalName = this.sObjectName;
 			List<String> split = sObjectName.split('__');
 			String namespace;
@@ -71,39 +71,34 @@ public inherited sharing class MetadataTriggerHandler extends TriggerBase implem
 				namespace = split[0];
 				sObjectLocalName = sObjectLocalName.replaceFirst(namespace + '__', '');
 			}
-			List<String> queryArray = new List<String>{
-				'SELECT Apex_Class_Name__c,',
-				'Order__c,',
-				'Flow_Name__c,',
-				'Bypass_Permission__c,',
-				'Required_Permission__c,',
-				'Allow_Flow_Recursion__c,',
-				'{0}__r.Bypass_Permission__c,',
-				'{0}__r.Required_Permission__c,',
-				'{0}__r.FlowTriggerRecord_Class_Name__c',
-				'FROM Trigger_Action__mdt',
-				'WHERE',
-				'{0}__c != NULL',
-				'AND {0}__r.Object_API_Name__c = :sObjectLocalName',
-				'AND {0}__r.Object_Namespace__c = :namespace',
-				'AND {0}__r.Bypass_Execution__c = FALSE',
-				'AND Bypass_Execution__c = FALSE',
-				'ORDER BY Order__c ASC'
-			};
-			String queryString = String.format(
-				String.join(queryArray, ' '),
-				new List<Object>{ relationshipName }
-			);
-			for (
-				Trigger_Action__mdt actionMetadata : (List<Trigger_Action__mdt>) Database.query(
-					queryString
-				)
-			) {
-				if (shouldExecute(actionMetadata, relationshipName)) {
-					result.add(actionMetadata);
+			Map<String, Trigger_Action__mdt> identifierToActionMetadata = new Map<String, Trigger_Action__mdt>();
+			List<String> sortingIdentifier = new List<String>();
+			for (Trigger_Action__mdt actionMetadata : triggerActions) {
+				Id sObjectSettingId = (Id) actionMetadata.get(relationshipName + '__c');
+				if (sObjectSettingId != null) {
+					sObject_Trigger_Setting__mdt sObjectSetting = sObject_Trigger_Setting__mdt.getInstance(
+						sObjectSettingId
+					);
+					if (
+						sObjectSetting.Object_API_Name__c == sObjectLocalName &&
+						sObjectSetting.Object_Namespace__c == namespace &&
+						sObjectSetting.Bypass_Execution__c == false &&
+						actionMetadata.Bypass_Execution__c == false &&
+						shouldExecute(sObjectSetting, actionMetadata, relationshipName)
+					) {
+						String uniqueIdentifier =
+							actionMetadata.Order__c +
+							'|' +
+							actionMetadata.QualifiedApiName;
+						sortingIdentifier.add(uniqueIdentifier);
+						identifierToActionMetadata.put(uniqueIdentifier, actionMetadata);
+					}
 				}
 			}
-
+			sortingIdentifier.sort();
+			for (String identifier : sortingIdentifier) {
+				result.add(identifierToActionMetadata.get(identifier));
+			}
 			sObjectToContextToActions.get(this.sObjectName)
 				.put(relationshipName, result);
 		}
@@ -112,17 +107,12 @@ public inherited sharing class MetadataTriggerHandler extends TriggerBase implem
 	}
 
 	private Boolean shouldExecute(
+		sObject_Trigger_Setting__mdt sObjectSetting,
 		Trigger_Action__mdt actionMetadata,
 		String relationshipName
 	) {
-		String sObjectBypassPermissionName = (String) ((sObject_Trigger_Setting__mdt) actionMetadata.getSobject(
-				relationshipName + '__r'
-			))
-			.get('Bypass_Permission__c');
-		String sObjectRequiredPermissionName = (String) ((sObject_Trigger_Setting__mdt) actionMetadata.getSobject(
-				relationshipName + '__r'
-			))
-			.get('Required_Permission__c');
+		String sObjectBypassPermissionName = sObjectSetting.Bypass_Permission__c;
+		String sObjectRequiredPermissionName = sObjectSetting.Required_Permission__c;
 		for (
 			String permissionName : new List<String>{
 				actionMetadata.Bypass_Permission__c,
@@ -194,9 +184,9 @@ public inherited sharing class MetadataTriggerHandler extends TriggerBase implem
 					((TriggerActionFlow) triggerAction)
 						.allowRecursion = triggerMetadata.Allow_Flow_Recursion__c;
 					((TriggerActionFlow) triggerAction)
-						.flowTriggerRecordClassName = ((sObject_Trigger_Setting__mdt) triggerMetadata.getSObject(
-							context.name() + '__r'
-						))
+						.flowTriggerRecordClassName = sObject_Trigger_Setting__mdt.getInstance(
+							(Id) triggerMetadata.get(context.name() + '__c')
+						)
 						.FlowTriggerRecord_Class_Name__c;
 				}
 			} catch (System.NullPointerException e) {
@@ -278,6 +268,16 @@ public inherited sharing class MetadataTriggerHandler extends TriggerBase implem
 		} catch (System.TypeException e) {
 			handleException(INVALID_TYPE_ERROR, className, context);
 		}
+	}
+
+	private static List<Trigger_Action__mdt> triggerActions {
+		get {
+			if (triggerActions == null) {
+				triggerActions = Trigger_Action__mdt.getAll().values();
+			}
+			return triggerActions;
+		}
+		set;
 	}
 
 	@TestVisible
