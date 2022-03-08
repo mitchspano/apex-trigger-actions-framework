@@ -14,7 +14,7 @@
    limitations under the License.
  */
 
-public inherited sharing class TriggerActionFlow implements TriggerAction.BeforeInsert, TriggerAction.AfterInsert, TriggerAction.BeforeUpdate, TriggerAction.AfterUpdate, TriggerAction.AfterUndelete {
+public inherited sharing class TriggerActionFlow implements TriggerAction.BeforeInsert, TriggerAction.AfterInsert, TriggerAction.BeforeUpdate, TriggerAction.AfterUpdate, TriggerAction.BeforeDelete, TriggerAction.AfterDelete, TriggerAction.AfterUndelete {
 	public static final String APEX_STRING = 'Apex';
 	public static final String FLOW_STRING = 'Flow';
 	public static final String INVALID_BYPASS_REQUEST = 'You can only pass one request into {0}';
@@ -58,7 +58,7 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 	}
 
 	public TriggerActionFlow() {
-		boolean foundNovelIdentifier = false;
+		Boolean foundNovelIdentifier = false;
 		while (foundNovelIdentifier == false) {
 			Integer random = Crypto.getRandomInteger();
 			if (usedIdentifiers.contains(random)) {
@@ -66,7 +66,7 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 			} else {
 				identifier = random;
 				usedIdentifiers.add(identifier);
-                foundNovelIdentifier = true;
+				foundNovelIdentifier = true;
 			}
 		}
 	}

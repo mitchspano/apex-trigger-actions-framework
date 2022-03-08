@@ -21,7 +21,7 @@ This project is meant to demonstrate an Apex Trigger Framework which is built wi
 In order to use this trigger framework, we start with the `MetadataTriggerHandler` class which is included in this project.
 
 ```java
-Trigger OpportunityTrigger on Opportunity (
+trigger OpportunityTrigger on Opportunity (
   before insert,
   after insert,
   before update,
