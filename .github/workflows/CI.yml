@@ -37,12 +37,21 @@ jobs:
       - name: Install Salesforce CLI
         run: |
           npm install sfdx-cli
-          node_modules/sfdx-cli/bin/run --version
-          node_modules/sfdx-cli/bin/run plugins --core
+          sfdx --version
+          sfdx plugins --core
 
       - name: 'Populate auth file with SFDX_URL secret'
         shell: bash
         run: 'echo ${{ secrets.DEV_HUB_TOKEN}} > DEV_HUB_TOKEN'
+
+      - name: 'Authenticate against dev hub'
+        run: sfdx force:auth:sfdxurl:store -f DEV_HUB_TOKEN -s -a devHub
+
+      - name: 'Create Scratch Org'
+        run: |
+        sfdx force:org:create -f project-scratch-def.json -a MyScratchOrg --setdefaultusername
+        sfdx force:org:list
+      
 
       # Runs a single command using the runners shell
       - name: Run a one-line script
