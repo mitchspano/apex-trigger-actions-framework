@@ -40,29 +40,18 @@ jobs:
           node_modules/sfdx-cli/bin/run --version
           node_modules/sfdx-cli/bin/run plugins --core
 
-      - name: 'Populate auth file with SFDX_URL secret'
-        shell: bash
-        run: 'echo ${{ secrets.DEV_HUB_TOKEN}} > DEV_HUB_TOKEN'
-
-      - name: 'Authenticate against dev hub'
-        run: node_modules/sfdx-cli/bin/run force:auth:sfdxurl:store -f DEV_HUB_TOKEN -s -a devHub
-
-      - name: 'Create Scratch Org'
+      - name: Authenticate DevHub
         run: |
-          node_modules/sfdx-cli/bin/run force:org:create -f config/project-scratch-def.json -a MyScratchOrg --setdefaultusername
-          node_modules/sfdx-cli/bin/run force:org:list
-      
+          echo "${SALESFORCE_JWT_SECRET_KEY}" > server.key
+          node_modules/sfdx-cli/bin/run force:auth:jwt:grant --clientid ${{ secrets.SALESFORCE_CONSUMER_KEY }} --jwtkeyfile server.key --username ${{ secrets.SALESFORCE_DEVHUB_USERNAME}} --setdefaultdevhubusername -a devhub
+        env:
+          SALESFORCE_JWT_SECRET_KEY: ${{ secrets.SALESFORCE_JWT_SECRET_KEY }}
+        
+      - name: Define CI org
+        run: node_modules/sfdx-cli/bin/run force:org:create -v devhub -s -f config/project-scratch-def.json -a ciorg -d 1
 
-      # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: echo Hello, world!
+      - name: Deploy source
+        run: node_modules/sfdx-cli/bin/run force:source:push -u ciorg
 
-      # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
-        run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
-          
-          
-      - name: PMD Source Code Analyzer Action
-        uses: sfdx-actions/setup-pmd@v1
+      - name: Run Apex test
+        run: node_modules/sfdx-cli/bin/run force:apex:test:run -c -r human
