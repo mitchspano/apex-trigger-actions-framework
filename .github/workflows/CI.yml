@@ -49,8 +49,8 @@ jobs:
 
       - name: 'Create Scratch Org'
         run: |
-        sfdx force:org:create -f project-scratch-def.json -a MyScratchOrg --setdefaultusername
-        sfdx force:org:list
+          sfdx force:org:create -f config/project-scratch-def.json -a MyScratchOrg --setdefaultusername
+          sfdx force:org:list
       
 
       # Runs a single command using the runners shell
