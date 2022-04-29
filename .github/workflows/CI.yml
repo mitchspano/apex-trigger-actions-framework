@@ -21,27 +21,6 @@ jobs:
           node-version: '>=14'
           check-latest: true
           
-      - name: Install Salesforce CLI
-        run: |
-          npm install sfdx-cli
-          node_modules/sfdx-cli/bin/run --version
-          node_modules/sfdx-cli/bin/run plugins --core
-
-      - name: Authenticate DevHub
-        run: |
-          echo "${SALESFORCE_JWT_SECRET_KEY}" > server.key
-          node_modules/sfdx-cli/bin/run force:auth:jwt:grant --clientid ${{ secrets.SALESFORCE_CONSUMER_KEY }} --jwtkeyfile server.key --username ${{ secrets.SALESFORCE_DEVHUB_USERNAME}} --setdefaultdevhubusername -a devhub
-        env:
-          SALESFORCE_JWT_SECRET_KEY: ${{ secrets.SALESFORCE_JWT_SECRET_KEY }}
-        
-      - name: Define CI org
-        run: node_modules/sfdx-cli/bin/run force:org:create -v devhub -s -f config/project-scratch-def.json -a ciorg -d 1
-
-      - name: Deploy source
-        run: node_modules/sfdx-cli/bin/run force:source:push -u ciorg
-
-      - name: Run Apex test
-        run: node_modules/sfdx-cli/bin/run force:apex:test:run -c -r human
 
       - name: publish line comment curl
         env:
