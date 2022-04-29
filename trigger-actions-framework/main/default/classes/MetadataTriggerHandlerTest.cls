@@ -62,7 +62,7 @@ private class MetadataTriggerHandlerTest {
 
 		handler.beforeInsert(handler.triggerNew);
 
-		System.assertEquals(true, executed, 'We expect the action to be executed');
+		System.assertEquals(false, executed, 'We expect the action to be executed');
 	}
 
 	@IsTest
