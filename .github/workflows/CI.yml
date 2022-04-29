@@ -42,3 +42,18 @@ jobs:
 
       - name: Run Apex test
         run: node_modules/sfdx-cli/bin/run force:apex:test:run -c -r human
+
+      - name: publish line comment curl
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          curl \
+            -X POST \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/comments \
+            -H "Authorization: token $GITHUB_TOKEN" \
+            --data '{  "body": "blah blah" ,
+                    "path": "test.txt",
+                    "position": 1,
+                    "commit_id": "${{ github.event.pull_request.head.sha }}"
+                    }'
