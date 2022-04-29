@@ -40,6 +40,10 @@ jobs:
           node_modules/sfdx-cli/bin/run --version
           node_modules/sfdx-cli/bin/run plugins --core
 
+      - name: 'Populate auth file with SFDX_URL secret'
+        shell: bash
+        run: 'echo ${{ secrets.DEV_HUB_TOKEN}} > DEV_HUB_TOKEN'
+
       # Runs a single command using the runners shell
       - name: Run a one-line script
         run: echo Hello, world!
