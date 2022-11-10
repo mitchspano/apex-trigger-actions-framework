@@ -70,32 +70,6 @@ private class TriggerActionFlowClearBypassTest {
 	}
 
 	@IsTest
-	private static void clearBypassShouldFailWithInvalidRequest() {
-		try {
-			TriggerActionFlowClearBypass.clearBypass(
-				new List<TriggerActionFlowClearBypass.Request>()
-			);
-		} catch (Exception e) {
-			myException = e;
-		}
-
-		System.assertNotEquals(
-			null,
-			myException,
-			'We should have an exception thrown in this scenario'
-		);
-		System.assert(
-			myException instanceof TriggerActionFlowClearBypass.TriggerActionFlowClearBypassObjectException,
-			'The exception should be of the correct type'
-		);
-		System.assertEquals(
-			myException.getMessage(),
-			TriggerActionFlowClearBypass.INVALID_REQUEST,
-			'The exeption should contain the message we are looking for'
-		);
-	}
-
-	@IsTest
 	private static void clearBypassShouldFailWithInvalidType() {
 		request.Name = MY_STRING;
 		request.bypassType = MY_STRING;

@@ -29,9 +29,6 @@ public inherited sharing class TriggerActionFlowClearBypass {
 		description='Sets the static bypass to false for this object, apex action, or flow action.'
 	)
 	public static void clearBypass(List<Request> requests) {
-		if (requests.size() != 1) {
-			throw new TriggerActionFlowClearBypassObjectException(INVALID_REQUEST);
-		}
 		if (!TriggerActionFlow.REQUEST_TYPES.contains(requests[0].bypassType)) {
 			throw new TriggerActionFlowClearBypassObjectException(
 				TriggerActionFlow.INVALID_TYPE

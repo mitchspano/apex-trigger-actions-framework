@@ -29,9 +29,6 @@ public inherited sharing class TriggerActionFlowIsBypassed {
 		description='Returns if the bypass for this object, apex action, or flow action is set to true.'
 	)
 	public static List<Boolean> isBypassed(List<Request> requests) {
-		if (requests.size() != 1) {
-			throw new TriggerActionFlowIsBypassedObjectException(INVALID_REQUEST);
-		}
 		if (!TriggerActionFlow.REQUEST_TYPES.contains(requests[0].bypassType)) {
 			throw new TriggerActionFlowIsBypassedObjectException(
 				TriggerActionFlow.INVALID_TYPE
