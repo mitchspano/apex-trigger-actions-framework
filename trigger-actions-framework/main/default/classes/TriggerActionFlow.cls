@@ -19,27 +19,21 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 	public static final String FLOW_STRING = 'Flow';
 	public static final String INVALID_BYPASS_REQUEST = 'You can only pass one request into {0}';
 	public static final String INVALID_FLOW_NAME = 'You must provide the name of a flow to execute';
-	public static final String INVALD_FLOW_INPUT = 'The Flow Input Generator must provide a map which contains "triggerRecords" as a key that is mapped to a list of FlowTriggerRecord.';
-	public static final String INVALID_FLOW_TRIGGER_RECORD_CLASS = ' is not a valid name of a class that extends FlowTriggerRecord';
 	public static final String INVALID_TYPE = 'The bypassType must equal Object, Apex, or Flow';
 	public static final String OBJECT_STRING = 'Object';
-	public static final String TRIGGER_RECORDS_VARIABLE = 'triggerRecords';
+	public static final String RECORD_PRIOR_VARIABLE = 'recordPrior';
+	public static final String RECORD_VARIABLE = 'record';
 	public static final Set<String> REQUEST_TYPES = new Set<String>{
 		OBJECT_STRING,
 		APEX_STRING,
 		FLOW_STRING
 	};
-	private static final String PIPE = '|';
 	@TestVisible
 	private static Set<String> bypassedFlows = new Set<String>();
 	private static Map<Schema.SObjectType, List<String>> sObjectToEditableFields = new Map<Schema.SObjectType, List<String>>();
-	private static Set<Integer> usedIdentifiers = new Set<Integer>();
 
 	public String flowName;
 	public Boolean allowRecursion;
-	public String flowTriggerRecordClassName;
-
-	private Integer identifier;
 
 	public static void bypass(String flowName) {
 		TriggerActionFlow.bypassedFlows.add(flowName);
@@ -57,114 +51,113 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 		TriggerActionFlow.bypassedFlows.clear();
 	}
 
-	public TriggerActionFlow() {
-		Boolean foundNovelIdentifier = false;
-		while (foundNovelIdentifier == false) {
-			Integer random = Crypto.getRandomInteger();
-			if (usedIdentifiers.contains(random)) {
-				continue;
-			} else {
-				identifier = random;
-				usedIdentifiers.add(identifier);
-				foundNovelIdentifier = true;
-			}
-		}
-	}
-
 	public void beforeInsert(List<SObject> newList) {
-		if (!thisFlowIsBypassed()) {
-			Flow.Interview myFlow = Flow.Interview.createInterview(
-				flowName,
-				getFlowInput(newList, null)
-			);
-			myFlow.start();
-			applyFlowValues(newList);
+		if (thisFlowIsBypassed()) {
+			return;
 		}
+		Invocable.Action action = getAction();
+
+		action.setInvocations(getInterviewInputs(newList, RECORD_VARIABLE));
+
+		List<Invocable.Action.Result> results = action.invoke();
+
+		handleInvocableActionResults(results, newList);
 	}
 
 	public void afterInsert(List<SObject> newList) {
-		if (!thisFlowIsBypassed()) {
-			Flow.Interview myFlow = Flow.Interview.createInterview(
-				flowName,
-				getFlowInput(newList, null)
-			);
-			myFlow.start();
+		if (thisFlowIsBypassed()) {
+			return;
 		}
+		Invocable.Action action = getAction();
+
+		action.setInvocations(getInterviewInputs(newList, RECORD_VARIABLE));
+
+		List<Invocable.Action.Result> results = action.invoke();
 	}
 
 	public void beforeUpdate(List<SObject> newList, List<SObject> oldList) {
-		if (!thisFlowIsBypassed()) {
-			List<sObject> recordsNotYetProcessed = new List<sObject>();
-			List<sObject> oldRecordsNotYetProcessed = new List<sObject>();
-			for (Integer i = 0; i < newList.size(); i++) {
-				sObject record = newList[i];
-				if (
-					TriggerBase.idToNumberOfTimesSeenBeforeUpdate.get(record.id) == 1 ||
-					(allowRecursion == true)
-				) {
-					recordsNotYetProcessed.add(record);
-					oldRecordsNotYetProcessed.add(oldList[i]);
-				}
-			}
-			Flow.Interview myFlow = Flow.Interview.createInterview(
-				flowName,
-				getFlowInput(recordsNotYetProcessed, oldRecordsNotYetProcessed)
-			);
-			myFlow.start();
-			applyFlowValues(newList);
+		if (thisFlowIsBypassed()) {
+			return;
 		}
+		List<sObject> recordsNotYetProcessed = new List<sObject>();
+		List<sObject> oldRecordsNotYetProcessed = new List<sObject>();
+		for (Integer i = 0; i < newList.size(); i++) {
+			sObject record = newList[i];
+			if (
+				TriggerBase.idToNumberOfTimesSeenBeforeUpdate.get(record.id) == 1 ||
+				(allowRecursion == true)
+			) {
+				recordsNotYetProcessed.add(record);
+				oldRecordsNotYetProcessed.add(oldList[i]);
+			}
+		}
+		Invocable.Action action = getAction();
+
+		action.setInvocations(
+			getInterviewInputs(recordsNotYetProcessed, oldRecordsNotYetProcessed)
+		);
+
+		List<Invocable.Action.Result> results = action.invoke();
+
+		handleInvocableActionResults(results, recordsNotYetProcessed);
 	}
 
 	public void afterUpdate(List<SObject> newList, List<SObject> oldList) {
-		if (!thisFlowIsBypassed()) {
-			List<sObject> recordsNotYetProcessed = new List<sObject>();
-			List<sObject> oldRecordsNotYetProcessed = new List<sObject>();
-			for (Integer i = 0; i < newList.size(); i++) {
-				sObject record = newList[i];
-				if (
-					TriggerBase.idToNumberOfTimesSeenBeforeUpdate.get(record.id) == 1 ||
-					(allowRecursion == true)
-				) {
-					recordsNotYetProcessed.add(record);
-					oldRecordsNotYetProcessed.add(oldList[i]);
-				}
-			}
-			Flow.Interview myFlow = Flow.Interview.createInterview(
-				flowName,
-				getFlowInput(recordsNotYetProcessed, oldRecordsNotYetProcessed)
-			);
-			myFlow.start();
+		if (thisFlowIsBypassed()) {
+			return;
 		}
+		List<sObject> recordsNotYetProcessed = new List<sObject>();
+		List<sObject> oldRecordsNotYetProcessed = new List<sObject>();
+		for (Integer i = 0; i < newList.size(); i++) {
+			sObject record = newList[i];
+			if (
+				TriggerBase.idToNumberOfTimesSeenBeforeUpdate.get(record.id) == 1 ||
+				(allowRecursion == true)
+			) {
+				recordsNotYetProcessed.add(record);
+				oldRecordsNotYetProcessed.add(oldList[i]);
+			}
+		}
+		Invocable.Action action = getAction();
+
+		action.setInvocations(
+			getInterviewInputs(recordsNotYetProcessed, oldRecordsNotYetProcessed)
+		);
+
+		List<Invocable.Action.Result> results = action.invoke();
 	}
 
 	public void beforeDelete(List<SObject> oldList) {
-		if (!thisFlowIsBypassed()) {
-			Flow.Interview myFlow = Flow.Interview.createInterview(
-				flowName,
-				getFlowInput(null, oldList)
-			);
-			myFlow.start();
+		if (thisFlowIsBypassed()) {
+			return;
 		}
+		Invocable.Action action = getAction();
+
+		action.setInvocations(getInterviewInputs(oldList, RECORD_PRIOR_VARIABLE));
+
+		List<Invocable.Action.Result> results = action.invoke();
 	}
 
 	public void afterDelete(List<SObject> oldList) {
-		if (!thisFlowIsBypassed()) {
-			Flow.Interview myFlow = Flow.Interview.createInterview(
-				flowName,
-				getFlowInput(null, oldList)
-			);
-			myFlow.start();
+		if (thisFlowIsBypassed()) {
+			return;
 		}
+		Invocable.Action action = getAction();
+
+		action.setInvocations(getInterviewInputs(oldList, RECORD_PRIOR_VARIABLE));
+
+		List<Invocable.Action.Result> results = action.invoke();
 	}
 
 	public void afterUndelete(List<SObject> newList) {
-		if (!thisFlowIsBypassed()) {
-			Flow.Interview myFlow = Flow.Interview.createInterview(
-				flowName,
-				getFlowInput(newList, null)
-			);
-			myFlow.start();
+		if (thisFlowIsBypassed()) {
+			return;
 		}
+		Invocable.Action action = getAction();
+
+		action.setInvocations(getInterviewInputs(newList, RECORD_VARIABLE));
+
+		List<Invocable.Action.Result> results = action.invoke();
 	}
 
 	private Boolean thisFlowIsBypassed() {
@@ -174,70 +167,61 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 		return TriggerActionFlow.isBypassed(flowName);
 	}
 
-	private Map<String, Object> getFlowInput(
-		List<sObject> newList,
-		List<sObject> oldList
+	private Invocable.Action getAction() {
+		return Invocable.Action.createCustomAction(FLOW_STRING, flowName);
+	}
+
+	private void applyFlowValues(
+		sObject stateBeforeFlow,
+		sObject stateAfterFlow,
+		List<String> editableFields
 	) {
-		Map<String, Object> generatedInput = getFlowTriggerRecord()
-			.getFlowInput(newList, oldList, this.identifier);
-		verifyInput(generatedInput);
-		return generatedInput;
-	}
-
-	private void verifyInput(Map<String, Object> generatedInput) {
-		if (
-			generatedInput == null ||
-			generatedInput.containsKey(TRIGGER_RECORDS_VARIABLE) ||
-			!(generatedInput.get(
-				TRIGGER_RECORDS_VARIABLE
-			) instanceof List<FlowTriggerRecord>)
-		) {
-			List<FlowTriggerRecord> triggerRecords;
-			try {
-				triggerRecords = (List<FlowTriggerRecord>) generatedInput.get(
-					TRIGGER_RECORDS_VARIABLE
-				);
-			} catch (Exception e) {
-				throw new TriggerActionFlowException(INVALD_FLOW_INPUT);
+		Map<String, Object> afterFlowMap = stateAfterFlow.getPopulatedFieldsAsMap();
+		for (String fieldName : editableFields) {
+			if (
+				afterFlowMap.containsKey(fieldName) &&
+				stateBeforeFlow.get(fieldName) != stateAfterFlow.get(fieldName)
+			) {
+				stateBeforeFlow.put(fieldName, stateAfterFlow.get(fieldName));
 			}
 		}
 	}
 
-	private void applyFlowValues(List<sObject> newList) {
-		Schema.SObjectType newRecordSObjectType = newList[0].getSObjectType();
-		List<String> editableFields = new List<String>();
-
-		if (sObjectToEditableFields.containsKey(newRecordSObjectType)) {
-			editableFields = sObjectToEditableFields.get(newRecordSObjectType);
-		} else {
-			editableFields = getEditableFields(newRecordSObjectType);
-			sObjectToEditableFields.put(newRecordSObjectType, editableFields);
-		}
-
+	private List<Map<String, Object>> getInterviewInputs(
+		List<SObject> newList,
+		List<SObject> oldList
+	) {
+		List<Map<String, Object>> result = new List<Map<String, Object>>();
 		for (Integer i = 0; i < newList.size(); i++) {
-			SObject recordInNewList = newList[i];
-			SObject recordAfterFlowIsComplete = FlowTriggerRecord.triggerActionFlowIdAndIndexToNewRecord.get(
-				this.identifier +
-				PIPE +
-				i
-			);
-			for (String fieldName : editableFields) {
-				if (
-					recordInNewList.get(fieldName) !=
-					recordAfterFlowIsComplete.get(fieldName)
-				) {
-					recordInNewList.put(
-						fieldName,
-						recordAfterFlowIsComplete.get(fieldName)
-					);
+			SObject oldRecord = oldList[i];
+			SObject newRecord = newList[i];
+			result.add(
+				new Map<String, Object>{
+					RECORD_PRIOR_VARIABLE => oldRecord,
+					RECORD_VARIABLE => newRecord
 				}
-			}
+			);
 		}
+		return result;
+	}
+
+	private List<Map<String, Object>> getInterviewInputs(
+		List<SObject> records,
+		String variableName
+	) {
+		List<Map<String, Object>> result = new List<Map<String, Object>>();
+		for (Integer i = 0; i < records.size(); i++) {
+			result.add(new Map<String, Object>{ variableName => records[i] });
+		}
+		return result;
 	}
 
 	private List<String> getEditableFields(
 		Schema.SObjectType newRecordSObjectType
 	) {
+		if (sObjectToEditableFields.containsKey(newRecordSObjectType)) {
+			return sObjectToEditableFields.get(newRecordSObjectType);
+		}
 		List<String> editableFields = new List<String>();
 		for (
 			Schema.SObjectField fieldRef : newRecordSObjectType
@@ -250,25 +234,23 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 				editableFields.add(fieldResult.getName());
 			}
 		}
-		return editableFields;
+		sObjectToEditableFields.put(newRecordSObjectType, editableFields);
+		return sObjectToEditableFields.get(newRecordSObjectType);
 	}
 
-	private FlowTriggerRecord getFlowTriggerRecord() {
-		FlowTriggerRecord result;
-		if (flowTriggerRecordClassName == null) {
-			throw new TriggerActionFlowException(
-				flowTriggerRecordClassName + INVALID_FLOW_TRIGGER_RECORD_CLASS
-			);
+	private void handleInvocableActionResults(
+		List<Invocable.Action.Result> results,
+		List<SObject> newList
+	) {
+		List<String> editableFields = newList.isEmpty()
+			? new List<String>()
+			: getEditableFields(newList[0].getSObjectType());
+		for (Integer i = 0; i < results.size(); i++) {
+			Invocable.Action.Result result = results[i];
+			SObject newRecordWhenFlowIsComplete = (SObject) (result.getOutputParameters()
+				.get(RECORD_VARIABLE));
+			applyFlowValues(newList[i], newRecordWhenFlowIsComplete, editableFields);
 		}
-		try {
-			result = (FlowTriggerRecord) Type.forName(flowTriggerRecordClassName)
-				.newInstance();
-		} catch (Exception e) {
-			throw new TriggerActionFlowException(
-				flowTriggerRecordClassName + INVALID_FLOW_TRIGGER_RECORD_CLASS
-			);
-		}
-		return result;
 	}
 
 	@TestVisible

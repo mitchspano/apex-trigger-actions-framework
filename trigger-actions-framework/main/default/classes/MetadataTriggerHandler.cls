@@ -193,11 +193,6 @@ public inherited sharing class MetadataTriggerHandler extends TriggerBase implem
 						.flowName = triggerMetadata.Flow_Name__c;
 					((TriggerActionFlow) triggerAction)
 						.allowRecursion = triggerMetadata.Allow_Flow_Recursion__c;
-					((TriggerActionFlow) triggerAction)
-						.flowTriggerRecordClassName = ((sObject_Trigger_Setting__mdt) triggerMetadata.getSObject(
-							context.name() + '__r'
-						))
-						.FlowTriggerRecord_Class_Name__c;
 				}
 			} catch (System.NullPointerException e) {
 				handleException(
