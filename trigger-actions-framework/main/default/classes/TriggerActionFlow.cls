@@ -61,7 +61,9 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 
 		List<Invocable.Action.Result> results = action.invoke();
 
-		handleInvocableActionResults(results, newList);
+		handleInvocableResults(results, newList);
+
+		applyFieldValuesDuringBefore(results, newList);
 	}
 
 	public void afterInsert(List<SObject> newList) {
@@ -73,6 +75,8 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 		action.setInvocations(getInterviewInputs(newList, RECORD_VARIABLE));
 
 		List<Invocable.Action.Result> results = action.invoke();
+
+		handleInvocableResults(results, newList);
 	}
 
 	public void beforeUpdate(List<SObject> newList, List<SObject> oldList) {
@@ -99,7 +103,9 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 
 		List<Invocable.Action.Result> results = action.invoke();
 
-		handleInvocableActionResults(results, recordsNotYetProcessed);
+		handleInvocableResults(results, recordsNotYetProcessed);
+
+		applyFieldValuesDuringBefore(results, recordsNotYetProcessed);
 	}
 
 	public void afterUpdate(List<SObject> newList, List<SObject> oldList) {
@@ -125,6 +131,8 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 		);
 
 		List<Invocable.Action.Result> results = action.invoke();
+
+		handleInvocableResults(results, recordsNotYetProcessed);
 	}
 
 	public void beforeDelete(List<SObject> oldList) {
@@ -136,6 +144,8 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 		action.setInvocations(getInterviewInputs(oldList, RECORD_PRIOR_VARIABLE));
 
 		List<Invocable.Action.Result> results = action.invoke();
+
+		handleInvocableResults(results, oldList);
 	}
 
 	public void afterDelete(List<SObject> oldList) {
@@ -147,6 +157,8 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 		action.setInvocations(getInterviewInputs(oldList, RECORD_PRIOR_VARIABLE));
 
 		List<Invocable.Action.Result> results = action.invoke();
+
+		handleInvocableResults(results, oldList);
 	}
 
 	public void afterUndelete(List<SObject> newList) {
@@ -158,6 +170,8 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 		action.setInvocations(getInterviewInputs(newList, RECORD_VARIABLE));
 
 		List<Invocable.Action.Result> results = action.invoke();
+
+		handleInvocableResults(results, newList);
 	}
 
 	private Boolean thisFlowIsBypassed() {
@@ -238,19 +252,51 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 		return sObjectToEditableFields.get(newRecordSObjectType);
 	}
 
-	private void handleInvocableActionResults(
+	private void applyFieldValuesDuringBefore(
 		List<Invocable.Action.Result> results,
 		List<SObject> newList
 	) {
-		List<String> editableFields = newList.isEmpty()
-			? new List<String>()
-			: getEditableFields(newList[0].getSObjectType());
+		if (newList.isEmpty()) {
+			return;
+		}
+		List<String> editableFields = getEditableFields(
+			newList[0].getSObjectType()
+		);
 		for (Integer i = 0; i < results.size(); i++) {
 			Invocable.Action.Result result = results[i];
-			SObject newRecordWhenFlowIsComplete = (SObject) (result.getOutputParameters()
-				.get(RECORD_VARIABLE));
-			applyFlowValues(newList[i], newRecordWhenFlowIsComplete, editableFields);
+			if (result.isSuccess() == true) {
+				SObject newRecordWhenFlowIsComplete = (SObject) (result.getOutputParameters()
+					.get(RECORD_VARIABLE));
+				applyFlowValues(
+					newList[i],
+					newRecordWhenFlowIsComplete,
+					editableFields
+				);
+			}
 		}
+	}
+
+	private void handleInvocableResults(
+		List<Invocable.Action.Result> results,
+		List<SObject> records
+	) {
+		if (records.isEmpty()) {
+			return;
+		}
+		for (Integer i = 0; i < results.size(); i++) {
+			Invocable.Action.Result result = results[i];
+			if (result.isSuccess() == false) {
+				records[i].addError(getFormattedErrorMessage(result.getErrors()));
+			}
+		}
+	}
+
+	private String getFormattedErrorMessage(List<Invocable.Action.Error> errors) {
+		List<String> messagesAndCodes = new List<String>();
+		for (Invocable.Action.Error error : errors) {
+			messagesAndCodes.add(error.getCode() + ' - ' + error.getMessage());
+		}
+		return String.join(messagesAndCodes, ', ');
 	}
 
 	@TestVisible
