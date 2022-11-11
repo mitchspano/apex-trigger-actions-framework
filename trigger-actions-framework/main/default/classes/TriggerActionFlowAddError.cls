@@ -29,11 +29,12 @@ public inherited sharing class TriggerActionFlowAddError {
 		description='Adds an error to an sObject'
 	)
 	public static void addError(List<Request> requests) {
-		if (!String.isBlank(requests[0].fieldName)) {
-			requests[0]
-				.record.addError(requests[0].fieldName, requests[0].errorMessage);
-		} else {
-			requests[0].record.addError(requests[0].errorMessage);
+		for (Request myRequest : requests) {
+			if (!String.isBlank(myRequest.fieldName)) {
+				myRequest.record.addError(myRequest.fieldName, myRequest.errorMessage);
+			} else {
+				myRequest.record.addError(myRequest.errorMessage);
+			}
 		}
 	}
 

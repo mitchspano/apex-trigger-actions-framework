@@ -103,7 +103,7 @@ The trigger actions framework can also allow you to invoke a flow by name, and d
 
 ### Define a Flow
 
-To make your flows usable, they must be auto-launched flows and you need to create the following flow resource variables which are applicable for the trigger context:
+To make your flows usable, they must be auto-launched flows and you need to create the following flow resource variables:
 
 | Variable Name | Variable Type | Available for Input | Available for Output | Description                                        | Available Contexts       |
 | ------------- | ------------- | ------------------- | -------------------- | -------------------------------------------------- | ------------------------ |
