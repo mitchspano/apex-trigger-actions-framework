@@ -4,6 +4,12 @@
   <img src="https://raw.githubusercontent.com/afawcett/githubsfdeploy/master/src/main/webapp/resources/img/deploy.png" alt="Deploy to Salesforce" />
 </a>
 
+#### [Unlocked Package Installation (Production)](https://login.salesforce.com/packaging/installPackage.apexp?p0=04t3h000004VaHaAAK)
+
+#### [Unlocked Package Installation (Sandbox)](https://test.salesforce.com/packaging/installPackage.apexp?p0=04t3h000004VaHaAAK)
+
+---
+
 This project is meant to demonstrate an Apex Trigger Framework which is built with the following goals in mind:
 
 1. Single Trigger per sObject
