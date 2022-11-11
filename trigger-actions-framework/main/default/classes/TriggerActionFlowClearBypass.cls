@@ -29,19 +29,21 @@ public inherited sharing class TriggerActionFlowClearBypass {
 		description='Sets the static bypass to false for this object, apex action, or flow action.'
 	)
 	public static void clearBypass(List<Request> requests) {
-		if (!TriggerActionFlow.REQUEST_TYPES.contains(requests[0].bypassType)) {
-			throw new TriggerActionFlowClearBypassObjectException(
-				TriggerActionFlow.INVALID_TYPE
-			);
-		}
-		if (requests[0].bypassType == TriggerActionFlow.OBJECT_STRING) {
-			TriggerBase.clearBypass(requests[0].name);
-		}
-		if (requests[0].bypassType == TriggerActionFlow.APEX_STRING) {
-			MetadataTriggerHandler.clearBypass(requests[0].name);
-		}
-		if (requests[0].bypassType == TriggerActionFlow.FLOW_STRING) {
-			TriggerActionFlow.clearBypass(requests[0].name);
+		for (Request myRequest : requests) {
+			if (!TriggerActionFlow.REQUEST_TYPES.contains(myRequest.bypassType)) {
+				throw new TriggerActionFlowClearBypassObjectException(
+					TriggerActionFlow.INVALID_TYPE
+				);
+			}
+			if (myRequest.bypassType == TriggerActionFlow.OBJECT_STRING) {
+				TriggerBase.clearBypass(myRequest.name);
+			}
+			if (myRequest.bypassType == TriggerActionFlow.APEX_STRING) {
+				MetadataTriggerHandler.clearBypass(myRequest.name);
+			}
+			if (myRequest.bypassType == TriggerActionFlow.FLOW_STRING) {
+				TriggerActionFlow.clearBypass(myRequest.name);
+			}
 		}
 	}
 
