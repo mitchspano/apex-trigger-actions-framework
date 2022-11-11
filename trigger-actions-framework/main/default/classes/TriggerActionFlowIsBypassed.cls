@@ -22,16 +22,12 @@ public inherited sharing class TriggerActionFlowIsBypassed {
 	)
 	public static List<Boolean> isBypassed(List<Request> requests) {
 		List<Boolean> results = new List<Boolean>();
-		for (Request current : requests) {
-			TriggerActionFlow.validateType(current.bypassType);
-			Boolean result = false;
-			if (current.bypassType == TriggerActionFlow.OBJECT_STRING) {
-				result = TriggerBase.isBypassed(current.name);
-			} else if (current.bypassType == TriggerActionFlow.APEX_STRING) {
-				result = MetadataTriggerHandler.isBypassed(current.name);
-			} else if (current.bypassType == TriggerActionFlow.FLOW_STRING) {
-				result = TriggerActionFlow.isBypassed(current.name);
-			}
+		TriggerActionFlowBypassProcessor bypassProcesser = new FlowIsBypassedProcesser();
+		for (Request myRequest : requests) {
+			Boolean result = bypassProcesser.hasActionBeenPerformed(
+				myRequest.bypassType,
+				myRequest.name
+			);
 			results.add(result);
 		}
 		return results;
@@ -42,5 +38,19 @@ public inherited sharing class TriggerActionFlowIsBypassed {
 		public String name;
 		@InvocableVariable
 		public String bypassType;
+	}
+
+	private class FlowIsBypassedProcesser extends TriggerActionFlowBypassProcessor {
+		protected override void processApexBypasses(String name) {
+			this.hasActionBeenPerformed = MetadataTriggerHandler.isBypassed(name);
+		}
+
+		protected override void processFlowBypasses(String name) {
+			this.hasActionBeenPerformed = TriggerActionFlow.isBypassed(name);
+		}
+
+		protected override void processObjectBypasses(String name) {
+			this.hasActionBeenPerformed = TriggerBase.isBypassed(name);
+		}
 	}
 }

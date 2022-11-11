@@ -15,19 +15,6 @@
  */
 
 public inherited sharing class TriggerActionFlow implements TriggerAction.BeforeInsert, TriggerAction.AfterInsert, TriggerAction.BeforeUpdate, TriggerAction.AfterUpdate, TriggerAction.BeforeDelete, TriggerAction.AfterDelete, TriggerAction.AfterUndelete {
-	public static final String APEX_STRING = 'Apex';
-	public static final String FLOW_STRING = 'Flow';
-	public static final String OBJECT_STRING = 'Object';
-	@TestVisible
-	private static final String INVALID_TYPE = 'The bypassType must equal Object, Apex, or Flow';
-	private static final String INVALID_FLOW_NAME = 'You must provide the name of a flow to execute';
-	private static final String RECORD_PRIOR_VARIABLE = 'recordPrior';
-	private static final String RECORD_VARIABLE = 'record';
-	private static final Set<String> REQUEST_TYPES = new Set<String>{
-		OBJECT_STRING,
-		APEX_STRING,
-		FLOW_STRING
-	};
 	@TestVisible
 	private static Set<String> bypassedFlows = new Set<String>();
 	private static Map<Schema.SObjectType, List<String>> sObjectToEditableFields = new Map<Schema.SObjectType, List<String>>();
@@ -52,8 +39,8 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 	}
 
 	public static void validateType(String bypassType) {
-		if (!TriggerActionFlow.REQUEST_TYPES.contains(bypassType)) {
-			throw new IllegalArgumentException(TriggerActionFlow.INVALID_TYPE);
+		if (!TriggerActionConstants.REQUEST_TYPES.contains(bypassType)) {
+			throw new IllegalArgumentException(TriggerActionConstants.INVALID_TYPE);
 		}
 	}
 
@@ -62,7 +49,7 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 			return;
 		}
 		List<Invocable.Action.Result> results = invokeAction(
-			getInterviewInputs(newList, RECORD_VARIABLE)
+			getInterviewInputs(newList, TriggerActionConstants.RECORD_VARIABLE)
 		);
 		handleInvocableResults(results, newList);
 		applyFieldValuesDuringBefore(results, newList);
@@ -73,7 +60,9 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 			return;
 		}
 		handleInvocableResults(
-			invokeAction(getInterviewInputs(newList, RECORD_VARIABLE)),
+			invokeAction(
+				getInterviewInputs(newList, TriggerActionConstants.RECORD_VARIABLE)
+			),
 			newList
 		);
 	}
@@ -130,7 +119,12 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 			return;
 		}
 		handleInvocableResults(
-			invokeAction(getInterviewInputs(oldList, RECORD_PRIOR_VARIABLE)),
+			invokeAction(
+				getInterviewInputs(
+					oldList,
+					TriggerActionConstants.RECORD_PRIOR_VARIABLE
+				)
+			),
 			oldList
 		);
 	}
@@ -140,7 +134,12 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 			return;
 		}
 		handleInvocableResults(
-			invokeAction(getInterviewInputs(oldList, RECORD_PRIOR_VARIABLE)),
+			invokeAction(
+				getInterviewInputs(
+					oldList,
+					TriggerActionConstants.RECORD_PRIOR_VARIABLE
+				)
+			),
 			oldList
 		);
 	}
@@ -150,14 +149,18 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 			return;
 		}
 		handleInvocableResults(
-			invokeAction(getInterviewInputs(newList, RECORD_VARIABLE)),
+			invokeAction(
+				getInterviewInputs(newList, TriggerActionConstants.RECORD_VARIABLE)
+			),
 			newList
 		);
 	}
 
 	private Boolean thisFlowIsBypassed() {
 		if (String.isBlank(flowName)) {
-			throw new IllegalArgumentException(INVALID_FLOW_NAME);
+			throw new IllegalArgumentException(
+				TriggerActionConstants.INVALID_FLOW_NAME
+			);
 		}
 		return TriggerActionFlow.isBypassed(flowName);
 	}
@@ -166,7 +169,7 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 		List<Map<String, Object>> inputs
 	) {
 		Invocable.Action action = Invocable.Action.createCustomAction(
-			FLOW_STRING,
+			TriggerActionConstants.FLOW_STRING,
 			this.flowName
 		);
 		action.setInvocations(inputs);
@@ -199,8 +202,8 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 			SObject newRecord = newList[i];
 			result.add(
 				new Map<String, Object>{
-					RECORD_PRIOR_VARIABLE => oldRecord,
-					RECORD_VARIABLE => newRecord
+					TriggerActionConstants.RECORD_PRIOR_VARIABLE => oldRecord,
+					TriggerActionConstants.RECORD_VARIABLE => newRecord
 				}
 			);
 		}
@@ -254,7 +257,7 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 			Invocable.Action.Result result = results[i];
 			if (result.isSuccess() == true) {
 				SObject newRecordWhenFlowIsComplete = (SObject) (result.getOutputParameters()
-					.get(RECORD_VARIABLE));
+					.get(TriggerActionConstants.RECORD_VARIABLE));
 				applyFlowValues(
 					newList[i],
 					newRecordWhenFlowIsComplete,
