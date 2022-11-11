@@ -82,32 +82,6 @@ private class TriggerActionFlowIsBypassedTest {
 	}
 
 	@IsTest
-	private static void isBypassedShouldFailWithInvalidRequest() {
-		try {
-			List<Boolean> isBypassed = TriggerActionFlowIsBypassed.isBypassed(
-				new List<TriggerActionFlowIsBypassed.Request>()
-			);
-		} catch (Exception e) {
-			myException = e;
-		}
-
-		System.assertNotEquals(
-			null,
-			myException,
-			'We should have an exception thrown in this scenario'
-		);
-		System.assert(
-			myException instanceof TriggerActionFlowIsBypassed.TriggerActionFlowIsBypassedObjectException,
-			'The exception should be of the correct type'
-		);
-		System.assertEquals(
-			myException.getMessage(),
-			TriggerActionFlowIsBypassed.INVALID_REQUEST,
-			'The exeption should contain the message we are looking for'
-		);
-	}
-
-	@IsTest
 	private static void isBypassedShouldFailWithInvalidType() {
 		request.Name = MY_STRING;
 		request.bypassType = MY_STRING;

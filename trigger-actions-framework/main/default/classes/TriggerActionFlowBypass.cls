@@ -29,22 +29,21 @@ public inherited sharing class TriggerActionFlowBypass {
 		description='Sets the static bypass to true for this object, apex action, or flow action.'
 	)
 	public static void bypass(List<Request> requests) {
-		if (requests.size() != 1) {
-			throw new TriggerActionFlowBypassObjectException(INVALID_REQUEST);
-		}
-		if (!TriggerActionFlow.REQUEST_TYPES.contains(requests[0].bypassType)) {
-			throw new TriggerActionFlowBypassObjectException(
-				TriggerActionFlow.INVALID_TYPE
-			);
-		}
-		if (requests[0].bypassType == TriggerActionFlow.OBJECT_STRING) {
-			TriggerBase.bypass(requests[0].name);
-		}
-		if (requests[0].bypassType == TriggerActionFlow.APEX_STRING) {
-			MetadataTriggerHandler.bypass(requests[0].name);
-		}
-		if (requests[0].bypassType == TriggerActionFlow.FLOW_STRING) {
-			TriggerActionFlow.bypass(requests[0].name);
+		for (Request myRequest : requests) {
+			if (!TriggerActionFlow.REQUEST_TYPES.contains(myRequest.bypassType)) {
+				throw new TriggerActionFlowBypassObjectException(
+					TriggerActionFlow.INVALID_TYPE
+				);
+			}
+			if (myRequest.bypassType == TriggerActionFlow.OBJECT_STRING) {
+				TriggerBase.bypass(myRequest.name);
+			}
+			if (myRequest.bypassType == TriggerActionFlow.APEX_STRING) {
+				MetadataTriggerHandler.bypass(myRequest.name);
+			}
+			if (myRequest.bypassType == TriggerActionFlow.FLOW_STRING) {
+				TriggerActionFlow.bypass(myRequest.name);
+			}
 		}
 	}
 

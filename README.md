@@ -97,85 +97,18 @@ With this multiplicity of Apex classes, it would be wise to follow a naming conv
 
 ## Support for Flows
 
-The trigger actions framework can also allow you to invoke a flow by name, and determine the order of the flow's execution amongst other trigger actions in a given trigger context. Here is an example of a trigger action flow that checks if a record's status has changed and if so it sets the record's description to a default value.
+The trigger actions framework can also allow you to invoke a flow by name, and determine the order of the flow's execution amongst other trigger actions in a given trigger context. Here is an example of a trigger action flow that checks if a record's name has changed and if so it sets the record's description to a default value.
 
 ![Sample Flow](images/sampleFlow.png)
 
-### Enable Flows for an sObject
-
-To enable Trigger Action Flows on a given sObject, you must first author a class which creates an Apex defined data type to be referenced in flows and can generate the required input to launch the flow from a trigger context. This class must extend `FlowTriggerRecord`, provide @AuraEnabled properties for interacting with the old and new versions of the records within flow, and support a zero-argument constructor.
-
-```java
-public with sharing class OpportunityTriggerRecord extends FlowTriggerRecord {
-
-  public OpportunityTriggerRecord() {
-    super();
-  }
-
-  public OpportunityTriggerRecord(
-    Opportunity newRecord,
-    Opportunity oldRecord,
-    Integer newRecordIndex,
-    Integer triggerActionFlowIdentifier
-  ) {
-    super(newRecord, oldRecord, newRecordIndex, triggerActionFlowIdentifier);
-  }
-
-  @AuraEnabled
-  public Opportunity newRecord {
-    get {
-      return (Opportunity) this.newSObject;
-    }
-    set {
-      this.newSObject = value;
-    }
-  }
-
-  @AuraEnabled
-  public Opportunity oldRecord {
-    get {
-      return (Opportunity) this.oldSObject;
-    }
-  }
-
-  public override Map<String, Object> getFlowInput(
-    List<SObject> newList,
-    List<SObject> oldList,
-    Integer triggerActionFlowIdentifier
-  ) {
-    List<SObject> collection = newList != null ? newList : oldList;
-    List<OpportunityTriggerRecord> triggerRecords = new List<OpportunityTriggerRecord>();
-    for (Integer i = 0; i < collection.size(); i++) {
-      Opportunity newRecord = newList != null ? (Opportunity) newList.get(i) : null;
-      Opportunity oldRecord = oldList != null ? (Opportunity) oldList.get(i) : null;
-      triggerRecords.add(
-        new OpportunityTriggerRecord(
-          newRecord,
-          oldRecord,
-          i,
-          triggerActionFlowIdentifier
-        )
-      );
-    }
-    return new Map<String, Object>{
-      TriggerActionFlow.TRIGGER_RECORDS_VARIABLE => triggerRecords
-    };
-  }
-}
-```
-
-Once this class is defined, the name of the class must be specified on the `SObject_Trigger_Setting` custom
-metadata type row for the given sObject in the `FlowTriggerRecord_Class_Name__c` field:
-
-![Set FlowTriggerRecord Class Name](images/flowTriggerRecordName.png)
-
 ### Define a Flow
 
-To make your flows usable, they must be auto-launched flows and you need to create the following flow resource variable:
+To make your flows usable, they must be auto-launched flows and you need to create the following flow resource variables:
 
-| Variable Name  | Variable Type                                                            | Available for Input | Available for Output | Description                                           |
-| -------------- | ------------------------------------------------------------------------ | ------------------- | -------------------- | ----------------------------------------------------- |
-| triggerRecords | Variable Collection of Apex Defined Type which extends FlowTriggerRecord | yes                 | no                   | Used to store the Trigger.new and Trigger.old records |
+| Variable Name | Variable Type | Available for Input | Available for Output | Description                                        | Available Contexts       |
+| ------------- | ------------- | ------------------- | -------------------- | -------------------------------------------------- | ------------------------ |
+| record        | record        | yes                 | yes                  | the new version of the record in the DML operation | insert, update, undelete |
+| recordPrior   | record        | yes                 | no                   | the old version of the record in the DML operation | update, delete           |
 
 To enable this flow, simply insert a trigger action record with Apex Class Name equal to `TriggerActionFlow` and set the Flow Name field with the API name of the flow itself. You can select the `Allow_Flow_Recursion__c` checkbox to allow flows to run recursively (advanced).
 
