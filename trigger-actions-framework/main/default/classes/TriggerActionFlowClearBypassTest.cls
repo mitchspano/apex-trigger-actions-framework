@@ -14,7 +14,7 @@
    limitations under the License.
  */
 
-@isTest
+@IsTest
 private class TriggerActionFlowClearBypassTest {
 	private static final String MY_STRING = 'MY_STRING';
 	private static List<TriggerActionFlowClearBypass.Request> requests = new List<TriggerActionFlowClearBypass.Request>();
@@ -87,7 +87,7 @@ private class TriggerActionFlowClearBypassTest {
 			'We should have an exception thrown in this scenario'
 		);
 		System.assert(
-			myException instanceof TriggerActionFlowClearBypass.TriggerActionFlowClearBypassObjectException,
+			myException instanceof IllegalArgumentException,
 			'The exception should be of the correct type'
 		);
 		System.assertEquals(

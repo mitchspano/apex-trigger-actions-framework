@@ -15,14 +15,6 @@
  */
 
 public inherited sharing class TriggerActionFlowAddError {
-	@TestVisible
-	private static final String CLASS_NAME = 'TriggerActionFlowAddError';
-	@TestVisible
-	private static final String INVALID_REQUEST = String.format(
-		TriggerActionFlow.INVALID_BYPASS_REQUEST,
-		new List<String>{ CLASS_NAME }
-	);
-
 	@InvocableMethod(
 		category='Trigger Action Flow'
 		label='Add Error'

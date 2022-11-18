@@ -13,36 +13,22 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-
+@SuppressWarnings('PMD.CognitiveComplexity')
 public inherited sharing class TriggerActionFlowBypass {
-	@TestVisible
-	private static final String CLASS_NAME = 'TriggerActionFlowBypass';
-	@TestVisible
-	private static final String INVALID_REQUEST = String.format(
-		TriggerActionFlow.INVALID_BYPASS_REQUEST,
-		new List<String>{ CLASS_NAME }
-	);
-
 	@InvocableMethod(
 		category='Trigger Action Flow'
 		label='Bypass'
 		description='Sets the static bypass to true for this object, apex action, or flow action.'
 	)
 	public static void bypass(List<Request> requests) {
-		for (Request myRequest : requests) {
-			if (!TriggerActionFlow.REQUEST_TYPES.contains(myRequest.bypassType)) {
-				throw new TriggerActionFlowBypassObjectException(
-					TriggerActionFlow.INVALID_TYPE
-				);
-			}
-			if (myRequest.bypassType == TriggerActionFlow.OBJECT_STRING) {
-				TriggerBase.bypass(myRequest.name);
-			}
-			if (myRequest.bypassType == TriggerActionFlow.APEX_STRING) {
-				MetadataTriggerHandler.bypass(myRequest.name);
-			}
-			if (myRequest.bypassType == TriggerActionFlow.FLOW_STRING) {
-				TriggerActionFlow.bypass(myRequest.name);
+		for (Request current : requests) {
+			TriggerActionFlow.validateType(current.bypassType);
+			if (current.bypassType == TriggerActionFlow.OBJECT_STRING) {
+				TriggerBase.bypass(current.name);
+			} else if (current.bypassType == TriggerActionFlow.APEX_STRING) {
+				MetadataTriggerHandler.bypass(current.name);
+			} else if (current.bypassType == TriggerActionFlow.FLOW_STRING) {
+				TriggerActionFlow.bypass(current.name);
 			}
 		}
 	}
@@ -60,8 +46,5 @@ public inherited sharing class TriggerActionFlowBypass {
 			required=true
 		)
 		public String bypassType;
-	}
-
-	public class TriggerActionFlowBypassObjectException extends Exception {
 	}
 }

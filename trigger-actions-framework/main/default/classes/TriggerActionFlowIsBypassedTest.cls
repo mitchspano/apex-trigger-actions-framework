@@ -14,7 +14,7 @@
    limitations under the License.
  */
 
-@isTest
+@IsTest
 private class TriggerActionFlowIsBypassedTest {
 	private static final String MY_STRING = 'MY_STRING';
 	private static List<TriggerActionFlowIsBypassed.Request> requests = new List<TriggerActionFlowIsBypassed.Request>();
@@ -101,7 +101,7 @@ private class TriggerActionFlowIsBypassedTest {
 			'We should have an exception thrown in this scenario'
 		);
 		System.assert(
-			myException instanceof TriggerActionFlowIsBypassed.TriggerActionFlowIsBypassedObjectException,
+			myException instanceof IllegalArgumentException,
 			'The exception should be of the correct type'
 		);
 		System.assertEquals(
