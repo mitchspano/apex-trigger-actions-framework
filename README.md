@@ -4,9 +4,9 @@
   <img src="https://raw.githubusercontent.com/afawcett/githubsfdeploy/master/src/main/webapp/resources/img/deploy.png" alt="Deploy to Salesforce" />
 </a>
 
-#### [Unlocked Package Installation (Production)](https://login.salesforce.com/packaging/installPackage.apexp?p0=04t3h000004VaHaAAK)
+#### [Unlocked Package Installation (Production)](https://login.salesforce.com/packaging/installPackage.apexp?p0=04t3h000004VaIdAAK)
 
-#### [Unlocked Package Installation (Sandbox)](https://test.salesforce.com/packaging/installPackage.apexp?p0=04t3h000004VaHaAAK)
+#### [Unlocked Package Installation (Sandbox)](https://test.salesforce.com/packaging/installPackage.apexp?p0=04t3h000004VaIdAAK)
 
 ---
 
@@ -18,7 +18,7 @@ This project is meant to demonstrate an Apex Trigger Framework which is built wi
 4. Easy to Migrate Existing Code
 5. Simple Unit Testing
 6. Configuration from Setup Menu
-7. Adherance to SOLID Principles
+7. Adherence to SOLID Principles
 
 ---
 
@@ -232,7 +232,7 @@ Developers can enter the API name of a permission in the `Bypass_Permission__c` 
 
 #### Required Permission
 
-Developers can enter the API name of a permission in the `Required_Permission__c` field. If this field has a value, then the trigger/action will only exectute if the running user has the custom permission identified. This can be allow for new functionality to be released to a subset of users.
+Developers can enter the API name of a permission in the `Required_Permission__c` field. If this field has a value, then the trigger/action will only execute if the running user has the custom permission identified. This can be allow for new functionality to be released to a subset of users.
 
 ---
 
@@ -319,11 +319,11 @@ This will help the transition process if you are migrating an existing Salesforc
 
 ## DML-Less Trigger Testing
 
-Peforming DML operations is extremely computationally intensive and can really slow down the speed of your unit tests. We want to avoid this at all costs. Traditionally, this has not been possible with existing Apex Trigger frameworks, but this Trigger Action approach makes it much easier. Included in this project is a `TestUtility` class which allows us to generate fake record Ids.
+Performing DML operations is extremely computationally intensive and can really slow down the speed of your unit tests. We want to avoid this at all costs. Traditionally, this has not been possible with existing Apex Trigger frameworks, but this Trigger Action approach makes it much easier. Included in this project is a `TriggerTestUtility` class which allows us to generate fake record Ids.
 
 ```java
 @IsTest
-public class TestUtility {
+public class TriggerTestUtility {
   static Integer myNumber = 1;
 
   public static Id getFakeId(Schema.SObjectType sObjectType) {
@@ -345,7 +345,7 @@ private static void beforeUpdateTest() {
   List<Opportunity> newList = new List<Opportunity>();
   List<Opportunity> oldList = new List<Opportunity>();
   //generate fake Id
-  Id myRecordId = TestUtility.getFakeId(Opportunity.SObjectType);
+  Id myRecordId = TriggerTestUtility.getFakeId(Opportunity.SObjectType);
   newList.add(
     new Opportunity(
       Id = myRecordId,

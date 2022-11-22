@@ -22,7 +22,7 @@ public class TriggerActionFlowTest {
 	private static final String SAMPLE_FLOW_NAME = 'TriggerActionFlowTest';
 	private static Account myAccount = new Account(
 		Name = MY_ACCOUNT,
-		Id = TestUtility.getFakeId(Schema.Account.SObjectType)
+		Id = TriggerTestUtility.getFakeId(Schema.Account.SObjectType)
 	);
 	private static Account oldAccount = new Account(
 		Name = OLD_NAME,
