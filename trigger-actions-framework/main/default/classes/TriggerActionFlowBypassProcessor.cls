@@ -14,15 +14,8 @@
    limitations under the License.
  */
 public inherited sharing abstract class TriggerActionFlowBypassProcessor {
-	public static final Set<String> REQUEST_TYPES = new Set<String>{
-		TriggerActionConstants.APEX_STRING,
-		TriggerActionConstants.FLOW_STRING,
-		TriggerActionConstants.OBJECT_STRING
-	};
 
-	protected Boolean hasActionBeenPerformed = true;
-
-	public Boolean hasActionBeenPerformed(
+	public void execute(
 		String requestType,
 		String requestName
 	) {
@@ -35,7 +28,6 @@ public inherited sharing abstract class TriggerActionFlowBypassProcessor {
 		} else if (requestType == TriggerActionConstants.OBJECT_STRING) {
 			this.processObjectBypasses(requestName);
 		}
-		return this.hasActionBeenPerformed;
 	}
 
 	protected abstract void processApexBypasses(String requestType);

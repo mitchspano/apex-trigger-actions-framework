@@ -23,7 +23,7 @@ public inherited sharing class TriggerActionFlowClearAllBypasses {
 	public static void clearAllBypasses(List<String> requests) {
 		TriggerActionFlowBypassProcessor bypassProcessor = new ClearBypassesProcessor();
 		for (String myRequest : requests) {
-			bypassProcessor.hasActionBeenPerformed(myRequest, myRequest);
+			bypassProcessor.execute(myRequest, myRequest);
 		}
 	}
 

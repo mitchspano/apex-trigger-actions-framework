@@ -23,7 +23,7 @@ public inherited sharing class TriggerActionFlowBypass {
 	public static void bypass(List<Request> requests) {
 		TriggerActionFlowBypassProcessor bypassProcessor = new FlowBypassProcessor();
 		for (Request myRequest : requests) {
-			bypassProcessor.hasActionBeenPerformed(
+			bypassProcessor.execute(
 				myRequest.bypassType,
 				myRequest.name
 			);
