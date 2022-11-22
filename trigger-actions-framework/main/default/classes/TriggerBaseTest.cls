@@ -18,7 +18,7 @@
 private class TriggerBaseTest {
 	private static final String ACCOUNT = 'Account';
 	private static final Account MY_ACCOUNT = new Account(
-		Id = TestUtility.getFakeId(Schema.Account.SObjectType),
+		Id = TriggerTestUtility.getFakeId(Schema.Account.SObjectType),
 		Name = 'My Account'
 	);
 	private static BaseTest base = new BaseTest();

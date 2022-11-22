@@ -81,7 +81,7 @@ private class TriggerActionFlowClearAllBypassesTest {
 			'We should have an exception thrown in this scenario'
 		);
 		System.assert(
-			myException instanceof TriggerActionFlowClearAllBypasses.TriggerActionFlowClearAllBypassesObjectException,
+			myException instanceof IllegalArgumentException,
 			'The exception should be of the correct type'
 		);
 		System.assertEquals(

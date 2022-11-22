@@ -13,16 +13,8 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-
+@SuppressWarnings('PMD.CognitiveComplexity')
 public inherited sharing class TriggerActionFlowIsBypassed {
-	@TestVisible
-	private static final String CLASS_NAME = 'TriggerActionFlowIsBypassed';
-	@TestVisible
-	private static final String INVALID_REQUEST = String.format(
-		TriggerActionFlow.INVALID_BYPASS_REQUEST,
-		new List<String>{ CLASS_NAME }
-	);
-
 	@InvocableMethod(
 		category='Trigger Action Flow'
 		label='Is Bypassed'
@@ -30,21 +22,15 @@ public inherited sharing class TriggerActionFlowIsBypassed {
 	)
 	public static List<Boolean> isBypassed(List<Request> requests) {
 		List<Boolean> results = new List<Boolean>();
-		for (Request myRequest : requests) {
-			if (!TriggerActionFlow.REQUEST_TYPES.contains(myRequest.bypassType)) {
-				throw new TriggerActionFlowIsBypassedObjectException(
-					TriggerActionFlow.INVALID_TYPE
-				);
-			}
+		for (Request current : requests) {
+			TriggerActionFlow.validateType(current.bypassType);
 			Boolean result = false;
-			if (myRequest.bypassType == TriggerActionFlow.OBJECT_STRING) {
-				result = TriggerBase.isBypassed(myRequest.name);
-			}
-			if (myRequest.bypassType == TriggerActionFlow.APEX_STRING) {
-				result = MetadataTriggerHandler.isBypassed(myRequest.name);
-			}
-			if (myRequest.bypassType == TriggerActionFlow.FLOW_STRING) {
-				result = TriggerActionFlow.isBypassed(myRequest.name);
+			if (current.bypassType == TriggerActionFlow.OBJECT_STRING) {
+				result = TriggerBase.isBypassed(current.name);
+			} else if (current.bypassType == TriggerActionFlow.APEX_STRING) {
+				result = MetadataTriggerHandler.isBypassed(current.name);
+			} else if (current.bypassType == TriggerActionFlow.FLOW_STRING) {
+				result = TriggerActionFlow.isBypassed(current.name);
 			}
 			results.add(result);
 		}
@@ -56,8 +42,5 @@ public inherited sharing class TriggerActionFlowIsBypassed {
 		public String name;
 		@InvocableVariable
 		public String bypassType;
-	}
-
-	public class TriggerActionFlowIsBypassedObjectException extends Exception {
 	}
 }

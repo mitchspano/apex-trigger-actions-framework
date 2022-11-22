@@ -15,7 +15,7 @@
  */
 
 @IsTest
-public class TestUtility {
+public class TriggerTestUtility {
 	static Integer myNumber = 1;
 
 	public static Id getFakeId(Schema.SObjectType sObjectType) {

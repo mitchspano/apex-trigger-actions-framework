@@ -13,7 +13,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-
+@SuppressWarnings('PMD.CognitiveComplexity')
 public inherited sharing class MetadataTriggerHandler extends TriggerBase implements TriggerAction.BeforeInsert, TriggerAction.AfterInsert, TriggerAction.BeforeUpdate, TriggerAction.AfterUpdate, TriggerAction.BeforeDelete, TriggerAction.AfterDelete, TriggerAction.AfterUndelete {
 	@TestVisible
 	private static final String INVALID_TYPE_ERROR = 'Please check the Trigger Action Custom Metadata for the {1} context on the {2} sObject. The {0} class does not implement the Trigger Action interface specified for the {1} context.';
@@ -79,8 +79,7 @@ public inherited sharing class MetadataTriggerHandler extends TriggerBase implem
 				'Required_Permission__c,',
 				'Allow_Flow_Recursion__c,',
 				'{0}__r.Bypass_Permission__c,',
-				'{0}__r.Required_Permission__c,',
-				'{0}__r.FlowTriggerRecord_Class_Name__c',
+				'{0}__r.Required_Permission__c',
 				'FROM Trigger_Action__mdt',
 				'WHERE',
 				'{0}__c != NULL',

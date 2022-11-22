@@ -31,11 +31,13 @@ private class MetadataTriggerHandlerTest {
 
 	private static Account myAccount = new Account(
 		Name = MY_ACCOUNT,
-		Id = TestUtility.getFakeId(Schema.Account.SObjectType)
+		Id = TriggerTestUtility.getFakeId(Schema.Account.SObjectType)
 	);
 	private static sObject_Trigger_Setting__mdt setting = new sObject_Trigger_Setting__mdt(
 		Object_API_Name__c = ACCOUNT,
-		Id = TestUtility.getFakeId(Schema.sObject_Trigger_Setting__mdt.SObjectType)
+		Id = TriggerTestUtility.getFakeId(
+			Schema.sObject_Trigger_Setting__mdt.SObjectType
+		)
 	);
 	private static MetadataTriggerHandler handler = new MetadataTriggerHandler();
 	private static Boolean executed = false;

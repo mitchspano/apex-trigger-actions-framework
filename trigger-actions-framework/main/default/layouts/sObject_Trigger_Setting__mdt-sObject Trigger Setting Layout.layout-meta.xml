@@ -41,10 +41,6 @@
                 <behavior>Edit</behavior>
                 <field>Object_Namespace__c</field>
             </layoutItems>
-            <layoutItems>
-                <behavior>Edit</behavior>
-                <field>FlowTriggerRecord_Class_Name__c</field>
-            </layoutItems>
         </layoutColumns>
         <layoutColumns>
             <layoutItems>
