@@ -23,7 +23,7 @@ private class TriggerActionFlowClearAllBypassesTest {
 		TriggerBase.bypass(MY_STRING);
 
 		TriggerActionFlowClearAllBypasses.clearAllBypasses(
-			new List<String>{ TriggerActionFlow.OBJECT_STRING }
+			new List<String>{ TriggerActionConstants.OBJECT_STRING }
 		);
 
 		System.assertEquals(
@@ -38,7 +38,7 @@ private class TriggerActionFlowClearAllBypassesTest {
 		MetadataTriggerHandler.bypass(MY_STRING);
 
 		TriggerActionFlowClearAllBypasses.clearAllBypasses(
-			new List<String>{ TriggerActionFlow.APEX_STRING }
+			new List<String>{ TriggerActionConstants.APEX_STRING }
 		);
 
 		System.assertEquals(
@@ -53,7 +53,7 @@ private class TriggerActionFlowClearAllBypassesTest {
 		TriggerActionFlow.bypass(MY_STRING);
 
 		TriggerActionFlowClearAllBypasses.clearAllBypasses(
-			new List<String>{ TriggerActionFlow.FLOW_STRING }
+			new List<String>{ TriggerActionConstants.FLOW_STRING }
 		);
 
 		System.assertEquals(
@@ -80,13 +80,14 @@ private class TriggerActionFlowClearAllBypassesTest {
 			myException,
 			'We should have an exception thrown in this scenario'
 		);
-		System.assert(
-			myException instanceof IllegalArgumentException,
+		Assert.isInstanceOfType(
+			myException,
+			IllegalArgumentException.class,
 			'The exception should be of the correct type'
 		);
 		System.assertEquals(
 			myException.getMessage(),
-			TriggerActionFlow.INVALID_TYPE,
+			TriggerActionConstants.INVALID_TYPE,
 			'The exeption should contain the message we are looking for'
 		);
 	}

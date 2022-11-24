@@ -21,15 +21,12 @@ public inherited sharing class TriggerActionFlowBypass {
 		description='Sets the static bypass to true for this object, apex action, or flow action.'
 	)
 	public static void bypass(List<Request> requests) {
-		for (Request current : requests) {
-			TriggerActionFlow.validateType(current.bypassType);
-			if (current.bypassType == TriggerActionFlow.OBJECT_STRING) {
-				TriggerBase.bypass(current.name);
-			} else if (current.bypassType == TriggerActionFlow.APEX_STRING) {
-				MetadataTriggerHandler.bypass(current.name);
-			} else if (current.bypassType == TriggerActionFlow.FLOW_STRING) {
-				TriggerActionFlow.bypass(current.name);
-			}
+		TriggerActionFlowBypassProcessor bypassProcessor = new FlowBypassProcessor();
+		for (Request myRequest : requests) {
+			bypassProcessor.execute(
+				myRequest.bypassType,
+				myRequest.name
+			);
 		}
 	}
 
@@ -46,5 +43,19 @@ public inherited sharing class TriggerActionFlowBypass {
 			required=true
 		)
 		public String bypassType;
+	}
+
+	private class FlowBypassProcessor extends TriggerActionFlowBypassProcessor {
+		protected override void processApexBypasses(String name) {
+			MetadataTriggerHandler.bypass(name);
+		}
+
+		protected override void processFlowBypasses(String name) {
+			TriggerActionFlow.bypass(name);
+		}
+
+		protected override void processObjectBypasses(String name) {
+			TriggerBase.bypass(name);
+		}
 	}
 }

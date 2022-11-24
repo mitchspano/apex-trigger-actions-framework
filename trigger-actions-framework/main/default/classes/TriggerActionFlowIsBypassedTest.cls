@@ -24,7 +24,7 @@ private class TriggerActionFlowIsBypassedTest {
 	@IsTest
 	private static void isBypassedObjectShouldSucceedWithValidRequest() {
 		request.Name = MY_STRING;
-		request.bypassType = TriggerActionFlow.OBJECT_STRING;
+		request.bypassType = TriggerActionConstants.OBJECT_STRING;
 		requests.add(request);
 
 		List<Boolean> isBypassed = TriggerActionFlowIsBypassed.isBypassed(requests);
@@ -44,7 +44,7 @@ private class TriggerActionFlowIsBypassedTest {
 	@IsTest
 	private static void isBypassedApexShouldSucceedWithValidRequest() {
 		request.Name = MY_STRING;
-		request.bypassType = TriggerActionFlow.APEX_STRING;
+		request.bypassType = TriggerActionConstants.APEX_STRING;
 		requests.add(request);
 
 		List<Boolean> isBypassed = TriggerActionFlowIsBypassed.isBypassed(requests);
@@ -64,7 +64,7 @@ private class TriggerActionFlowIsBypassedTest {
 	@IsTest
 	private static void isBypassedFlowShouldSucceedWithValidRequest() {
 		request.Name = MY_STRING;
-		request.bypassType = TriggerActionFlow.FLOW_STRING;
+		request.bypassType = TriggerActionConstants.FLOW_STRING;
 		requests.add(request);
 
 		List<Boolean> isBypassed = TriggerActionFlowIsBypassed.isBypassed(requests);
@@ -100,13 +100,14 @@ private class TriggerActionFlowIsBypassedTest {
 			myException,
 			'We should have an exception thrown in this scenario'
 		);
-		System.assert(
-			myException instanceof IllegalArgumentException,
+		Assert.isInstanceOfType(
+			myException,
+			IllegalArgumentException.class,
 			'The exception should be of the correct type'
 		);
 		System.assertEquals(
 			myException.getMessage(),
-			TriggerActionFlow.INVALID_TYPE,
+			TriggerActionConstants.INVALID_TYPE,
 			'The exeption should contain the message we are looking for'
 		);
 	}

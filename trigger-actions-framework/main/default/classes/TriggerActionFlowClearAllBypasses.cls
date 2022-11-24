@@ -21,15 +21,23 @@ public inherited sharing class TriggerActionFlowClearAllBypasses {
 		description='Sets the static bypass to false for all objects, apex actions, or flow actions.'
 	)
 	public static void clearAllBypasses(List<String> requests) {
-		for (String current : requests) {
-			TriggerActionFlow.validateType(current);
-			if (current == TriggerActionFlow.OBJECT_STRING) {
-				TriggerBase.clearAllBypasses();
-			} else if (current == TriggerActionFlow.APEX_STRING) {
-				MetadataTriggerHandler.clearAllBypasses();
-			} else if (current == TriggerActionFlow.FLOW_STRING) {
-				TriggerActionFlow.clearAllBypasses();
-			}
+		TriggerActionFlowBypassProcessor bypassProcessor = new ClearBypassesProcessor();
+		for (String myRequest : requests) {
+			bypassProcessor.execute(myRequest, myRequest);
+		}
+	}
+
+	private class ClearBypassesProcessor extends TriggerActionFlowBypassProcessor {
+		protected override void processApexBypasses(String name) {
+			MetadataTriggerHandler.clearAllBypasses();
+		}
+
+		protected override void processFlowBypasses(String name) {
+			TriggerActionFlow.clearAllBypasses();
+		}
+
+		protected override void processObjectBypasses(String name) {
+			TriggerBase.clearAllBypasses();
 		}
 	}
 }
