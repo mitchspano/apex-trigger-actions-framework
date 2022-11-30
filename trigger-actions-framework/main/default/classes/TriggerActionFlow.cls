@@ -178,15 +178,11 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 
 	private void applyFlowValues(
 		sObject stateBeforeFlow,
-		sObject stateAfterFlow,
-		List<String> editableFields
+		sObject stateAfterFlow
 	) {
 		Map<String, Object> afterFlowMap = stateAfterFlow.getPopulatedFieldsAsMap();
-		for (String fieldName : editableFields) {
-			if (
-				afterFlowMap.containsKey(fieldName) &&
-				stateBeforeFlow.get(fieldName) != stateAfterFlow.get(fieldName)
-			) {
+		for (String fieldName : afterFlowMap.keySet()) {
+			if (stateBeforeFlow.get(fieldName) != stateAfterFlow.get(fieldName)) {
 				stateBeforeFlow.put(fieldName, stateAfterFlow.get(fieldName));
 			}
 		}
@@ -221,28 +217,6 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 		return result;
 	}
 
-	private List<String> getEditableFields(
-		Schema.SObjectType newRecordSObjectType
-	) {
-		if (sObjectToEditableFields.containsKey(newRecordSObjectType)) {
-			return sObjectToEditableFields.get(newRecordSObjectType);
-		}
-		List<String> editableFields = new List<String>();
-		for (
-			Schema.SObjectField fieldRef : newRecordSObjectType
-				.getDescribe()
-				.fields.getMap()
-				.values()
-		) {
-			Schema.DescribeFieldResult fieldResult = fieldRef.getDescribe();
-			if (fieldResult.isUpdateable()) {
-				editableFields.add(fieldResult.getName());
-			}
-		}
-		sObjectToEditableFields.put(newRecordSObjectType, editableFields);
-		return sObjectToEditableFields.get(newRecordSObjectType);
-	}
-
 	private void applyFieldValuesDuringBefore(
 		List<Invocable.Action.Result> results,
 		List<SObject> newList
@@ -250,19 +224,12 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 		if (newList.isEmpty()) {
 			return;
 		}
-		List<String> editableFields = getEditableFields(
-			newList[0].getSObjectType()
-		);
 		for (Integer i = 0; i < results.size(); i++) {
 			Invocable.Action.Result result = results[i];
 			if (result.isSuccess() == true) {
 				SObject newRecordWhenFlowIsComplete = (SObject) (result.getOutputParameters()
 					.get(TriggerActionConstants.RECORD_VARIABLE));
-				applyFlowValues(
-					newList[i],
-					newRecordWhenFlowIsComplete,
-					editableFields
-				);
+				applyFlowValues(newList[i], newRecordWhenFlowIsComplete);
 			}
 		}
 	}
