@@ -21,11 +21,19 @@ jobs:
           node-version: ">=14"
           check-latest: true
 
-      - name: Install Salesforce CLI
+      - name: Install Salesforce CLI + Scanner
         run: |
           npm install sfdx-cli
           node_modules/sfdx-cli/bin/run --version
           node_modules/sfdx-cli/bin/run plugins --core
+          node_modules/sfdx-cli/bin/run plugins:install @salesforce/sfdx-scanner
+
+      - name: Run SFDX Scanner - Report findings as comments
+        uses: mitchspano/sfdx-scan-pull-request@v0.1.4
+        with:
+          severity-threshold: 4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Authenticate DevHub
         run: |
