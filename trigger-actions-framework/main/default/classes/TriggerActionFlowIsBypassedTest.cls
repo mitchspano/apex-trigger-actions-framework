@@ -29,12 +29,12 @@ private class TriggerActionFlowIsBypassedTest {
 
 		List<Boolean> isBypassed = TriggerActionFlowIsBypassed.isBypassed(requests);
 
-		System.assertEquals(
+		System.Assert.areEqual(
 			1,
 			isBypassed.size(),
 			'We should only have one result for our request'
 		);
-		System.assertEquals(
+		System.Assert.areEqual(
 			TriggerBase.isBypassed(MY_STRING),
 			isBypassed[0],
 			'The result should contain the same result as the TriggerBase'
@@ -49,12 +49,12 @@ private class TriggerActionFlowIsBypassedTest {
 
 		List<Boolean> isBypassed = TriggerActionFlowIsBypassed.isBypassed(requests);
 
-		System.assertEquals(
+		System.Assert.areEqual(
 			1,
 			isBypassed.size(),
 			'We should only have one result for our request'
 		);
-		System.assertEquals(
+		System.Assert.areEqual(
 			MetadataTriggerHandler.isBypassed(MY_STRING),
 			isBypassed[0],
 			'The result should contain the same result as the MetadataTriggerHandler'
@@ -69,12 +69,12 @@ private class TriggerActionFlowIsBypassedTest {
 
 		List<Boolean> isBypassed = TriggerActionFlowIsBypassed.isBypassed(requests);
 
-		System.assertEquals(
+		System.Assert.areEqual(
 			1,
 			isBypassed.size(),
 			'We should only have one result for our request'
 		);
-		System.assertEquals(
+		System.Assert.areEqual(
 			TriggerActionFlow.isBypassed(MY_STRING),
 			isBypassed[0],
 			'The result should contain the same result as the TriggerActionFlow'
@@ -95,7 +95,7 @@ private class TriggerActionFlowIsBypassedTest {
 			myException = e;
 		}
 
-		System.assertNotEquals(
+		System.Assert.areNotEqual(
 			null,
 			myException,
 			'We should have an exception thrown in this scenario'
@@ -105,7 +105,7 @@ private class TriggerActionFlowIsBypassedTest {
 			IllegalArgumentException.class,
 			'The exception should be of the correct type'
 		);
-		System.assertEquals(
+		System.Assert.areEqual(
 			myException.getMessage(),
 			TriggerActionConstants.INVALID_TYPE,
 			'The exeption should contain the message we are looking for'

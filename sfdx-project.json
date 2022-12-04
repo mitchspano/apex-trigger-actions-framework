@@ -10,7 +10,7 @@
     ],
     "namespace": "",
     "sfdcLoginUrl": "https://login.salesforce.com",
-    "sourceApiVersion": "55.0",
+    "sourceApiVersion": "56.0",
     "packageAliases": {
         "Trigger Actions Framework": "0Ho3h0000008Om4CAE",
         "Trigger Actions Framework@0.1.0-1": "04t3h000004VaHaAAK",

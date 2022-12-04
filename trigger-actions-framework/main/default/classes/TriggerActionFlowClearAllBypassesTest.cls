@@ -26,8 +26,7 @@ private class TriggerActionFlowClearAllBypassesTest {
 			new List<String>{ TriggerActionConstants.OBJECT_STRING }
 		);
 
-		System.assertEquals(
-			false,
+		System.Assert.isFalse(
 			TriggerBase.isBypassed(MY_STRING),
 			'The Object should not be bypassed'
 		);
@@ -41,8 +40,7 @@ private class TriggerActionFlowClearAllBypassesTest {
 			new List<String>{ TriggerActionConstants.APEX_STRING }
 		);
 
-		System.assertEquals(
-			false,
+		System.Assert.isFalse(
 			MetadataTriggerHandler.isBypassed(MY_STRING),
 			'The Apex should be not bypassed'
 		);
@@ -56,8 +54,7 @@ private class TriggerActionFlowClearAllBypassesTest {
 			new List<String>{ TriggerActionConstants.FLOW_STRING }
 		);
 
-		System.assertEquals(
-			false,
+		System.Assert.isFalse(
 			TriggerActionFlow.isBypassed(MY_STRING),
 			'The Flow should not be bypassed'
 		);
@@ -75,7 +72,7 @@ private class TriggerActionFlowClearAllBypassesTest {
 			myException = e;
 		}
 
-		System.assertNotEquals(
+		System.Assert.areNotEqual(
 			null,
 			myException,
 			'We should have an exception thrown in this scenario'
@@ -85,7 +82,7 @@ private class TriggerActionFlowClearAllBypassesTest {
 			IllegalArgumentException.class,
 			'The exception should be of the correct type'
 		);
-		System.assertEquals(
+		System.Assert.areEqual(
 			myException.getMessage(),
 			TriggerActionConstants.INVALID_TYPE,
 			'The exeption should contain the message we are looking for'

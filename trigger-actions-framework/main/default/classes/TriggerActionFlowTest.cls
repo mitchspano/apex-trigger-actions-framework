@@ -47,7 +47,7 @@ public class TriggerActionFlowTest {
 			myException = e;
 		}
 
-		System.assertEquals(
+		System.Assert.areEqual(
 			null,
 			myException,
 			'There should be no exception thrown when this method is called with a valid flow.'
@@ -62,7 +62,7 @@ public class TriggerActionFlowTest {
 			myException = e;
 		}
 
-		System.assertEquals(
+		System.Assert.areEqual(
 			null,
 			myException,
 			'There should be no exception thrown when this method is called with a valid flow.'
@@ -77,7 +77,7 @@ public class TriggerActionFlowTest {
 			myException = e;
 		}
 
-		System.assertEquals(
+		System.Assert.areEqual(
 			null,
 			myException,
 			'There should be no exception thrown when this method is called with a valid flow.'
@@ -92,7 +92,7 @@ public class TriggerActionFlowTest {
 			myException = e;
 		}
 
-		System.assertEquals(
+		System.Assert.areEqual(
 			null,
 			myException,
 			'There should be no exception thrown when this method is called with a valid flow.'
@@ -107,7 +107,7 @@ public class TriggerActionFlowTest {
 			myException = e;
 		}
 
-		System.assertEquals(
+		System.Assert.areEqual(
 			null,
 			myException,
 			'There should be no exception thrown when this method is called with a valid flow.'
@@ -122,7 +122,7 @@ public class TriggerActionFlowTest {
 			myException = e;
 		}
 
-		System.assertEquals(
+		System.Assert.areEqual(
 			null,
 			myException,
 			'There should be no exception thrown when this method is called with a valid flow.'
@@ -137,7 +137,7 @@ public class TriggerActionFlowTest {
 			myException = e;
 		}
 
-		System.assertEquals(
+		System.Assert.areEqual(
 			null,
 			myException,
 			'There should be no exception thrown when this method is called with a valid flow.'
@@ -148,7 +148,7 @@ public class TriggerActionFlowTest {
 	private static void bypassShouldSucceed() {
 		TriggerActionFlow.bypass(SAMPLE_FLOW_NAME);
 
-		System.assert(
+		System.Assert.isTrue(
 			TriggerActionFlow.bypassedFlows.contains(SAMPLE_FLOW_NAME),
 			'Static bypasses should be populated properly'
 		);
@@ -159,8 +159,8 @@ public class TriggerActionFlowTest {
 		TriggerActionFlow.bypass(SAMPLE_FLOW_NAME);
 		TriggerActionFlow.clearBypass(SAMPLE_FLOW_NAME);
 
-		System.assert(
-			!TriggerActionFlow.bypassedFlows.contains(SAMPLE_FLOW_NAME),
+		System.Assert.isFalse(
+			TriggerActionFlow.bypassedFlows.contains(SAMPLE_FLOW_NAME),
 			'Static bypasses should be populated properly'
 		);
 	}
@@ -172,8 +172,7 @@ public class TriggerActionFlowTest {
 
 		isBypassed = TriggerActionFlow.isBypassed(SAMPLE_FLOW_NAME);
 
-		System.assertEquals(
-			true,
+		System.Assert.isTrue(
 			isBypassed,
 			'Static bypasses should be populated properly'
 		);
@@ -185,7 +184,7 @@ public class TriggerActionFlowTest {
 
 		TriggerActionFlow.clearAllBypasses();
 
-		System.assertEquals(
+		System.Assert.areEqual(
 			0,
 			TriggerActionFlow.bypassedFlows.size(),
 			'Static bypasses should be populated properly'

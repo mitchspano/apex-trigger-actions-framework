@@ -29,8 +29,7 @@ private class TriggerActionFlowBypassTest {
 
 		TriggerActionFlowBypass.bypass(requests);
 
-		System.assertEquals(
-			true,
+		System.Assert.isTrue(
 			TriggerBase.isBypassed(MY_STRING),
 			'The Object should be bypassed'
 		);
@@ -44,8 +43,7 @@ private class TriggerActionFlowBypassTest {
 
 		TriggerActionFlowBypass.bypass(requests);
 
-		System.assertEquals(
-			true,
+		System.Assert.isTrue(
 			MetadataTriggerHandler.isBypassed(MY_STRING),
 			'The Apex should be bypassed'
 		);
@@ -59,8 +57,7 @@ private class TriggerActionFlowBypassTest {
 
 		TriggerActionFlowBypass.bypass(requests);
 
-		System.assertEquals(
-			true,
+		System.Assert.isTrue(
 			TriggerActionFlow.isBypassed(MY_STRING),
 			'The Flow should be bypassed'
 		);
@@ -78,7 +75,7 @@ private class TriggerActionFlowBypassTest {
 			myException = e;
 		}
 
-		System.assertNotEquals(
+		System.Assert.areNotEqual(
 			null,
 			myException,
 			'We should have an exception thrown in this scenario'
@@ -88,7 +85,7 @@ private class TriggerActionFlowBypassTest {
 			IllegalArgumentException.class,
 			'The exception should be of the correct type'
 		);
-		System.assertEquals(
+		System.Assert.areEqual(
 			myException.getMessage(),
 			TriggerActionConstants.INVALID_TYPE,
 			'The exeption should contain the message we are looking for'

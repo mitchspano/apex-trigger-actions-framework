@@ -36,7 +36,7 @@ private class TriggerBaseTest {
 
 		base.run();
 
-		System.assertEquals(true, base.executed, 'Run should be successful');
+		System.Assert.isTrue(base.executed, 'Run should be successful');
 	}
 
 	@IsTest
@@ -45,7 +45,7 @@ private class TriggerBaseTest {
 
 		base.run();
 
-		System.assertEquals(true, base.executed, 'Run should be successful');
+		System.Assert.isTrue(base.executed, 'Run should be successful');
 	}
 
 	@IsTest
@@ -54,7 +54,7 @@ private class TriggerBaseTest {
 
 		base.run();
 
-		System.assertEquals(true, base.executed, 'Run should be successful');
+		System.Assert.isTrue(base.executed, 'Run should be successful');
 	}
 
 	@IsTest
@@ -63,7 +63,7 @@ private class TriggerBaseTest {
 
 		base.run();
 
-		System.assertEquals(true, base.executed, 'Run should be successful');
+		System.Assert.isTrue(base.executed, 'Run should be successful');
 	}
 
 	@IsTest
@@ -72,7 +72,7 @@ private class TriggerBaseTest {
 
 		base.run();
 
-		System.assertEquals(true, base.executed, 'Run should be successful');
+		System.Assert.isTrue(base.executed, 'Run should be successful');
 	}
 
 	@IsTest
@@ -81,7 +81,7 @@ private class TriggerBaseTest {
 
 		base.run();
 
-		System.assertEquals(true, base.executed, 'Run should be successful');
+		System.Assert.isTrue(base.executed, 'Run should be successful');
 	}
 
 	@IsTest
@@ -90,7 +90,7 @@ private class TriggerBaseTest {
 
 		base.run();
 
-		System.assertEquals(true, base.executed, 'Run should be successful');
+		System.Assert.isTrue(base.executed, 'Run should be successful');
 	}
 
 	@IsTest
@@ -100,7 +100,7 @@ private class TriggerBaseTest {
 		base.run();
 		base.run();
 
-		System.assertEquals(
+		System.Assert.areEqual(
 			2,
 			TriggerBase.idToNumberOfTimesSeenBeforeUpdate.get(MY_ACCOUNT.Id),
 			'The number of time seen should be populated properly'
@@ -114,7 +114,7 @@ private class TriggerBaseTest {
 		base.run();
 		base.run();
 
-		System.assertEquals(
+		System.Assert.areEqual(
 			2,
 			TriggerBase.idToNumberOfTimesSeenAfterUpdate.get(MY_ACCOUNT.Id),
 			'The number of time seen should be populated properly'
@@ -129,8 +129,8 @@ private class TriggerBaseTest {
 			myException = e;
 		}
 
-		System.assertNotEquals(null, myException, 'An exception should be thrown');
-		System.assert(
+		System.Assert.areNotEqual(null, myException, 'An exception should be thrown');
+		System.Assert.isTrue(
 			myException.getMessage()
 				.contains(TriggerBase.HANDLER_OUTSIDE_TRIGGER_MESSAGE),
 			'The exception should be the one we are looking for'
@@ -145,8 +145,7 @@ private class TriggerBaseTest {
 
 		base.run();
 
-		System.assertEquals(
-			false,
+		System.Assert.isFalse(
 			base.executed,
 			'The base should not have executed'
 		);
@@ -156,7 +155,7 @@ private class TriggerBaseTest {
 	private static void bypassShouldSucceed() {
 		TriggerBase.bypass(ACCOUNT);
 
-		System.assert(
+		System.Assert.isTrue(
 			TriggerBase.bypassedObjects.contains(ACCOUNT),
 			'The bypasses should be configured correctly'
 		);
@@ -168,8 +167,8 @@ private class TriggerBaseTest {
 
 		TriggerBase.clearBypass(ACCOUNT);
 
-		System.assert(
-			!TriggerBase.bypassedObjects.contains(ACCOUNT),
+		System.Assert.isFalse(
+			TriggerBase.bypassedObjects.contains(ACCOUNT),
 			'The bypasses should be configured correctly'
 		);
 	}
@@ -178,8 +177,7 @@ private class TriggerBaseTest {
 	private static void isBypassedShouldSucceed() {
 		TriggerBase.bypass(ACCOUNT);
 
-		System.assertEquals(
-			true,
+		System.Assert.isTrue(
 			TriggerBase.isBypassed(ACCOUNT),
 			'The bypasses should be configured correctly'
 		);
@@ -191,7 +189,7 @@ private class TriggerBaseTest {
 
 		TriggerBase.clearAllBypasses();
 
-		System.assertEquals(
+		System.Assert.areEqual(
 			0,
 			TriggerBase.bypassedObjects.size(),
 			'The bypasses should be configured correctly'
