@@ -1,22 +1,23 @@
 {
-    "packageDirectories": [
-        {
-            "path": "trigger-actions-framework",
-            "default": true,
-            "package": "Trigger Actions Framework",
-            "versionName": "ver 0.1",
-            "versionNumber": "0.1.0.NEXT"
-        }
-    ],
-    "namespace": "",
-    "sfdcLoginUrl": "https://login.salesforce.com",
-    "sourceApiVersion": "56.0",
-    "packageAliases": {
-        "Trigger Actions Framework": "0Ho3h0000008Om4CAE",
-        "Trigger Actions Framework@0.1.0-1": "04t3h000004VaHaAAK",
-        "Trigger Actions Framework@0.1.2": "04t3h000004VaIdAAK",
-        "Trigger Actions Framework@0.1.3": "04t3h000004VaInAAK",
-        "Trigger Actions Framework@0.1.4-0": "04t3h000004VaJWAA0",
-        "Trigger Actions Framework@0.1.4-1": "04t3h000004VaJbAAK"
-    }
+	"packageDirectories": [
+		{
+			"path": "trigger-actions-framework",
+			"default": true,
+			"package": "Trigger Actions Framework",
+			"versionName": "ver 0.1",
+			"versionNumber": "0.1.0.NEXT"
+		}
+	],
+	"namespace": "",
+	"sfdcLoginUrl": "https://login.salesforce.com",
+	"sourceApiVersion": "56.0",
+	"packageAliases": {
+		"Trigger Actions Framework": "0Ho3h0000008Om4CAE",
+		"Trigger Actions Framework@0.1.0-1": "04t3h000004VaHaAAK",
+		"Trigger Actions Framework@0.1.2": "04t3h000004VaIdAAK",
+		"Trigger Actions Framework@0.1.3": "04t3h000004VaInAAK",
+		"Trigger Actions Framework@0.1.4-0": "04t3h000004VaJWAA0",
+		"Trigger Actions Framework@0.1.4-1": "04t3h000004VaJbAAK",
+		"Trigger Actions Framework@0.1.5-0": "04t3h000004VaJqAAK"
+	}
 }
