@@ -30,17 +30,16 @@ private class TriggerActionFlowAddErrorTest {
 
 		TriggerActionFlowAddError.addError(requests);
 
-		System.assertEquals(
-			true,
+		System.Assert.isTrue(
 			account.hasErrors(),
 			'The Account should have an error'
 		);
-		System.assertEquals(
+		System.Assert.areEqual(
 			1,
 			account.getErrors().size(),
 			'There should only be one error'
 		);
-		System.assertEquals(
+		System.Assert.areEqual(
 			MY_STRING,
 			account.getErrors()[0].getMessage(),
 			'The error should contain the message we are looking for'
@@ -57,17 +56,16 @@ private class TriggerActionFlowAddErrorTest {
 
 		TriggerActionFlowAddError.addError(requests);
 
-		System.assertEquals(
-			true,
+		System.Assert.isTrue(
 			account.hasErrors(),
 			'The Account should have an error'
 		);
-		System.assertEquals(
+		System.Assert.areEqual(
 			1,
 			account.getErrors().size(),
 			'There should only be one error'
 		);
-		System.assertEquals(
+		System.Assert.areEqual(
 			MY_STRING,
 			account.getErrors()[0].getMessage(),
 			'The error should contain the message we are looking for'

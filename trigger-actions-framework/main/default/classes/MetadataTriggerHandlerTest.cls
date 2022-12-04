@@ -64,7 +64,7 @@ private class MetadataTriggerHandlerTest {
 
 		handler.beforeInsert(handler.triggerNew);
 
-		System.assertEquals(true, executed, 'We expect the action to be executed');
+		System.Assert.isTrue(executed, 'We expect the action to be executed');
 	}
 
 	@IsTest
@@ -86,8 +86,8 @@ private class MetadataTriggerHandlerTest {
 			myException = e;
 		}
 
-		System.assertNotEquals(null, myException, 'An exception should be thrown');
-		System.assertEquals(
+		System.Assert.areNotEqual(null, myException, 'An exception should be thrown');
+		System.Assert.areEqual(
 			myException.getMessage(),
 			String.format(
 				MetadataTriggerHandler.INVALID_TYPE_ERROR,
@@ -120,8 +120,8 @@ private class MetadataTriggerHandlerTest {
 			myException = e;
 		}
 
-		System.assertNotEquals(null, myException, 'An exception should be thrown');
-		System.assertEquals(
+		System.Assert.areNotEqual(null, myException, 'An exception should be thrown');
+		System.Assert.areEqual(
 			myException.getMessage(),
 			String.format(
 				MetadataTriggerHandler.INVALID_CLASS_ERROR,
@@ -149,7 +149,7 @@ private class MetadataTriggerHandlerTest {
 
 		handler.afterInsert(handler.triggerNew);
 
-		System.assertEquals(true, executed, 'We expect the action to be executed');
+		System.Assert.isTrue(executed, 'We expect the action to be executed');
 	}
 
 	@IsTest
@@ -169,8 +169,8 @@ private class MetadataTriggerHandlerTest {
 			myException = e;
 		}
 
-		System.assertNotEquals(null, myException, 'An exception should be thrown');
-		System.assertEquals(
+		System.Assert.areNotEqual(null, myException, 'An exception should be thrown');
+		System.Assert.areEqual(
 			myException.getMessage(),
 			String.format(
 				MetadataTriggerHandler.INVALID_TYPE_ERROR,
@@ -201,8 +201,8 @@ private class MetadataTriggerHandlerTest {
 			myException = e;
 		}
 
-		System.assertNotEquals(null, myException, 'An exception should be thrown');
-		System.assertEquals(
+		System.Assert.areNotEqual(null, myException, 'An exception should be thrown');
+		System.Assert.areEqual(
 			myException.getMessage(),
 			String.format(
 				MetadataTriggerHandler.INVALID_CLASS_ERROR,
@@ -232,7 +232,7 @@ private class MetadataTriggerHandlerTest {
 
 		handler.beforeUpdate(handler.triggerNew, handler.triggerOld);
 
-		System.assertEquals(true, executed, 'We expect the action to be executed');
+		System.Assert.isTrue(executed, 'We expect the action to be executed');
 	}
 
 	@IsTest
@@ -254,8 +254,8 @@ private class MetadataTriggerHandlerTest {
 			myException = e;
 		}
 
-		System.assertNotEquals(null, myException, 'An exception should be thrown');
-		System.assertEquals(
+		System.Assert.areNotEqual(null, myException, 'An exception should be thrown');
+		System.Assert.areEqual(
 			myException.getMessage(),
 			String.format(
 				MetadataTriggerHandler.INVALID_TYPE_ERROR,
@@ -288,8 +288,8 @@ private class MetadataTriggerHandlerTest {
 			myException = e;
 		}
 
-		System.assertNotEquals(null, myException, 'An exception should be thrown');
-		System.assertEquals(
+		System.Assert.areNotEqual(null, myException, 'An exception should be thrown');
+		System.Assert.areEqual(
 			myException.getMessage(),
 			String.format(
 				MetadataTriggerHandler.INVALID_CLASS_ERROR,
@@ -317,7 +317,7 @@ private class MetadataTriggerHandlerTest {
 
 		handler.afterUpdate(handler.triggerNew, handler.triggerOld);
 
-		System.assertEquals(true, executed, 'We expect the action to be executed');
+		System.Assert.isTrue(executed, 'We expect the action to be executed');
 	}
 
 	@IsTest
@@ -337,8 +337,8 @@ private class MetadataTriggerHandlerTest {
 			myException = e;
 		}
 
-		System.assertNotEquals(null, myException, 'An exception should be thrown');
-		System.assertEquals(
+		System.Assert.areNotEqual(null, myException, 'An exception should be thrown');
+		System.Assert.areEqual(
 			myException.getMessage(),
 			String.format(
 				MetadataTriggerHandler.INVALID_TYPE_ERROR,
@@ -369,8 +369,8 @@ private class MetadataTriggerHandlerTest {
 			myException = e;
 		}
 
-		System.assertNotEquals(null, myException, 'An exception should be thrown');
-		System.assertEquals(
+		System.Assert.areNotEqual(null, myException, 'An exception should be thrown');
+		System.Assert.areEqual(
 			myException.getMessage(),
 			String.format(
 				MetadataTriggerHandler.INVALID_CLASS_ERROR,
@@ -400,7 +400,7 @@ private class MetadataTriggerHandlerTest {
 
 		handler.beforeDelete(handler.triggerOld);
 
-		System.assertEquals(true, executed, 'We expect the action to be executed');
+		System.Assert.isTrue(executed, 'We expect the action to be executed');
 	}
 
 	@IsTest
@@ -422,8 +422,8 @@ private class MetadataTriggerHandlerTest {
 			myException = e;
 		}
 
-		System.assertNotEquals(null, myException, 'An exception should be thrown');
-		System.assertEquals(
+		System.Assert.areNotEqual(null, myException, 'An exception should be thrown');
+		System.Assert.areEqual(
 			myException.getMessage(),
 			String.format(
 				MetadataTriggerHandler.INVALID_TYPE_ERROR,
@@ -456,8 +456,8 @@ private class MetadataTriggerHandlerTest {
 			myException = e;
 		}
 
-		System.assertNotEquals(null, myException, 'An exception should be thrown');
-		System.assertEquals(
+		System.Assert.areNotEqual(null, myException, 'An exception should be thrown');
+		System.Assert.areEqual(
 			myException.getMessage(),
 			String.format(
 				MetadataTriggerHandler.INVALID_CLASS_ERROR,
@@ -485,7 +485,7 @@ private class MetadataTriggerHandlerTest {
 
 		handler.afterDelete(handler.triggerOld);
 
-		System.assertEquals(true, executed, 'We expect the action to be executed');
+		System.Assert.isTrue(executed, 'We expect the action to be executed');
 	}
 
 	@IsTest
@@ -505,8 +505,8 @@ private class MetadataTriggerHandlerTest {
 			myException = e;
 		}
 
-		System.assertNotEquals(null, myException, 'An exception should be thrown');
-		System.assertEquals(
+		System.Assert.areNotEqual(null, myException, 'An exception should be thrown');
+		System.Assert.areEqual(
 			myException.getMessage(),
 			String.format(
 				MetadataTriggerHandler.INVALID_TYPE_ERROR,
@@ -537,8 +537,8 @@ private class MetadataTriggerHandlerTest {
 			myException = e;
 		}
 
-		System.assertNotEquals(null, myException, 'An exception should be thrown');
-		System.assertEquals(
+		System.Assert.areNotEqual(null, myException, 'An exception should be thrown');
+		System.Assert.areEqual(
 			myException.getMessage(),
 			String.format(
 				MetadataTriggerHandler.INVALID_CLASS_ERROR,
@@ -568,7 +568,7 @@ private class MetadataTriggerHandlerTest {
 
 		handler.afterUndelete(handler.triggerOld);
 
-		System.assertEquals(true, executed, 'We expect the action to be executed');
+		System.Assert.isTrue(executed, 'We expect the action to be executed');
 	}
 
 	@IsTest
@@ -590,8 +590,8 @@ private class MetadataTriggerHandlerTest {
 			myException = e;
 		}
 
-		System.assertNotEquals(null, myException, 'An exception should be thrown');
-		System.assertEquals(
+		System.Assert.areNotEqual(null, myException, 'An exception should be thrown');
+		System.Assert.areEqual(
 			myException.getMessage(),
 			String.format(
 				MetadataTriggerHandler.INVALID_TYPE_ERROR,
@@ -624,8 +624,8 @@ private class MetadataTriggerHandlerTest {
 			myException = e;
 		}
 
-		System.assertNotEquals(null, myException, 'An exception should be thrown');
-		System.assertEquals(
+		System.Assert.areNotEqual(null, myException, 'An exception should be thrown');
+		System.Assert.areEqual(
 			myException.getMessage(),
 			String.format(
 				MetadataTriggerHandler.INVALID_CLASS_ERROR,
@@ -641,37 +641,37 @@ private class MetadataTriggerHandlerTest {
 
 	@IsTest
 	private static void actionMetadataShouldConstruct() {
-		System.assertNotEquals(
+		System.Assert.areNotEqual(
 			null,
 			handler.beforeInsertActionMetadata,
 			'The metadata should be populated properly'
 		);
-		System.assertNotEquals(
+		System.Assert.areNotEqual(
 			null,
 			handler.afterInsertActionMetadata,
 			'The metadata should be populated properly'
 		);
-		System.assertNotEquals(
+		System.Assert.areNotEqual(
 			null,
 			handler.beforeUpdateActionMetadata,
 			'The metadata should be populated properly'
 		);
-		System.assertNotEquals(
+		System.Assert.areNotEqual(
 			null,
 			handler.afterUpdateActionMetadata,
 			'The metadata should be populated properly'
 		);
-		System.assertNotEquals(
+		System.Assert.areNotEqual(
 			null,
 			handler.beforeDeleteActionMetadata,
 			'The metadata should be populated properly'
 		);
-		System.assertNotEquals(
+		System.Assert.areNotEqual(
 			null,
 			handler.afterDeleteActionMetadata,
 			'The metadata should be populated properly'
 		);
-		System.assertNotEquals(
+		System.Assert.areNotEqual(
 			null,
 			handler.afterUndeleteActionMetadata,
 			'The metadata should be populated properly'
@@ -682,7 +682,7 @@ private class MetadataTriggerHandlerTest {
 	private static void bypassShouldSucceed() {
 		MetadataTriggerHandler.bypass(TEST_BEFORE_INSERT);
 
-		System.assert(
+		System.Assert.isTrue(
 			MetadataTriggerHandler.bypassedActions.contains(TEST_BEFORE_INSERT),
 			'All bypasses should be configured correctly'
 		);
@@ -693,8 +693,8 @@ private class MetadataTriggerHandlerTest {
 		MetadataTriggerHandler.bypass(TEST_BEFORE_INSERT);
 		MetadataTriggerHandler.clearBypass(TEST_BEFORE_INSERT);
 
-		System.assert(
-			!MetadataTriggerHandler.bypassedActions.contains(TEST_BEFORE_INSERT),
+		System.Assert.isFalse(
+			MetadataTriggerHandler.bypassedActions.contains(TEST_BEFORE_INSERT),
 			'All bypasses should be configured correctly'
 		);
 	}
@@ -706,8 +706,7 @@ private class MetadataTriggerHandlerTest {
 
 		isBypassed = MetadataTriggerHandler.isBypassed(TEST_BEFORE_INSERT);
 
-		System.assertEquals(
-			true,
+		System.Assert.isTrue(
 			isBypassed,
 			'All bypasses should be configured correctly'
 		);
@@ -719,7 +718,7 @@ private class MetadataTriggerHandlerTest {
 
 		MetadataTriggerHandler.clearAllBypasses();
 
-		System.assertEquals(
+		System.Assert.areEqual(
 			0,
 			MetadataTriggerHandler.bypassedActions.size(),
 			'All bypasses should be configured correctly'
