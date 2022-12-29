@@ -14,6 +14,7 @@
    limitations under the License.
  */
 
+@SuppressWarnings('PMD.ApexDoc, PMD.CyclomaticComplexity')
 public class TriggerAction {
 	public interface BeforeInsert {
 		void beforeInsert(List<SObject> newList);

@@ -13,6 +13,8 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
+
+@SuppressWarnings('PMD.ApexDoc')
 public class TriggerActionConstants {
 	public static final String APEX_STRING = 'Apex';
 	public static final String FLOW_STRING = 'Flow';

@@ -14,6 +14,7 @@
    limitations under the License.
  */
 
+@SuppressWarnings('PMD.ApexDoc, PMD.ApexUnitTestClassShouldHaveRunAs')
 @IsTest(isParallel=true)
 private class TriggerBaseTest {
 	private static final String ACCOUNT = 'Account';
@@ -129,7 +130,11 @@ private class TriggerBaseTest {
 			myException = e;
 		}
 
-		System.Assert.areNotEqual(null, myException, 'An exception should be thrown');
+		System.Assert.areNotEqual(
+			null,
+			myException,
+			'An exception should be thrown'
+		);
 		System.Assert.isTrue(
 			myException.getMessage()
 				.contains(TriggerBase.HANDLER_OUTSIDE_TRIGGER_MESSAGE),
@@ -145,10 +150,7 @@ private class TriggerBaseTest {
 
 		base.run();
 
-		System.Assert.isFalse(
-			base.executed,
-			'The base should not have executed'
-		);
+		System.Assert.isFalse(base.executed, 'The base should not have executed');
 	}
 
 	@IsTest

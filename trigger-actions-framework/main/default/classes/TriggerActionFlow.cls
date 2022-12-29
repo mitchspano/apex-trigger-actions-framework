@@ -14,6 +14,7 @@
    limitations under the License.
  */
 
+@SuppressWarnings('PMD.ApexDoc, PMD.CyclomaticComplexity')
 public inherited sharing class TriggerActionFlow implements TriggerAction.BeforeInsert, TriggerAction.AfterInsert, TriggerAction.BeforeUpdate, TriggerAction.AfterUpdate, TriggerAction.BeforeDelete, TriggerAction.AfterDelete, TriggerAction.AfterUndelete {
 	@TestVisible
 	private static Set<String> bypassedFlows = new Set<String>();
@@ -44,7 +45,7 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 	}
 
 	public void beforeInsert(List<SObject> newList) {
-		if (thisFlowIsBypassed()) {
+		if (flowIsBypassed()) {
 			return;
 		}
 		List<Invocable.Action.Result> results = invokeAction(
@@ -55,7 +56,7 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 	}
 
 	public void afterInsert(List<SObject> newList) {
-		if (thisFlowIsBypassed()) {
+		if (flowIsBypassed()) {
 			return;
 		}
 		handleInvocableResults(
@@ -67,7 +68,7 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 	}
 
 	public void beforeUpdate(List<SObject> newList, List<SObject> oldList) {
-		if (thisFlowIsBypassed()) {
+		if (flowIsBypassed()) {
 			return;
 		}
 		List<sObject> recordsNotYetProcessed = new List<sObject>();
@@ -90,7 +91,7 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 	}
 
 	public void afterUpdate(List<SObject> newList, List<SObject> oldList) {
-		if (thisFlowIsBypassed()) {
+		if (flowIsBypassed()) {
 			return;
 		}
 		List<sObject> recordsNotYetProcessed = new List<sObject>();
@@ -114,7 +115,7 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 	}
 
 	public void beforeDelete(List<SObject> oldList) {
-		if (thisFlowIsBypassed()) {
+		if (flowIsBypassed()) {
 			return;
 		}
 		handleInvocableResults(
@@ -129,7 +130,7 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 	}
 
 	public void afterDelete(List<SObject> oldList) {
-		if (thisFlowIsBypassed()) {
+		if (flowIsBypassed()) {
 			return;
 		}
 		handleInvocableResults(
@@ -144,7 +145,7 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 	}
 
 	public void afterUndelete(List<SObject> newList) {
-		if (thisFlowIsBypassed()) {
+		if (flowIsBypassed()) {
 			return;
 		}
 		handleInvocableResults(
@@ -155,7 +156,7 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 		);
 	}
 
-	private Boolean thisFlowIsBypassed() {
+	private Boolean flowIsBypassed() {
 		if (String.isBlank(flowName)) {
 			throw new IllegalArgumentException(
 				TriggerActionConstants.INVALID_FLOW_NAME
@@ -179,11 +180,29 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 		sObject stateBeforeFlow,
 		sObject stateAfterFlow
 	) {
+		Boolean hasBeenMutated = false;
 		Map<String, Object> afterFlowMap = stateAfterFlow.getPopulatedFieldsAsMap();
 		for (String fieldName : afterFlowMap.keySet()) {
 			if (stateBeforeFlow.get(fieldName) != stateAfterFlow.get(fieldName)) {
 				stateBeforeFlow.put(fieldName, stateAfterFlow.get(fieldName));
+				hasBeenMutated = true;
 			}
+		}
+		/**
+		 * If the record is not mutated, then any errors will persist after the flow is complete,
+		 * so there is no need to re-add them
+		 */
+		if (hasBeenMutated == false) {
+			return;
+		}
+		for (Database.Error err : stateAfterFlow.getErrors()) {
+			/**
+			 * Unfortunately, err.getFields() does not include the field api name after
+			 * calling .addError(String fieldApiName, String message) from within a flow,
+			 * so when the record is mutated before save,
+			 * the exact field location for the error cannot be applied.
+			 */
+			stateBeforeFlow.addError(err.getMessage());
 		}
 	}
 

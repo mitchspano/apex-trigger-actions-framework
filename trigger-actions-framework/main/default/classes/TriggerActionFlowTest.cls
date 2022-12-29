@@ -14,6 +14,7 @@
    limitations under the License.
  */
 
+@SuppressWarnings('PMD.ApexDoc, PMD.ApexUnitTestClassShouldHaveRunAs')
 @IsTest(isParallel=true)
 public class TriggerActionFlowTest {
 	private static final String MY_ACCOUNT = 'My Account';
@@ -52,6 +53,44 @@ public class TriggerActionFlowTest {
 			myException,
 			'There should be no exception thrown when this method is called with a valid flow.'
 		);
+		System.Assert.areEqual(
+			'Foo',
+			myAccount.Name,
+			'The name should be set from the flow'
+		);
+		System.Assert.areEqual(
+			true,
+			myAccount.hasErrors(),
+			'There should be an error added to the record'
+		);
+		System.Assert.areEqual(
+			1,
+			myAccount.getErrors().size(),
+			'There should be exactly one error'
+		);
+		System.Assert.areEqual(
+			'Test!',
+			myAccount.getErrors()[0].getMessage(),
+			'The message should be what we expect'
+		);
+	}
+
+	@IsTest
+	private static void beforeInsertShouldDoNothingWhenBypassed() {
+		TriggerActionFlow.bypass(SAMPLE_FLOW_NAME);
+
+		actionFlow.beforeInsert(newList);
+
+		System.Assert.areEqual(
+			MY_ACCOUNT,
+			myAccount.Name,
+			'The name should not be set from the flow'
+		);
+		System.Assert.areEqual(
+			false,
+			myAccount.hasErrors(),
+			'There should be no errors added to the record'
+		);
 	}
 
 	@IsTest
@@ -81,6 +120,44 @@ public class TriggerActionFlowTest {
 			null,
 			myException,
 			'There should be no exception thrown when this method is called with a valid flow.'
+		);
+		System.Assert.areEqual(
+			'Foo',
+			myAccount.Name,
+			'The name should be set from the flow'
+		);
+		System.Assert.areEqual(
+			true,
+			myAccount.hasErrors(),
+			'There should be an error added to the record'
+		);
+		System.Assert.areEqual(
+			1,
+			myAccount.getErrors().size(),
+			'There should be exactly one error'
+		);
+		System.Assert.areEqual(
+			'Test!',
+			myAccount.getErrors()[0].getMessage(),
+			'The message should be what we expect'
+		);
+	}
+
+	@IsTest
+	private static void beforeUpdateShouldDoNothingWhenBypassed() {
+		TriggerActionFlow.bypass(SAMPLE_FLOW_NAME);
+
+		actionFlow.beforeUpdate(newList, oldList);
+
+		System.Assert.areEqual(
+			MY_ACCOUNT,
+			myAccount.Name,
+			'The name should not be set from the flow'
+		);
+		System.Assert.areEqual(
+			false,
+			myAccount.hasErrors(),
+			'There should be no errors added to the record'
 		);
 	}
 

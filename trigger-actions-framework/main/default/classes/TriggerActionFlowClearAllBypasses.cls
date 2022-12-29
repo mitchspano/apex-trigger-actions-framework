@@ -13,7 +13,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-@SuppressWarnings('PMD.CognitiveComplexity')
+@SuppressWarnings('PMD.ApexDoc, PMD.CognitiveComplexity')
 public inherited sharing class TriggerActionFlowClearAllBypasses {
 	@InvocableMethod(
 		category='Trigger Action Flow'

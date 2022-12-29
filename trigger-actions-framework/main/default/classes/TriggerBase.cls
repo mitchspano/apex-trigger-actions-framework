@@ -14,6 +14,9 @@
    limitations under the License.
  */
 
+@SuppressWarnings(
+	'PMD.ApexDoc, PMD.StdCyclomaticComplexity, PMD.CyclomaticComplexity'
+)
 public inherited sharing virtual class TriggerBase {
 	@TestVisible
 	private static final String HANDLER_OUTSIDE_TRIGGER_MESSAGE = 'Trigger handler called outside of Trigger execution';

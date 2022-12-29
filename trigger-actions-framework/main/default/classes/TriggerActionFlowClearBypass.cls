@@ -13,7 +13,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-@SuppressWarnings('PMD.CognitiveComplexity')
+@SuppressWarnings('PMD.ApexDoc, PMD.CognitiveComplexity')
 public inherited sharing class TriggerActionFlowClearBypass {
 	@InvocableMethod(
 		category='Trigger Action Flow'
@@ -23,10 +23,7 @@ public inherited sharing class TriggerActionFlowClearBypass {
 	public static void clearBypass(List<Request> requests) {
 		TriggerActionFlowBypassProcessor bypassProcesser = new FlowClearBypassProcessor();
 		for (Request myRequest : requests) {
-			bypassProcesser.execute(
-				myRequest.bypassType,
-				myRequest.name
-			);
+			bypassProcesser.execute(myRequest.bypassType, myRequest.name);
 		}
 	}
 

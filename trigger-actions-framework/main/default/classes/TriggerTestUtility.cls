@@ -14,6 +14,7 @@
    limitations under the License.
  */
 
+@SuppressWarnings('PMD.ApexDoc')
 @IsTest
 public class TriggerTestUtility {
 	static Integer myNumber = 1;
