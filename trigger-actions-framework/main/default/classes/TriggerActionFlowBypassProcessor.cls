@@ -13,12 +13,10 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-public inherited sharing abstract class TriggerActionFlowBypassProcessor {
 
-	public void execute(
-		String requestType,
-		String requestName
-	) {
+@SuppressWarnings('PMD.ApexDoc')
+public inherited sharing abstract class TriggerActionFlowBypassProcessor {
+	public void execute(String requestType, String requestName) {
 		if (!TriggerActionConstants.REQUEST_TYPES.contains(requestType)) {
 			throw new IllegalArgumentException(TriggerActionConstants.INVALID_TYPE);
 		} else if (requestType == TriggerActionConstants.FLOW_STRING) {

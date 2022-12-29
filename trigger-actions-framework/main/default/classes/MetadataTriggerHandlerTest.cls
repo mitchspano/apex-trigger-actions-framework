@@ -14,6 +14,9 @@
    limitations under the License.
  */
 
+@SuppressWarnings(
+	'PMD.ApexDoc, PMD.CyclomaticComplexity, PMD.ApexUnitTestClassShouldHaveRunAs'
+)
 @IsTest(isParallel=true)
 private class MetadataTriggerHandlerTest {
 	private static final String MY_ACCOUNT = 'My Account';
@@ -86,7 +89,11 @@ private class MetadataTriggerHandlerTest {
 			myException = e;
 		}
 
-		System.Assert.areNotEqual(null, myException, 'An exception should be thrown');
+		System.Assert.areNotEqual(
+			null,
+			myException,
+			'An exception should be thrown'
+		);
 		System.Assert.areEqual(
 			myException.getMessage(),
 			String.format(
@@ -120,7 +127,11 @@ private class MetadataTriggerHandlerTest {
 			myException = e;
 		}
 
-		System.Assert.areNotEqual(null, myException, 'An exception should be thrown');
+		System.Assert.areNotEqual(
+			null,
+			myException,
+			'An exception should be thrown'
+		);
 		System.Assert.areEqual(
 			myException.getMessage(),
 			String.format(
@@ -169,7 +180,11 @@ private class MetadataTriggerHandlerTest {
 			myException = e;
 		}
 
-		System.Assert.areNotEqual(null, myException, 'An exception should be thrown');
+		System.Assert.areNotEqual(
+			null,
+			myException,
+			'An exception should be thrown'
+		);
 		System.Assert.areEqual(
 			myException.getMessage(),
 			String.format(
@@ -201,7 +216,11 @@ private class MetadataTriggerHandlerTest {
 			myException = e;
 		}
 
-		System.Assert.areNotEqual(null, myException, 'An exception should be thrown');
+		System.Assert.areNotEqual(
+			null,
+			myException,
+			'An exception should be thrown'
+		);
 		System.Assert.areEqual(
 			myException.getMessage(),
 			String.format(
@@ -254,7 +273,11 @@ private class MetadataTriggerHandlerTest {
 			myException = e;
 		}
 
-		System.Assert.areNotEqual(null, myException, 'An exception should be thrown');
+		System.Assert.areNotEqual(
+			null,
+			myException,
+			'An exception should be thrown'
+		);
 		System.Assert.areEqual(
 			myException.getMessage(),
 			String.format(
@@ -288,7 +311,11 @@ private class MetadataTriggerHandlerTest {
 			myException = e;
 		}
 
-		System.Assert.areNotEqual(null, myException, 'An exception should be thrown');
+		System.Assert.areNotEqual(
+			null,
+			myException,
+			'An exception should be thrown'
+		);
 		System.Assert.areEqual(
 			myException.getMessage(),
 			String.format(
@@ -337,7 +364,11 @@ private class MetadataTriggerHandlerTest {
 			myException = e;
 		}
 
-		System.Assert.areNotEqual(null, myException, 'An exception should be thrown');
+		System.Assert.areNotEqual(
+			null,
+			myException,
+			'An exception should be thrown'
+		);
 		System.Assert.areEqual(
 			myException.getMessage(),
 			String.format(
@@ -369,7 +400,11 @@ private class MetadataTriggerHandlerTest {
 			myException = e;
 		}
 
-		System.Assert.areNotEqual(null, myException, 'An exception should be thrown');
+		System.Assert.areNotEqual(
+			null,
+			myException,
+			'An exception should be thrown'
+		);
 		System.Assert.areEqual(
 			myException.getMessage(),
 			String.format(
@@ -422,7 +457,11 @@ private class MetadataTriggerHandlerTest {
 			myException = e;
 		}
 
-		System.Assert.areNotEqual(null, myException, 'An exception should be thrown');
+		System.Assert.areNotEqual(
+			null,
+			myException,
+			'An exception should be thrown'
+		);
 		System.Assert.areEqual(
 			myException.getMessage(),
 			String.format(
@@ -456,7 +495,11 @@ private class MetadataTriggerHandlerTest {
 			myException = e;
 		}
 
-		System.Assert.areNotEqual(null, myException, 'An exception should be thrown');
+		System.Assert.areNotEqual(
+			null,
+			myException,
+			'An exception should be thrown'
+		);
 		System.Assert.areEqual(
 			myException.getMessage(),
 			String.format(
@@ -505,7 +548,11 @@ private class MetadataTriggerHandlerTest {
 			myException = e;
 		}
 
-		System.Assert.areNotEqual(null, myException, 'An exception should be thrown');
+		System.Assert.areNotEqual(
+			null,
+			myException,
+			'An exception should be thrown'
+		);
 		System.Assert.areEqual(
 			myException.getMessage(),
 			String.format(
@@ -537,7 +584,11 @@ private class MetadataTriggerHandlerTest {
 			myException = e;
 		}
 
-		System.Assert.areNotEqual(null, myException, 'An exception should be thrown');
+		System.Assert.areNotEqual(
+			null,
+			myException,
+			'An exception should be thrown'
+		);
 		System.Assert.areEqual(
 			myException.getMessage(),
 			String.format(
@@ -590,7 +641,11 @@ private class MetadataTriggerHandlerTest {
 			myException = e;
 		}
 
-		System.Assert.areNotEqual(null, myException, 'An exception should be thrown');
+		System.Assert.areNotEqual(
+			null,
+			myException,
+			'An exception should be thrown'
+		);
 		System.Assert.areEqual(
 			myException.getMessage(),
 			String.format(
@@ -624,7 +679,11 @@ private class MetadataTriggerHandlerTest {
 			myException = e;
 		}
 
-		System.Assert.areNotEqual(null, myException, 'An exception should be thrown');
+		System.Assert.areNotEqual(
+			null,
+			myException,
+			'An exception should be thrown'
+		);
 		System.Assert.areEqual(
 			myException.getMessage(),
 			String.format(

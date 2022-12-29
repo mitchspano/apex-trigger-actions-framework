@@ -1,5 +1,30 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionCalls>
+        <name>Add_Error</name>
+        <label>Add Error</label>
+        <locationX>176</locationX>
+        <locationY>278</locationY>
+        <actionName>TriggerActionFlowAddError</actionName>
+        <actionType>apex</actionType>
+        <dataTypeMappings>
+            <typeName>T__record</typeName>
+            <typeValue>Account</typeValue>
+        </dataTypeMappings>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>errorMessage</name>
+            <value>
+                <stringValue>Test!</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>record</name>
+            <value>
+                <elementReference>record</elementReference>
+            </value>
+        </inputParameters>
+    </actionCalls>
     <apiVersion>56.0</apiVersion>
     <assignments>
         <name>Set_Name</name>
@@ -13,10 +38,15 @@
                 <stringValue>Foo</stringValue>
             </value>
         </assignmentItems>
+        <connector>
+            <targetReference>Add_Error</targetReference>
+        </connector>
     </assignments>
-    <description>This is meant for test coverage for the TriggerActionFlow class.</description>
+    <description
+	>This is meant for test coverage for the TriggerActionFlow class.</description>
     <environments>Default</environments>
-    <interviewLabel>TriggerActionFlowTest {!$Flow.CurrentDateTime}</interviewLabel>
+    <interviewLabel
+	>TriggerActionFlowTest {!$Flow.CurrentDateTime}</interviewLabel>
     <label>Trigger Action Flow Test</label>
     <processMetadataValues>
         <name>BuilderType</name>

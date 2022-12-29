@@ -14,6 +14,7 @@
    limitations under the License.
  */
 
+@SuppressWarnings('PMD.ApexDoc')
 public inherited sharing class TriggerActionFlowAddError {
 	@InvocableMethod(
 		category='Trigger Action Flow'

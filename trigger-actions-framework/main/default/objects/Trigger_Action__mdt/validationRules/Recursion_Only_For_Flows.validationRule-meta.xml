@@ -1,8 +1,11 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Recursion_Only_For_Flows</fullName>
     <active>true</active>
-    <description>Throws an error if the &quot;Allow Flow Recursion&quot; checkbox is checked without a &quot;Flow Name&quot;.</description>
-    <errorConditionFormula>Allow_Flow_Recursion__c == true &amp;&amp; ISBLANK( Flow_Name__c )</errorConditionFormula>
-    <errorMessage>You can only mark &quot;Allow Flow Recursion&quot; checkbox as &quot;True&quot; when you have a value for &quot;Flow Name&quot;.</errorMessage>
+    <description
+	>Throws an error if the &quot;Allow Flow Recursion&quot; checkbox is checked without a &quot;Flow Name&quot;.</description>
+    <errorConditionFormula
+	>Allow_Flow_Recursion__c == true &amp;&amp; ISBLANK( Flow_Name__c )</errorConditionFormula>
+    <errorMessage
+	>You can only mark &quot;Allow Flow Recursion&quot; checkbox as &quot;True&quot; when you have a value for &quot;Flow Name&quot;.</errorMessage>
 </ValidationRule>

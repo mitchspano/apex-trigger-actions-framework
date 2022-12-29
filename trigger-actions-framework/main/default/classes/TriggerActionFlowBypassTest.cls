@@ -14,6 +14,7 @@
    limitations under the License.
  */
 
+@SuppressWarnings('PMD.ApexDoc, PMD.ApexUnitTestClassShouldHaveRunAs')
 @IsTest(isParallel=true)
 private class TriggerActionFlowBypassTest {
 	private static final String MY_STRING = 'MY_STRING';
