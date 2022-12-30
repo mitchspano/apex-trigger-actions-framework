@@ -18,6 +18,10 @@
 @IsTest(isParallel=true)
 private class TriggerBaseTest {
 	private static final String ACCOUNT = 'Account';
+	private static final String BYPASSES_SHOULD_BE_CONFIGURED_CORRECTLY = 'The bypasses should be configured correctly';
+	private static final String NUMBER_OF_TIMES_SEEN_SHOULD_BE_CORRECT = 'The number of time seen should be populated properly';
+	private static final String RUN_SUCCESS = 'Run should be successful ';
+
 	private static final Account MY_ACCOUNT = new Account(
 		Id = TriggerTestUtility.getFakeId(Schema.Account.SObjectType),
 		Name = 'My Account'
@@ -31,13 +35,56 @@ private class TriggerBaseTest {
 	}
 
 	@IsTest
+	private static void sObjectNameShouldBePopulatedFromTriggerNew() {
+		base.triggerOld = null;
+
+		String sObjectName = base.sObjectName;
+
+		System.Assert.areEqual(
+			sObjectName,
+			ACCOUNT,
+			'Name should be populated from elements of triggerOld'
+		);
+	}
+
+	@IsTest
+	private static void sObjectNameShouldBePopulatedFromTriggerOld() {
+		base.triggerNew = null;
+
+		String sObjectName = base.sObjectName;
+
+		System.Assert.areEqual(
+			sObjectName,
+			ACCOUNT,
+			'Name should be populated from elements of triggerNew'
+		);
+	}
+
+	@IsTest
+	private static void oldAndNewShouldComeFromTrigger() {
+		base.triggerNew = null;
+		base.triggerOld = null;
+
+		System.Assert.areEqual(
+			null,
+			base.triggerNew,
+			'triggerNew should match Trigger.new'
+		);
+		System.Assert.areEqual(
+			null,
+			base.triggerOld,
+			'triggerOld should match Trigger.old'
+		);
+	}
+
+	@IsTest
 	private static void beforeInsertShouldSucceed() {
 		MY_ACCOUNT.Id = null;
 		base.context = System.TriggerOperation.BEFORE_INSERT;
 
 		base.run();
 
-		System.Assert.isTrue(base.executed, 'Run should be successful');
+		System.Assert.isTrue(base.executed, RUN_SUCCESS);
 	}
 
 	@IsTest
@@ -46,7 +93,7 @@ private class TriggerBaseTest {
 
 		base.run();
 
-		System.Assert.isTrue(base.executed, 'Run should be successful');
+		System.Assert.isTrue(base.executed, RUN_SUCCESS);
 	}
 
 	@IsTest
@@ -55,7 +102,7 @@ private class TriggerBaseTest {
 
 		base.run();
 
-		System.Assert.isTrue(base.executed, 'Run should be successful');
+		System.Assert.isTrue(base.executed, RUN_SUCCESS);
 	}
 
 	@IsTest
@@ -64,7 +111,7 @@ private class TriggerBaseTest {
 
 		base.run();
 
-		System.Assert.isTrue(base.executed, 'Run should be successful');
+		System.Assert.isTrue(base.executed, RUN_SUCCESS);
 	}
 
 	@IsTest
@@ -73,7 +120,7 @@ private class TriggerBaseTest {
 
 		base.run();
 
-		System.Assert.isTrue(base.executed, 'Run should be successful');
+		System.Assert.isTrue(base.executed, RUN_SUCCESS);
 	}
 
 	@IsTest
@@ -82,7 +129,7 @@ private class TriggerBaseTest {
 
 		base.run();
 
-		System.Assert.isTrue(base.executed, 'Run should be successful');
+		System.Assert.isTrue(base.executed, RUN_SUCCESS);
 	}
 
 	@IsTest
@@ -91,7 +138,7 @@ private class TriggerBaseTest {
 
 		base.run();
 
-		System.Assert.isTrue(base.executed, 'Run should be successful');
+		System.Assert.isTrue(base.executed, RUN_SUCCESS);
 	}
 
 	@IsTest
@@ -104,7 +151,7 @@ private class TriggerBaseTest {
 		System.Assert.areEqual(
 			2,
 			TriggerBase.idToNumberOfTimesSeenBeforeUpdate.get(MY_ACCOUNT.Id),
-			'The number of time seen should be populated properly'
+			NUMBER_OF_TIMES_SEEN_SHOULD_BE_CORRECT
 		);
 	}
 
@@ -118,7 +165,7 @@ private class TriggerBaseTest {
 		System.Assert.areEqual(
 			2,
 			TriggerBase.idToNumberOfTimesSeenAfterUpdate.get(MY_ACCOUNT.Id),
-			'The number of time seen should be populated properly'
+			NUMBER_OF_TIMES_SEEN_SHOULD_BE_CORRECT
 		);
 	}
 
@@ -159,7 +206,7 @@ private class TriggerBaseTest {
 
 		System.Assert.isTrue(
 			TriggerBase.bypassedObjects.contains(ACCOUNT),
-			'The bypasses should be configured correctly'
+			BYPASSES_SHOULD_BE_CONFIGURED_CORRECTLY
 		);
 	}
 
@@ -171,7 +218,7 @@ private class TriggerBaseTest {
 
 		System.Assert.isFalse(
 			TriggerBase.bypassedObjects.contains(ACCOUNT),
-			'The bypasses should be configured correctly'
+			BYPASSES_SHOULD_BE_CONFIGURED_CORRECTLY
 		);
 	}
 
@@ -181,7 +228,7 @@ private class TriggerBaseTest {
 
 		System.Assert.isTrue(
 			TriggerBase.isBypassed(ACCOUNT),
-			'The bypasses should be configured correctly'
+			BYPASSES_SHOULD_BE_CONFIGURED_CORRECTLY
 		);
 	}
 
@@ -194,7 +241,7 @@ private class TriggerBaseTest {
 		System.Assert.areEqual(
 			0,
 			TriggerBase.bypassedObjects.size(),
-			'The bypasses should be configured correctly'
+			BYPASSES_SHOULD_BE_CONFIGURED_CORRECTLY
 		);
 	}
 

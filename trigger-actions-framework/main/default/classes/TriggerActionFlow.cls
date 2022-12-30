@@ -17,7 +17,11 @@
 @SuppressWarnings('PMD.ApexDoc, PMD.CyclomaticComplexity')
 public inherited sharing class TriggerActionFlow implements TriggerAction.BeforeInsert, TriggerAction.AfterInsert, TriggerAction.BeforeUpdate, TriggerAction.AfterUpdate, TriggerAction.BeforeDelete, TriggerAction.AfterDelete, TriggerAction.AfterUndelete {
 	@TestVisible
+	private static final String RECORD_VARIABLE_NOT_FOUND_ERROR = 'There must be a variable defined in this flow with api name of "record" and type of "record" that is marked as "available for output"';
+	@TestVisible
 	private static Set<String> bypassedFlows = new Set<String>();
+	@TestVisible
+	private static InvocableAction invocableAction = new InvocableAction();
 
 	public String flowName;
 	public Boolean allowRecursion;
@@ -168,12 +172,7 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 	private List<Invocable.Action.Result> invokeAction(
 		List<Map<String, Object>> inputs
 	) {
-		Invocable.Action action = Invocable.Action.createCustomAction(
-			TriggerActionConstants.FLOW_STRING,
-			this.flowName
-		);
-		action.setInvocations(inputs);
-		return action.invoke();
+		return invocableAction.invokeAction(this.flowName, inputs);
 	}
 
 	private void applyFlowValues(
@@ -239,14 +238,18 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 		List<Invocable.Action.Result> results,
 		List<SObject> newList
 	) {
-		if (newList.isEmpty()) {
-			return;
-		}
 		for (Integer i = 0; i < results.size(); i++) {
 			Invocable.Action.Result result = results[i];
 			if (result.isSuccess() == true) {
 				SObject newRecordWhenFlowIsComplete = (SObject) (result.getOutputParameters()
 					.get(TriggerActionConstants.RECORD_VARIABLE));
+				if (newRecordWhenFlowIsComplete == null) {
+					throw new IllegalArgumentException(
+						this.flowName +
+						': ' +
+						RECORD_VARIABLE_NOT_FOUND_ERROR
+					);
+				}
 				applyFlowValues(newList[i], newRecordWhenFlowIsComplete);
 			}
 		}
@@ -256,9 +259,6 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 		List<Invocable.Action.Result> results,
 		List<SObject> records
 	) {
-		if (records.isEmpty()) {
-			return;
-		}
 		for (Integer i = 0; i < results.size(); i++) {
 			Invocable.Action.Result result = results[i];
 			if (result.isSuccess() == false) {
@@ -273,5 +273,20 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 			messagesAndCodes.add(error.getCode() + ' - ' + error.getMessage());
 		}
 		return this.flowName + ': ' + String.join(messagesAndCodes, ', ');
+	}
+
+	@TestVisible
+	private virtual class InvocableAction {
+		public virtual List<Invocable.Action.Result> invokeAction(
+			String flowApiName,
+			List<Map<String, Object>> inputs
+		) {
+			Invocable.Action action = Invocable.Action.createCustomAction(
+				TriggerActionConstants.FLOW_STRING,
+				flowApiName
+			);
+			action.setInvocations(inputs);
+			return action.invoke();
+		}
 	}
 }

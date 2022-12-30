@@ -15,12 +15,39 @@
  */
 @SuppressWarnings('PMD.ApexDoc, PMD.CognitiveComplexity')
 public inherited sharing class MetadataTriggerHandler extends TriggerBase implements TriggerAction.BeforeInsert, TriggerAction.AfterInsert, TriggerAction.BeforeUpdate, TriggerAction.AfterUpdate, TriggerAction.BeforeDelete, TriggerAction.AfterDelete, TriggerAction.AfterUndelete {
+	private static final String DOUBLE_UNDERSCORE = '__';
+	private static final String EMPTY_STRING = '';
 	@TestVisible
 	private static final String INVALID_TYPE_ERROR = 'Please check the Trigger Action Custom Metadata for the {1} context on the {2} sObject. The {0} class does not implement the Trigger Action interface specified for the {1} context.';
 	@TestVisible
 	private static final String INVALID_CLASS_ERROR = 'Please check the Trigger Action Custom Metadata for the {1} context on the {2} sObject. The {0} class does not exist.';
+	private static final String QUERY_TEMPLATE = String.join(
+		new List<String>{
+			'SELECT Apex_Class_Name__c,',
+			'Order__c,',
+			'Flow_Name__c,',
+			'Bypass_Permission__c,',
+			'Required_Permission__c,',
+			'Allow_Flow_Recursion__c,',
+			'{0}__r.Bypass_Permission__c,',
+			'{0}__r.Required_Permission__c',
+			'FROM Trigger_Action__mdt',
+			'WHERE',
+			'{0}__c != NULL',
+			'AND {0}__r.Object_API_Name__c = \'\'{1}\'\'',
+			'AND {0}__r.Object_Namespace__c = \'\'{2}\'\'',
+			'AND {0}__r.Bypass_Execution__c = FALSE',
+			'AND Bypass_Execution__c = FALSE',
+			'ORDER BY Order__c ASC'
+		},
+		' '
+	);
+	private static final String RELATIONSHIP_SUFFIX = '__r';
 	@TestVisible
 	private static Set<String> bypassedActions = new Set<String>();
+	@TestVisible
+	private static Selector selector = new Selector();
+	@TestVisible
 	private static Map<String, Boolean> permissionMap = new Map<String, Boolean>();
 	private static Map<String, Map<String, List<Trigger_Action__mdt>>> sObjectToContextToActions = new Map<String, Map<String, List<Trigger_Action__mdt>>>();
 
@@ -65,36 +92,25 @@ public inherited sharing class MetadataTriggerHandler extends TriggerBase implem
 		) {
 			list<Trigger_Action__mdt> result = new List<Trigger_Action__mdt>();
 			String sObjectLocalName = this.sObjectName;
-			List<String> split = sObjectName.split('__');
+			List<String> split = sObjectName.split(DOUBLE_UNDERSCORE);
 			String namespace;
 			if (split.size() > 2) {
 				namespace = split[0];
-				sObjectLocalName = sObjectLocalName.replaceFirst(namespace + '__', '');
+				sObjectLocalName = sObjectLocalName.replaceFirst(
+					namespace + DOUBLE_UNDERSCORE,
+					EMPTY_STRING
+				);
 			}
-			List<String> queryArray = new List<String>{
-				'SELECT Apex_Class_Name__c,',
-				'Order__c,',
-				'Flow_Name__c,',
-				'Bypass_Permission__c,',
-				'Required_Permission__c,',
-				'Allow_Flow_Recursion__c,',
-				'{0}__r.Bypass_Permission__c,',
-				'{0}__r.Required_Permission__c',
-				'FROM Trigger_Action__mdt',
-				'WHERE',
-				'{0}__c != NULL',
-				'AND {0}__r.Object_API_Name__c = :sObjectLocalName',
-				'AND {0}__r.Object_Namespace__c = :namespace',
-				'AND {0}__r.Bypass_Execution__c = FALSE',
-				'AND Bypass_Execution__c = FALSE',
-				'ORDER BY Order__c ASC'
-			};
 			String queryString = String.format(
-				String.join(queryArray, ' '),
-				new List<Object>{ relationshipName }
+				QUERY_TEMPLATE,
+				new List<Object>{
+					relationshipName,
+					sObjectLocalName,
+					namespace != null ? namespace : EMPTY_STRING
+				}
 			);
 			for (
-				Trigger_Action__mdt actionMetadata : (List<Trigger_Action__mdt>) Database.query(
+				Trigger_Action__mdt actionMetadata : (List<Trigger_Action__mdt>) selector.query(
 					queryString
 				)
 			) {
@@ -115,13 +131,13 @@ public inherited sharing class MetadataTriggerHandler extends TriggerBase implem
 		String relationshipName
 	) {
 		String sObjectBypassPermissionName = (String) ((sObject_Trigger_Setting__mdt) actionMetadata.getSobject(
-				relationshipName + '__r'
+				relationshipName + RELATIONSHIP_SUFFIX
 			))
-			.get('Bypass_Permission__c');
+			.get(sObject_Trigger_Setting__mdt.Bypass_Permission__c);
 		String sObjectRequiredPermissionName = (String) ((sObject_Trigger_Setting__mdt) actionMetadata.getSobject(
-				relationshipName + '__r'
+				relationshipName + RELATIONSHIP_SUFFIX
 			))
-			.get('Required_Permission__c');
+			.get(sObject_Trigger_Setting__mdt.Required_Permission__c);
 		for (
 			String permissionName : new List<String>{
 				actionMetadata.Bypass_Permission__c,
@@ -139,17 +155,21 @@ public inherited sharing class MetadataTriggerHandler extends TriggerBase implem
 				);
 			}
 		}
-		Boolean actionShouldExecute = !((actionMetadata.Bypass_Permission__c !=
-		null && permissionMap.get(actionMetadata.Bypass_Permission__c)) ||
-		(actionMetadata.Required_Permission__c != null &&
-		!permissionMap.get(actionMetadata.Required_Permission__c)));
 
-		Boolean sObjectShouldExecute = !((sObjectBypassPermissionName != null &&
-		permissionMap.get(sObjectBypassPermissionName)) ||
-		(sObjectRequiredPermissionName != null &&
-		!permissionMap.get(sObjectRequiredPermissionName)));
+		return isNotBypassed(
+				actionMetadata.Bypass_Permission__c,
+				actionMetadata.Required_Permission__c
+			) &&
+			isNotBypassed(sObjectBypassPermissionName, sObjectRequiredPermissionName);
+	}
 
-		return actionShouldExecute && sObjectShouldExecute;
+	private static boolean isNotBypassed(
+		String requiredPermission,
+		String bypassPermission
+	) {
+		return !((requiredPermission != null &&
+		permissionMap.get(requiredPermission)) ||
+		(bypassPermission != null && !permissionMap.get(bypassPermission)));
 	}
 
 	private void executeActions(
@@ -396,6 +416,13 @@ public inherited sharing class MetadataTriggerHandler extends TriggerBase implem
 
 	public static void clearAllBypasses() {
 		MetadataTriggerHandler.bypassedActions.clear();
+	}
+
+	@TestVisible
+	private virtual inherited sharing class Selector {
+		public virtual List<SObject> query(String queryString) {
+			return Database.query(queryString);
+		}
 	}
 
 	private class MetadataTriggerHandlerException extends Exception {
