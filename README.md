@@ -10,17 +10,13 @@
 
 ---
 
-This project is meant to demonstrate an Apex Trigger Framework which is built with the following goals in mind:
+## Overview
 
-1. Single Trigger per sObject
-2. Logic-less Triggers
-3. Context Specific Implementation
-4. Easy to Migrate Existing Code
-5. Simple Unit Testing
-6. Configuration from Setup Menu
-7. Adherence to SOLID Principles
+The Apex Trigger Actions Framework allows developers and administrators to partition, order, and bypass record-triggered automations for applications built on Salesforce.com.
 
----
+The framework supports both Apex and Flow - which empowers developers and administrators to define automations in the tool of their choice, then plug them together harmoniously.
+
+With granular control of the relative order of execution of Apex vs. Flow and standardized bypass mechanisms, the framework enables an "Automation Studio" view of _all_ automations for a given sObject.
 
 ## Metadata Driven Trigger Actions
 
@@ -58,7 +54,6 @@ public class TA_Opportunity_StageInsertRules implements TriggerAction.BeforeInse
     }
   }
 }
-
 ```
 
 This allows us to use custom metadata to configure a few things from the setup menu:
@@ -79,31 +74,11 @@ Now, as future development work gets completed, we won't need to keep modifying 
 
 Note that if an Apex class is specified in metadata and it does not exist or does not implement the correct interface, a runtime error will occur.
 
-With this multiplicity of Apex classes, it would be wise to follow a naming convention such as `TA_ObjectName_Description` and utilize the `sfdx-project.json` file to partition your application into multiple directories.
-
-```javascript
-{
-  "packageDirectories": [
-    {
-      "path": "application/base",
-      "default": true
-    },
-    {
-      "path": "application/opportunity-automation",
-      "default": false
-    }
-  ],
-  "namespace": "",
-  "sfdcLoginUrl": "https://login.salesforce.com",
-  "sourceApiVersion": "50.0"
-}
-```
-
 ---
 
 ## Support for Flows
 
-The trigger actions framework can also allow you to invoke a flow by name, and determine the order of the flow's execution amongst other trigger actions in a given trigger context. Here is an example of a trigger action flow that checks if a record's name has changed and if so it sets the record's description to a default value.
+The Apex Trigger Actions Framework can also allow you to invoke a flow by name, and determine the order of the flow's execution amongst other trigger actions in a given trigger context. Here is an example of a trigger action flow that checks if a record's name has changed and if so it sets the record's description to a default value.
 
 ![Sample Flow](images/sampleFlow.png)
 
@@ -116,7 +91,7 @@ To make your flows usable, they must be auto-launched flows and you need to crea
 | record        | record        | yes                 | yes                  | the new version of the record in the DML operation | insert, update, undelete |
 | recordPrior   | record        | yes                 | no                   | the old version of the record in the DML operation | update, delete           |
 
-To enable this flow, simply insert a trigger action record with Apex Class Name equal to `TriggerActionFlow` and set the Flow Name field with the API name of the flow itself. You can select the `Allow_Flow_Recursion__c` checkbox to allow flows to run recursively (advanced).
+To enable this flow, simply insert a trigger action record with Apex Class Name equal to `TriggerActionFlow` and set the `Flow_Name__c` field with the API name of the flow itself. You can select the `Allow_Flow_Recursion__c` checkbox to allow flows to run recursively (advanced).
 
 ![Flow Trigger Action](images/flowTriggerAction.png)
 
@@ -167,9 +142,9 @@ public class TA_Opportunity_RecalculateCategory implements TriggerAction.AfterUp
 
 ## Bypass Mechanisms
 
-You can also bypass execution on either an entire sObject, or for a specific action.
+The framework provides standardized bypass mechanisms to control execution on either an entire sObject, or for a specific action.
 
-### Bypass from Setup Menu
+### Bypass Execution Globally
 
 To bypass from the setup menu, simply navigate to the sObject Trigger Setting or Trigger Action metadata record you are interested in and check the Bypass Execution checkbox.
 
@@ -179,7 +154,7 @@ To bypass from the setup menu, simply navigate to the sObject Trigger Setting or
 
 These bypasses will stay active until the checkbox is unchecked.
 
-### Static Bypasses
+### Bypass Execution for a Transaction
 
 You can bypass all actions on an sObject as well as specific Apex or Flow actions for the remainder of the transaction using Apex or Flow.
 
@@ -213,18 +188,19 @@ public void updateContactsNoFlow(List<Contacts> contactsToUpdate) {
 
 #### Bypass from Flow
 
-To bypass from Flow, use the `TriggerActionFlowBypass.bypass` invocable method. You can set the `bypassType` to `Apex`, `Object`, or `Flow`, then pass the API name of the object, class, or flow you would like to bypass into the `name` field.
+To bypass from Flow, use the `TriggerActionFlowBypass.bypass` invocable method. You can set the `Bypass Type` to `Apex`, `Object`, or `Flow`, then pass the API name of the sObject, class, or flow you would like to bypass into the `Name` field.
 
-![Bypass Flow Action](images/bypass_flow_apex_action.png)
-![Bypass Flow Action](images/bypass_flow.png)
+|                             Flow                             |               Invocable Action Setup               |
+| :----------------------------------------------------------: | :------------------------------------------------: |
+| ![Bypass Action in Flow](images/bypass_flow_apex_action.png) | ![Bypass Action Variables](images/bypass_flow.png) |
 
 #### Clear Apex and Flow Bypasses
 
-The Apex and Flow bypasses will stay active until the transaction is complete or until cleared using the `clearBypass` or `clearAllBypasses` methods in the `TriggerBase`, `MetadataTriggerHandler`, or `TriggerActionFlow` classes. There are also corresponding invocable methods in the `TriggerActionFlowClearBypass` and `TriggerActionFlowClearAllBypasses` which will perform the same resetting of the bypass. To use these invocable methods, set the `bypassType` to `Apex`, `Object`, or `Flow`, then to clear a specific bypass set the API name of the object, class, or flow you would like to clear the bypass for into the `name` field.
+The Apex and Flow bypasses will stay active until the transaction is complete or until cleared using the `clearBypass` or `clearAllBypasses` methods in the `TriggerBase`, `MetadataTriggerHandler`, or `TriggerActionFlow` classes. There are also corresponding invocable methods in the `TriggerActionFlowClearBypass` and `TriggerActionFlowClearAllBypasses` which will perform the same resetting of the bypass. To use these invocable methods, set the `bypassType` to `Apex`, `Object`, or `Flow`, then to clear a specific bypass set the API name of the sObject, class, or flow you would like to clear the bypass for into the `name` field.
 
-### Bypass Execution with Permissions
+### Bypass Execution for Specific Users
 
-Both the `sObject_Trigger_Setting__mdt` and the `Trigger_Action__mdt` have fields called `Bypass_Permission__c` and `Required_Permission__c`. Both of these fields are optional, but they can control execution flow.
+Both the `sObject_Trigger_Setting__mdt` and the `Trigger_Action__mdt` have fields called `Bypass_Permission__c` and `Required_Permission__c`. Both of these fields are optional, but they can control execution flow for specific users.
 
 #### Bypass Permission
 
@@ -238,7 +214,7 @@ Developers can enter the API name of a permission in the `Required_Permission__c
 
 ## Avoid Repeated Queries
 
-It could be the case that multiple triggered actions on the same sObject require results from a query to implement their logic. In order to avoid making duplicative queries to fetch similar data, use the singleton pattern to fetch and store query results once then use them in multiple individual action classes.
+It could be the case that multiple triggered actions on the same sObject require results from a query to implement their logic. In order to avoid making duplicative queries to fetch similar data, use the Singleton pattern to fetch and store query results once then use them in multiple individual action classes.
 
 ```java
 public class TA_Opportunity_Queries {
@@ -276,12 +252,13 @@ public class TA_Opportunity_Queries {
     }
   }
 }
-
 ```
 
 Now configure the queries to be the first action to be executed within the given context, and the results will be available for any subsequent triggered action.
 
 ![Query Setup](images/queriesSetup.png)
+
+With the `TA_Opportunity_Queries` class configured as the first action, all subsequent actions can use `TA_Opportunity_Queries.getInstance()` to fetch the query results.
 
 ```java
 public class TA_Opportunity_StandardizeName implements TriggerAction.BeforeInsert {
@@ -296,8 +273,12 @@ public class TA_Opportunity_StandardizeName implements TriggerAction.BeforeInser
     }
   }
 }
-
 ```
+
+**Note:**
+In the example above, the top level class is the implementation of the Singleton pattern, but we also define an inner class called `Service` which is the actual Trigger Action itself. When using this pattern for query management, the `Apex_Class_Name__c` value on the `Trigger_Action__mdt` row would be `TA_Opportunity_Queries.Service`.
+
+![Query Setup](images/queriesService.png)
 
 ---
 
@@ -341,7 +322,7 @@ Take a look at how both of these are used in the `TA_Opportunity_StageChangeRule
 
 ```java
 @IsTest
-private static void beforeUpdateTest() {
+private static void invalidStageChangeShouldPreventSave() {
   List<Opportunity> newList = new List<Opportunity>();
   List<Opportunity> oldList = new List<Opportunity>();
   //generate fake Id
