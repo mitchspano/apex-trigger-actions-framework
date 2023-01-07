@@ -87,6 +87,9 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 				oldRecordsNotYetProcessed.add(oldList[i]);
 			}
 		}
+		if (recordsNotYetProcessed.isEmpty()) {
+			return;
+		}
 		List<Invocable.Action.Result> results = invokeAction(
 			getInterviewInputs(recordsNotYetProcessed, oldRecordsNotYetProcessed)
 		);
@@ -109,6 +112,9 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 				recordsNotYetProcessed.add(record);
 				oldRecordsNotYetProcessed.add(oldList[i]);
 			}
+		}
+		if (recordsNotYetProcessed.isEmpty()) {
+			return;
 		}
 		handleInvocableResults(
 			invokeAction(
