@@ -28,6 +28,7 @@ public class TriggerActionFlowTest {
 	private static final String FOO = 'Foo';
 	private static final String MY_ACCOUNT = 'My Account';
 	private static final String NAME_SET_FROM_FLOW = 'The name should be set from the flow';
+	private static final String NAME_SHOULD_REMAIN_SAME = 'The name should remain the same as it was';
 	private static final String OLD_NAME = 'Old Name';
 	private static final String ONE_ERROR = 'There should be exactly one error';
 	private static final String SAMPLE_FLOW_NAME = 'TriggerActionFlowTest';
@@ -166,7 +167,31 @@ public class TriggerActionFlowTest {
 	}
 
 	@IsTest
+	private static void beforeUpdateWithNoRecordsToProcessShouldSucceed() {
+		newList.clear();
+		oldList.clear();
+
+		actionFlow.beforeUpdate(newList, oldList);
+
+		System.Assert.areEqual(MY_ACCOUNT, myAccount.Name, NAME_SHOULD_REMAIN_SAME);
+	}
+
+	@IsTest
 	private static void afterUpdateShouldSucceed() {
+		actionFlow.afterUpdate(newList, oldList);
+
+		System.Assert.areEqual(
+			false,
+			myAccount.hasErrors(),
+			ERROR_SHOULD_NOT_BE_ADDED
+		);
+	}
+
+	@IsTest
+	private static void afterUpdateWithNoRecordsToProcessShouldSucceed() {
+		newList.clear();
+		oldList.clear();
+
 		actionFlow.afterUpdate(newList, oldList);
 
 		System.Assert.areEqual(
