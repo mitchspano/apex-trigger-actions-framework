@@ -15,7 +15,7 @@
  */
 
 @SuppressWarnings(
-	'PMD.ApexDoc, PMD.StdCyclomaticComplexity, PMD.CyclomaticComplexity'
+	'PMD.ApexDoc, PMD.StdCyclomaticComplexity, PMD.CyclomaticComplexity, PMD.cognitivecomplexity'
 )
 public inherited sharing virtual class TriggerBase {
 	@TestVisible

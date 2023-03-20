@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <Layout xmlns="http://soap.sforce.com/2006/04/metadata">
     <layoutSections>
         <customLabel>false</customLabel>
@@ -89,6 +89,8 @@
     </layoutSections>
     <relatedLists>
         <fields>DeveloperName</fields>
+        <fields>Apex_Class_Name__c</fields>
+        <fields>Flow_Name__c</fields>
         <fields>Description__c</fields>
         <fields>Order__c</fields>
         <relatedList>Trigger_Action__mdt.Before_Insert__c</relatedList>
@@ -97,6 +99,8 @@
     </relatedLists>
     <relatedLists>
         <fields>DeveloperName</fields>
+        <fields>Apex_Class_Name__c</fields>
+        <fields>Flow_Name__c</fields>
         <fields>Description__c</fields>
         <fields>Order__c</fields>
         <relatedList>Trigger_Action__mdt.After_Insert__c</relatedList>
@@ -105,6 +109,8 @@
     </relatedLists>
     <relatedLists>
         <fields>DeveloperName</fields>
+        <fields>Apex_Class_Name__c</fields>
+        <fields>Flow_Name__c</fields>
         <fields>Description__c</fields>
         <fields>Order__c</fields>
         <relatedList>Trigger_Action__mdt.Before_Update__c</relatedList>
@@ -113,6 +119,8 @@
     </relatedLists>
     <relatedLists>
         <fields>DeveloperName</fields>
+        <fields>Apex_Class_Name__c</fields>
+        <fields>Flow_Name__c</fields>
         <fields>Description__c</fields>
         <fields>Order__c</fields>
         <relatedList>Trigger_Action__mdt.After_Update__c</relatedList>
@@ -121,6 +129,8 @@
     </relatedLists>
     <relatedLists>
         <fields>DeveloperName</fields>
+        <fields>Apex_Class_Name__c</fields>
+        <fields>Flow_Name__c</fields>
         <fields>Description__c</fields>
         <fields>Order__c</fields>
         <relatedList>Trigger_Action__mdt.Before_Delete__c</relatedList>
@@ -129,6 +139,8 @@
     </relatedLists>
     <relatedLists>
         <fields>DeveloperName</fields>
+        <fields>Apex_Class_Name__c</fields>
+        <fields>Flow_Name__c</fields>
         <fields>Description__c</fields>
         <fields>Order__c</fields>
         <relatedList>Trigger_Action__mdt.After_Delete__c</relatedList>
@@ -137,6 +149,8 @@
     </relatedLists>
     <relatedLists>
         <fields>DeveloperName</fields>
+        <fields>Apex_Class_Name__c</fields>
+        <fields>Flow_Name__c</fields>
         <fields>Description__c</fields>
         <fields>Order__c</fields>
         <relatedList>Trigger_Action__mdt.After_Undelete__c</relatedList>
@@ -149,7 +163,7 @@
     <showRunAssignmentRulesCheckbox>false</showRunAssignmentRulesCheckbox>
     <showSubmitAndAttachButton>false</showSubmitAndAttachButton>
     <summaryLayout>
-        <masterLabel>00h1F000005Ryc8</masterLabel>
+        <masterLabel>00h8H000001rOFk</masterLabel>
         <sizeX>4</sizeX>
         <sizeY>0</sizeY>
         <summaryLayoutStyle>Default</summaryLayoutStyle>
