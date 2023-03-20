@@ -87,11 +87,10 @@ private class TriggerActionFlowIsBypassedTest {
 		request.Name = MY_STRING;
 		request.bypassType = MY_STRING;
 		requests.add(request);
+		List<Boolean> isBypassed;
 
 		try {
-			List<Boolean> isBypassed = TriggerActionFlowIsBypassed.isBypassed(
-				requests
-			);
+			isBypassed = TriggerActionFlowIsBypassed.isBypassed(requests);
 		} catch (Exception e) {
 			myException = e;
 		}

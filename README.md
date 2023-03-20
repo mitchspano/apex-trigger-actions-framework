@@ -4,9 +4,9 @@
   <img src="https://raw.githubusercontent.com/afawcett/githubsfdeploy/master/src/main/webapp/resources/img/deploy.png" alt="Deploy to Salesforce" />
 </a>
 
-#### [Unlocked Package Installation (Production)](https://login.salesforce.com/packaging/installPackage.apexp?p0=04t3h000004VaLmAAK)
+#### [Unlocked Package Installation (Production)](https://login.salesforce.com/packaging/installPackage.apexp?p0=04t3h000004VaVFAA0)
 
-#### [Unlocked Package Installation (Sandbox)](https://test.salesforce.com/packaging/installPackage.apexp?p0=04t3h000004VaLmAAK)
+#### [Unlocked Package Installation (Sandbox)](https://test.salesforce.com/packaging/installPackage.apexp?p0=04t3h000004VaVFAA0)
 
 ---
 
@@ -20,7 +20,26 @@ With granular control of the relative order of execution of Apex vs. Flow and st
 
 ## Metadata Driven Trigger Actions
 
-In order to use this trigger framework, we start with the `MetadataTriggerHandler` class which is included in this project.
+With the Trigger Actions Framework, we use [custom metadata](https://help.salesforce.com/s/articleView?id=sf.custommetadatatypes_overview.htm&type=5) to configure our trigger logic from the setup menu. The custom metadata defines:
+
+- The sObject and context for which an action is supposed to execute
+- The order to take those actions within a given context
+- Mechanisms to determine if and when the action should be [bypassed](#bypass-mechanisms)
+
+The related lists on the `SObject_Trigger_Setting__mdt` record provide a consolidated and ordered view of _all_ of the Apex and Flow actions that will be executed when a record is inserted, updated, deleted, or undeleted:
+
+![Automation Studio](images/automationStudio.png)
+
+The Trigger Actions Framework conforms strongly to the [Open–closed principle](https://en.wikipedia.org/wiki/Open%E2%80%93closed_principle) and the [Single-responsibility principle](https://en.wikipedia.org/wiki/Single-responsibility_principle). To add or modify trigger logic in our Salesforce org, we won't need to keep modifying the body of a TriggerHandler class; we can create a class or a flow with responsibility scoped to the automation we are trying to build and configure these actions to run in a specified order within a given trigger context.
+
+The work is performed in the `MetadataTriggerHandler` class which implements the the [Strategy Pattern](https://en.wikipedia.org/wiki/Strategy_pattern) by fetching all Trigger Action metadata that is configured in the org for the given trigger context and uses [reflection](https://en.wikipedia.org/wiki/Reflective_programming) to dynamically instantiate an object which implements a `TriggerAction` interface, then casts the object to the appropriate interface as specified in the metadata and calls the respective context methods in the order specified.
+
+Note that if an Apex class is specified in metadata and it does not exist or does not implement the correct interface, a runtime error will occur.
+
+---
+
+### Enabling on an SObject
+To get started, call the the `MetadataTriggerHandler` class within the body of the trigger of the sObject:
 
 ```java
 trigger OpportunityTrigger on Opportunity (
@@ -35,8 +54,13 @@ trigger OpportunityTrigger on Opportunity (
   new MetadataTriggerHandler().run();
 }
 ```
+Next, create a row in the `SObject_Trigger_Setting__mdt` custom metadata type which corresponds to the sObject that we want to enable usage of the framework on -  in this case, it would be Opportunity.
 
-To define a specific action, we write an individual class which implements the correct context interface.
+![New SObject Trigger Setting](images/newSObjectTriggerSetting.png)
+
+
+## Apex Actions
+To define a specific action, we write an individual class which implements the applicable interface(s):
 
 ```java
 public class TA_Opportunity_StageInsertRules implements TriggerAction.BeforeInsert {
@@ -56,27 +80,13 @@ public class TA_Opportunity_StageInsertRules implements TriggerAction.BeforeInse
 }
 ```
 
-This allows us to use custom metadata to configure a few things from the setup menu:
+Then create a row within the `Trigger_Action__mdt` custom metadata type to call the action in the specified order on the sObject.
 
-- The sObject and context for which an action is supposed to execute
-- The order to take those actions within a given context
-- A checkbox to bypass execution at the sObject or trigger action level
-
-The setup menu provides a consolidated view of all of the actions that are executed when a record is inserted, updated, deleted, or undeleted.
-
-![Setup Menu](images/sObjectTriggerSettings.gif)
-
-The `MetadataTriggerHandler` class fetches all Trigger Action metadata that is configured in the org, and dynamically creates an instance of an object which implements a `TriggerAction` interface and casts it to the appropriate interface as specified in the metadata, then calls their respective context methods in the order specified.
-
-Now, as future development work gets completed, we won't need to keep modifying the bodies of our triggerHandler classes, we can just create a new class for each new piece of functionality that we want and configure those to run in a specified order within a given context.
-
-![Add an Action](images/newTriggerAction.gif)
-
-Note that if an Apex class is specified in metadata and it does not exist or does not implement the correct interface, a runtime error will occur.
+![New Trigger Action](images/newTriggerAction.png)
 
 ---
 
-## Support for Flows
+## Flow Actions
 
 The Apex Trigger Actions Framework can also allow you to invoke a flow by name, and determine the order of the flow's execution amongst other trigger actions in a given trigger context. Here is an example of a trigger action flow that checks if a record's name has changed and if so it sets the record's description to a default value.
 
@@ -91,7 +101,7 @@ To make your flows usable, they must be auto-launched flows and you need to crea
 | record        | record        | yes                 | yes                  | the new version of the record in the DML operation | insert, update, undelete |
 | recordPrior   | record        | yes                 | no                   | the old version of the record in the DML operation | update, delete           |
 
-To enable this flow, simply insert a trigger action record with Apex Class Name equal to `TriggerActionFlow` and set the `Flow_Name__c` field with the API name of the flow itself. You can select the `Allow_Flow_Recursion__c` checkbox to allow flows to run recursively (advanced).
+To enable this flow, simply insert a trigger action record with `Apex_Class_Name__` equal to `TriggerActionFlow` and set the `Flow_Name__c` field with the API name of the flow itself. You can select the `Allow_Flow_Recursion__c` checkbox to allow flows to run recursively (advanced).
 
 ![Flow Trigger Action](images/flowTriggerAction.png)
 
