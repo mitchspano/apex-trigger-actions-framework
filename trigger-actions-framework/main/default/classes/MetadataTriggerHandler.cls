@@ -79,6 +79,10 @@ public inherited sharing class MetadataTriggerHandler extends TriggerBase implem
 		this.executeActions(TriggerOperation.AFTER_UNDELETE, newList, null);
 	}
 
+	public override void finalizeTrigger() {
+		System.debug('Trigger has been finalized!');
+	}
+
 	private list<Trigger_Action__mdt> getActionMetadata(String relationshipName) {
 		if (!sObjectToContextToActions.containsKey(this.sObjectName)) {
 			sObjectToContextToActions.put(
