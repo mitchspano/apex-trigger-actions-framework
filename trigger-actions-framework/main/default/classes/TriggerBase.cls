@@ -25,8 +25,18 @@ public inherited sharing virtual class TriggerBase {
 		System.TriggerOperation.AFTER_UPDATE => System.TriggerOperation.BEFORE_UPDATE,
 		System.TriggerOperation.AFTER_DELETE => System.TriggerOperation.BEFORE_DELETE
 	};
+
 	@TestVisible
 	private static Set<String> bypassedObjects = new Set<String>();
+
+	private static Integer existingDmlRowsOffset = 0;
+
+	private static Integer rowsLeftToProcess;
+
+	private static TriggerBase.Stack contextStack = new TriggerBase.Stack();
+
+	private String lastProcessedContext;
+
 	@TestVisible
 	public static Map<Id, Integer> idToNumberOfTimesSeenBeforeUpdate {
 		get;
@@ -37,10 +47,6 @@ public inherited sharing virtual class TriggerBase {
 		get;
 		private set;
 	}
-
-	private static TriggerBase.Stack contextStack = new TriggerBase.Stack();
-
-	private String lastProcessedContext;
 
 	private String contextKey {
 		get {
@@ -76,10 +82,40 @@ public inherited sharing virtual class TriggerBase {
 		TriggerBase.bypassedObjects.clear();
 	}
 
+	public static void offsetExistingDmlRows() {
+		existingDmlRowsOffset = Limits.getDMLRows();
+	}
+
+	private void setRowsLeftToProcess() {
+		if (!TriggerBase.contextStack.isEmpty()) {
+			return;
+		}
+		if (rowsLeftToProcess == null) {
+			System.debug(
+				'Total number of records passed to the database (Limits.getDMLRows()): ' +
+				Limits.getDMLRows()
+			);
+			rowsLeftToProcess = Limits.getDMLRows() - existingDmlRowsOffset;
+		}
+		Integer numberOfRecordsBeingProcessed = triggerNew != null
+			? triggerNew.size()
+			: triggerOld.size();
+		rowsLeftToProcess = rowsLeftToProcess - numberOfRecordsBeingProcessed;
+
+		System.debug(
+			'numberOfRecordsBeingProcessed in this context: ' +
+			numberOfRecordsBeingProcessed
+		);
+		System.debug('rowsLeftToProcess until we are done: ' + rowsLeftToProcess);
+	}
+
 	public void run() {
 		if (!shouldRun()) {
 			return;
 		}
+		System.debug('Context :' + this.contextKey);
+		System.debug('Size : ' + Trigger.size);
+		setRowsLeftToProcess();
 		TriggerBase.contextStack.push(this.contextKey);
 		if (
 			this.context == System.TriggerOperation.BEFORE_INSERT &&
@@ -138,7 +174,7 @@ public inherited sharing virtual class TriggerBase {
 			((TriggerAction.AfterUndelete) this).afterUndelete(triggerNew);
 		}
 		checkForEndofTriggerProcessing();
-		if (TriggerBase.contextStack.isEmpty()) {
+		if (TriggerBase.contextStack.isEmpty() && rowsLeftToProcess == 0) {
 			this.finalizeTrigger();
 		}
 	}

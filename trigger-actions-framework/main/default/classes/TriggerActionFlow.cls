@@ -251,9 +251,7 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 					.get(TriggerActionConstants.RECORD_VARIABLE));
 				if (newRecordWhenFlowIsComplete == null) {
 					throw new IllegalArgumentException(
-						this.flowName +
-						': ' +
-						RECORD_VARIABLE_NOT_FOUND_ERROR
+						this.flowName + ': ' + RECORD_VARIABLE_NOT_FOUND_ERROR
 					);
 				}
 				applyFlowValues(newList[i], newRecordWhenFlowIsComplete);
