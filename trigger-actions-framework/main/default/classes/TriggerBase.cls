@@ -20,6 +20,8 @@
 public inherited sharing virtual class TriggerBase {
 	@TestVisible
 	private static final String HANDLER_OUTSIDE_TRIGGER_MESSAGE = 'Trigger handler called outside of Trigger execution';
+	@TestVisible
+	private static final String CANNOT_FINALIZE = 'Calling `nowFinalize()` is only allowed after `waitToFinalize()` has been called';
 	private static final Map<System.TriggerOperation, System.TriggerOperation> CONTEXT_TO_INVERSE = new Map<System.TriggerOperation, System.TriggerOperation>{
 		System.TriggerOperation.AFTER_INSERT => System.TriggerOperation.BEFORE_INSERT,
 		System.TriggerOperation.AFTER_UPDATE => System.TriggerOperation.BEFORE_UPDATE,
@@ -28,14 +30,12 @@ public inherited sharing virtual class TriggerBase {
 
 	@TestVisible
 	private static Set<String> bypassedObjects = new Set<String>();
-
 	private static Integer existingDmlRowsOffset = 0;
-
 	private static Integer rowsLeftToProcess;
-
 	private static TriggerBase.Stack contextStack = new TriggerBase.Stack();
-
 	private String lastProcessedContext;
+	private static Boolean suppressFinalizeExecution = false;
+	private static TriggerBase instanceToFinalize;
 
 	@TestVisible
 	public static Map<Id, Integer> idToNumberOfTimesSeenBeforeUpdate {
@@ -86,29 +86,22 @@ public inherited sharing virtual class TriggerBase {
 		existingDmlRowsOffset = Limits.getDMLRows();
 	}
 
-	private void setRowsLeftToProcess() {
-		if (!TriggerBase.contextStack.isEmpty()) {
-			return;
-		}
-		if (rowsLeftToProcess == null) {
-			System.debug('Limits.getDMLRows(): ' + Limits.getDMLRows());
-			rowsLeftToProcess = Limits.getDMLRows() - existingDmlRowsOffset;
-			System.debug(
-				'Total number of records passed to the database in this DML operation: ' +
-				rowsLeftToProcess
-			);
-		}
-		rowsLeftToProcess = rowsLeftToProcess - Trigger.size;
+	public static void waitToFinalize() {
+		suppressFinalizeExecution = true;
+	}
 
-		System.debug('Trigger.size in this context: ' + Trigger.size);
-		System.debug('rowsLeftToProcess until we are done: ' + rowsLeftToProcess);
+	public static void nowFinalize() {
+		if (suppressFinalizeExecution == false) {
+			throw new TriggerBaseException(CANNOT_FINALIZE);
+		}
+		instanceToFinalize?.finalizeTrigger();
 	}
 
 	public void run() {
 		if (!shouldRun()) {
 			return;
 		}
-		System.debug('Context :' + this.contextKey);
+		setInstanceToFinalize();
 		setRowsLeftToProcess();
 		TriggerBase.contextStack.push(this.contextKey);
 		if (
@@ -167,15 +160,10 @@ public inherited sharing virtual class TriggerBase {
 		) {
 			((TriggerAction.AfterUndelete) this).afterUndelete(triggerNew);
 		}
-		checkForEndofTriggerProcessing();
-		if (TriggerBase.contextStack.isEmpty() && rowsLeftToProcess == 0) {
-			rowsLeftToProcess = null;
-			existingDmlRowsOffset = limits.getDmlRows();
-			this.finalizeTrigger();
-		}
+		checkForEndOfTriggerProcessing();
 	}
 
-	private void checkForEndofTriggerProcessing() {
+	private void checkForEndOfTriggerProcessing() {
 		if (this.context == System.TriggerOperation.AFTER_UNDELETE) {
 			TriggerBase.contextStack.pop();
 		}
@@ -186,6 +174,13 @@ public inherited sharing virtual class TriggerBase {
 				TriggerBase.contextStack.pop();
 			} else {
 				triggerBase.contextStack.push(currentContext);
+			}
+		}
+		if (TriggerBase.contextStack.isEmpty() && rowsLeftToProcess == 0) {
+			rowsLeftToProcess = null;
+			existingDmlRowsOffset = limits.getDmlRows();
+			if (!suppressFinalizeExecution) {
+				this.finalizeTrigger();
 			}
 		}
 	}
@@ -202,6 +197,22 @@ public inherited sharing virtual class TriggerBase {
 			return false;
 		}
 		return true;
+	}
+
+	private void setRowsLeftToProcess() {
+		if (!TriggerBase.contextStack.isEmpty()) {
+			return;
+		}
+		if (rowsLeftToProcess == null) {
+			rowsLeftToProcess = Limits.getDMLRows() - existingDmlRowsOffset;
+		}
+		rowsLeftToProcess = rowsLeftToProcess - Trigger.size;
+	}
+
+	private void setInstanceToFinalize() {
+		if (suppressFinalizeExecution && instanceToFinalize == null) {
+			instanceToFinalize = this;
+		}
 	}
 
 	@TestVisible
@@ -258,10 +269,6 @@ public inherited sharing virtual class TriggerBase {
 		private set;
 	}
 
-	@TestVisible
-	private class TriggerBaseException extends Exception {
-	}
-
 	private class Stack {
 		private List<String> data = new List<String>();
 		public void push(String s) {
@@ -289,6 +296,11 @@ public inherited sharing virtual class TriggerBase {
 		}
 	}
 
-	public class EmptyStackException extends Exception {
+	@TestVisible
+	private class TriggerBaseException extends Exception {
+	}
+
+	@TestVisible
+	private class EmptyStackException extends Exception {
 	}
 }
