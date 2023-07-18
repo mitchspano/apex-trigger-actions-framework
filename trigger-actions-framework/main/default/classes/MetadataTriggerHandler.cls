@@ -43,6 +43,7 @@ public inherited sharing class MetadataTriggerHandler extends TriggerBase implem
 		' '
 	);
 	private static final String RELATIONSHIP_SUFFIX = '__r';
+
 	@TestVisible
 	private static Set<String> bypassedActions = new Set<String>();
 	@TestVisible
@@ -50,6 +51,22 @@ public inherited sharing class MetadataTriggerHandler extends TriggerBase implem
 	@TestVisible
 	private static Map<String, Boolean> permissionMap = new Map<String, Boolean>();
 	private static Map<String, Map<String, List<Trigger_Action__mdt>>> sObjectToContextToActions = new Map<String, Map<String, List<Trigger_Action__mdt>>>();
+
+	public static void bypass(String actionName) {
+		MetadataTriggerHandler.bypassedActions.add(actionName);
+	}
+
+	public static void clearBypass(String actionName) {
+		MetadataTriggerHandler.bypassedActions.remove(actionName);
+	}
+
+	public static Boolean isBypassed(String actionName) {
+		return MetadataTriggerHandler.bypassedActions.contains(actionName);
+	}
+
+	public static void clearAllBypasses() {
+		MetadataTriggerHandler.bypassedActions.clear();
+	}
 
 	public void beforeInsert(List<SObject> newList) {
 		this.executeActions(TriggerOperation.BEFORE_INSERT, newList, null);
@@ -79,8 +96,36 @@ public inherited sharing class MetadataTriggerHandler extends TriggerBase implem
 		this.executeActions(TriggerOperation.AFTER_UNDELETE, newList, null);
 	}
 
-	public override void finalizeTrigger() {
-		System.debug('Trigger has been finalized!');
+	protected override void finalizeTrigger() {
+		List<DML_Finalizer__mdt> sortedFinalizers = getSortedFinalizers();
+		for (DML_Finalizer__mdt finalizerMetadata : sortedFinalizers) {
+			if (finalizerMetadata.Bypass_Execution__c) {
+				return;
+			}
+			populatePermissionMap(finalizerMetadata.Bypass_Permission__c);
+			populatePermissionMap(finalizerMetadata.Required_Permission__c);
+			if (
+				isNotBypassed(
+					finalizerMetadata.Bypass_Permission__c,
+					finalizerMetadata.Required_Permission__c
+				)
+			) {
+				((TriggerAction.TriggerFinalizer) Type.forName(
+							finalizerMetadata.Apex_Class_Name__c
+						)
+						.newInstance())
+					.execute();
+			}
+		}
+	}
+
+	private void populatePermissionMap(String permissionName) {
+		if (permissionName != null && !permissionMap.containsKey(permissionName)) {
+			permissionMap.put(
+				permissionName,
+				FeatureManagement.checkPermission(permissionName)
+			);
+		}
 	}
 
 	private list<Trigger_Action__mdt> getActionMetadata(String relationshipName) {
@@ -150,14 +195,7 @@ public inherited sharing class MetadataTriggerHandler extends TriggerBase implem
 				sObjectRequiredPermissionName
 			}
 		) {
-			if (
-				permissionName != null && !permissionMap.containsKey(permissionName)
-			) {
-				permissionMap.put(
-					permissionName,
-					FeatureManagement.checkPermission(permissionName)
-				);
-			}
+			populatePermissionMap(permissionName);
 		}
 
 		return isNotBypassed(
@@ -298,6 +336,36 @@ public inherited sharing class MetadataTriggerHandler extends TriggerBase implem
 		}
 	}
 
+	private void handleException(
+		String error,
+		String className,
+		TriggerOperation triggerOperation
+	) {
+		throw new MetadataTriggerHandlerException(
+			String.format(
+				error,
+				new List<String>{
+					className,
+					String.valueOf(triggerOperation),
+					this.sObjectName
+				}
+			)
+		);
+	}
+
+	private List<DML_Finalizer__mdt> getSortedFinalizers() {
+		List<FinalizerSorter> sorters = new List<FinalizerSorter>();
+		for (DML_Finalizer__mdt finalizer : this.allFinalizers) {
+			sorters.add(new FinalizerSorter(finalizer));
+		}
+		List<DML_Finalizer__mdt> results = new List<DML_Finalizer__mdt>();
+		sorters.sort();
+		for (FinalizerSorter sorter : sorters) {
+			results.add(sorter.metadata);
+		}
+		return results;
+	}
+
 	@TestVisible
 	private List<Trigger_Action__mdt> beforeInsertActionMetadata {
 		get {
@@ -389,37 +457,29 @@ public inherited sharing class MetadataTriggerHandler extends TriggerBase implem
 		set;
 	}
 
-	private void handleException(
-		String error,
-		String className,
-		TriggerOperation triggerOperation
-	) {
-		throw new MetadataTriggerHandlerException(
-			String.format(
-				error,
-				new List<String>{
-					className,
-					String.valueOf(triggerOperation),
-					this.sObjectName
-				}
-			)
-		);
+	@TestVisible
+	private List<DML_Finalizer__mdt> allFinalizers {
+		get {
+			if (allFinalizers == null) {
+				allFinalizers = DML_Finalizer__mdt.getAll().values();
+			}
+			return allFinalizers;
+		}
+		private set;
 	}
 
-	public static void bypass(String actionName) {
-		MetadataTriggerHandler.bypassedActions.add(actionName);
-	}
+	private class FinalizerSorter implements Comparable {
+		public final DML_Finalizer__mdt metadata;
 
-	public static void clearBypass(String actionName) {
-		MetadataTriggerHandler.bypassedActions.remove(actionName);
-	}
+		public FinalizerSorter(DML_Finalizer__mdt metadata) {
+			this.metadata = metadata;
+		}
 
-	public static Boolean isBypassed(String actionName) {
-		return MetadataTriggerHandler.bypassedActions.contains(actionName);
-	}
-
-	public static void clearAllBypasses() {
-		MetadataTriggerHandler.bypassedActions.clear();
+		public Integer compareTo(Object other) {
+			Decimal difference = (this.metadata.Order__c -
+			((FinalizerSorter) other).metadata.Order__c);
+			return difference < 0 ? -1 : difference == 0 ? 0 : 1;
+		}
 	}
 
 	@TestVisible
