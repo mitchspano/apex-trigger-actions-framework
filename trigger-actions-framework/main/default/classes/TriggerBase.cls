@@ -91,21 +91,16 @@ public inherited sharing virtual class TriggerBase {
 			return;
 		}
 		if (rowsLeftToProcess == null) {
-			System.debug(
-				'Total number of records passed to the database (Limits.getDMLRows()): ' +
-				Limits.getDMLRows()
-			);
+			System.debug('Limits.getDMLRows(): ' + Limits.getDMLRows());
 			rowsLeftToProcess = Limits.getDMLRows() - existingDmlRowsOffset;
+			System.debug(
+				'Total number of records passed to the database in this DML operation: ' +
+				rowsLeftToProcess
+			);
 		}
-		Integer numberOfRecordsBeingProcessed = triggerNew != null
-			? triggerNew.size()
-			: triggerOld.size();
-		rowsLeftToProcess = rowsLeftToProcess - numberOfRecordsBeingProcessed;
+		rowsLeftToProcess = rowsLeftToProcess - Trigger.size;
 
-		System.debug(
-			'numberOfRecordsBeingProcessed in this context: ' +
-			numberOfRecordsBeingProcessed
-		);
+		System.debug('Trigger.size in this context: ' + Trigger.size);
 		System.debug('rowsLeftToProcess until we are done: ' + rowsLeftToProcess);
 	}
 
@@ -114,7 +109,6 @@ public inherited sharing virtual class TriggerBase {
 			return;
 		}
 		System.debug('Context :' + this.contextKey);
-		System.debug('Size : ' + Trigger.size);
 		setRowsLeftToProcess();
 		TriggerBase.contextStack.push(this.contextKey);
 		if (
@@ -175,6 +169,8 @@ public inherited sharing virtual class TriggerBase {
 		}
 		checkForEndofTriggerProcessing();
 		if (TriggerBase.contextStack.isEmpty() && rowsLeftToProcess == 0) {
+			rowsLeftToProcess = null;
+			existingDmlRowsOffset = limits.getDmlRows();
 			this.finalizeTrigger();
 		}
 	}
