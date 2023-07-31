@@ -4,9 +4,9 @@
   <img src="https://raw.githubusercontent.com/afawcett/githubsfdeploy/master/src/main/webapp/resources/img/deploy.png" alt="Deploy to Salesforce" />
 </a>
 
-#### [Unlocked Package Installation (Production)](https://login.salesforce.com/packaging/installPackage.apexp?p0=04t3h000004VaVFAA0)
+#### [Unlocked Package Installation (Production)](https://login.salesforce.com/packaging/installPackage.apexp?p0=04t3h000004OYREAA4)
 
-#### [Unlocked Package Installation (Sandbox)](https://test.salesforce.com/packaging/installPackage.apexp?p0=04t3h000004VaVFAA0)
+#### [Unlocked Package Installation (Sandbox)](https://test.salesforce.com/packaging/installPackage.apexp?p0=04t3h000004OYREAA4)
 
 ---
 
@@ -39,6 +39,7 @@ Note that if an Apex class is specified in metadata and it does not exist or doe
 ---
 
 ### Enabling on an SObject
+
 To get started, call the the `MetadataTriggerHandler` class within the body of the trigger of the sObject:
 
 ```java
@@ -54,12 +55,13 @@ trigger OpportunityTrigger on Opportunity (
   new MetadataTriggerHandler().run();
 }
 ```
-Next, create a row in the `SObject_Trigger_Setting__mdt` custom metadata type which corresponds to the sObject that we want to enable usage of the framework on -  in this case, it would be Opportunity.
+
+Next, create a row in the `SObject_Trigger_Setting__mdt` custom metadata type which corresponds to the sObject that we want to enable usage of the framework on - in this case, it would be Opportunity.
 
 ![New SObject Trigger Setting](images/newSObjectTriggerSetting.png)
 
-
 ## Apex Actions
+
 To define a specific action, we write an individual class which implements the applicable interface(s):
 
 ```java

@@ -29,9 +29,10 @@ jobs:
           node_modules/sfdx-cli/bin/run plugins:install @salesforce/sfdx-scanner
 
       - name: Run SFDX Scanner - Report findings as comments
-        uses: mitchspano/sfdx-scan-pull-request@v0.1.7
+        uses: mitchspano/sfdx-scan-pull-request@v0.1.14
         with:
           severity-threshold: 4
+          report-mode: comments
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
