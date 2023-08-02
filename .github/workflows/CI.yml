@@ -56,5 +56,5 @@ jobs:
           source /tmp/rcfile
           sfdx force:org:create -v devhub -s -f config/project-scratch-def.json -a scratchOrg -d 1
           sfdx force:source:push -u scratchOrg
-          sfdx force:apex:test:run -c -r human
+          sfdx force:apex:test:run -c -r human -w 10
           sfdx force:org:delete -p -u scratchOrg
