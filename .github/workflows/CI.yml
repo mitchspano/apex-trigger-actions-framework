@@ -20,12 +20,12 @@ jobs:
         with:
           node-version: ">=14"
           check-latest: true
-      
+
       - name: Define Aliases
         run: |
-        rc=/tmp/rcfile
-        echo 'shopt -s expand_aliases' > $rc
-        echo 'alias sfdx="node_modules/sfdx-cli/bin/run"' >> $rc
+          rc=/tmp/rcfile
+          echo 'shopt -s expand_aliases' > $rc
+          echo 'alias sfdx="node_modules/sfdx-cli/bin/run"' >> $rc
 
       - name: Install Salesforce CLI + Scanner
         run: |
