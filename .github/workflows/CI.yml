@@ -38,7 +38,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Validate Contents in a Scratch Org
+      - name: Authenticate into DevHub
         run: |
           shopt -s expand_aliases
           alias sfdx="node_modules/sfdx-cli/bin/run"
