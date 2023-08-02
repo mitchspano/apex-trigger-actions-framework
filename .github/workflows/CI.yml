@@ -21,16 +21,9 @@ jobs:
           node-version: ">=14"
           check-latest: true
 
-      - name: Define Aliases
-        run: |
-          rc=/tmp/rcfile
-          echo 'shopt -s expand_aliases' > $rc
-          echo 'alias sfdx="node_modules/sfdx-cli/bin/run"' >> $rc
-
       - name: Install Salesforce CLI + Scanner
         run: |
-          source /tmp/rcfile
-          npm install sfdx-cli
+          npm install sfdx-cli -g
           sfdx --version
           sfdx plugins --core
           sfdx plugins:install @salesforce/sfdx-scanner
@@ -45,7 +38,6 @@ jobs:
 
       - name: Authenticate into DevHub
         run: |
-          source /tmp/rcfile
           echo "${SALESFORCE_JWT_SECRET_KEY}" > server.key
           sfdx force:auth:jwt:grant --clientid ${{ secrets.SALESFORCE_CONSUMER_KEY }} --jwtkeyfile server.key --username ${{ secrets.SALESFORCE_DEVHUB_USERNAME}} --setdefaultdevhubusername -a devhub
         env:
@@ -53,7 +45,6 @@ jobs:
 
       - name: Validate Contents in a Scratch Org
         run: |
-          source /tmp/rcfile
           sfdx force:org:create -v devhub -s -f config/project-scratch-def.json -a scratchOrg -d 1
           sfdx force:source:push -u scratchOrg
           sfdx force:apex:test:run -c -r human -y
