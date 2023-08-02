@@ -24,7 +24,7 @@ jobs:
       - name: Install Salesforce CLI + Scanner
         run: |
           npm install sfdx-cli
-          alias sfdx = node_modules/sfdx-cli/bin/run
+          alias sfdx="node_modules/sfdx-cli/bin/run"
           sfdx --version
           sfdx plugins --core
           sfdx plugins:install @salesforce/sfdx-scanner
