@@ -96,6 +96,7 @@ public inherited sharing class MetadataTriggerHandler extends TriggerBase implem
 		this.executeActions(TriggerOperation.AFTER_UNDELETE, newList, null);
 	}
 
+    @TestVisible
 	protected override void finalizeTrigger() {
 		List<DML_Finalizer__mdt> sortedFinalizers = getSortedFinalizers();
 		for (DML_Finalizer__mdt finalizerMetadata : sortedFinalizers) {

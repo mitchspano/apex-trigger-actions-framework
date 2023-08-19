@@ -52,6 +52,7 @@ private class MetadataTriggerHandlerTest {
 	);
 	private static MetadataTriggerHandler handler = new MetadataTriggerHandler();
 	private static Boolean executed = false;
+	private static Boolean finalizerExecuted = false;
 	private static Exception myException;
 	private static Trigger_Action__mdt action = new Trigger_Action__mdt(
 		Apex_Class_Name__c = TEST_BEFORE_INSERT,
@@ -723,6 +724,55 @@ private class MetadataTriggerHandlerTest {
 		System.Assert.areEqual(null, myException, EXCEPTION_SHOULD_NOT_BE_THROWN);
 	}
 
+	@IsTest
+	private static void noConfiguredFinalizerShouldTakeNoAction() {
+		handler.finalizeTrigger();
+
+		System.Assert.isFalse(
+			finalizerExecuted,
+			'There are no finalizers so no action should be taken'
+		);
+	}
+
+	@IsTest
+	private static void properlyConfiguredFinalizerShouldExecute() {
+		handler.allFinalizers = new List<DML_Finalizer__mdt>{
+			new DML_Finalizer__mdt(
+				Apex_Class_Name__c = 'MetadataTriggerHandlerTest.TestFinalizer'
+			)
+		};
+
+		handler.finalizeTrigger();
+
+		System.Assert.isTrue(
+			finalizerExecuted,
+			'The finalizer should be dynamically instantiated and executed'
+		);
+	}
+
+	@IsTest
+	private static void bypassedFinalizerShouldNotExecute() {
+		handler.allFinalizers = new List<DML_Finalizer__mdt>{
+			new DML_Finalizer__mdt(
+				Apex_Class_Name__c = 'Foo',
+				Bypass_Execution__c = true,
+				Order__c = 1
+			),
+			new DML_Finalizer__mdt(
+				Apex_Class_Name__c = 'Bar',
+				Bypass_Execution__c = true,
+				Order__c = 2
+			)
+		};
+
+		handler.finalizeTrigger();
+
+		System.Assert.isFalse(
+			finalizerExecuted,
+			'The finalizers should be dynamically instantiated, but no action should be taken because they are bypassed'
+		);
+	}
+
 	public class TestBeforeInsert implements TriggerAction.BeforeInsert {
 		public void beforeInsert(List<SObject> newList) {
 			MetadataTriggerHandlerTest.executed = true;
@@ -756,6 +806,12 @@ private class MetadataTriggerHandlerTest {
 	public class TestAfterUndelete implements TriggerAction.AfterUndelete {
 		public void afterUndelete(List<SObject> newList) {
 			MetadataTriggerHandlerTest.executed = true;
+		}
+	}
+
+	public class TestFinalizer implements TriggerAction.TriggerFinalizer {
+		public void execute() {
+			finalizerExecuted = true;
 		}
 	}
 
