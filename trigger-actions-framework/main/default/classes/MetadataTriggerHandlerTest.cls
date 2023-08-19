@@ -809,7 +809,7 @@ private class MetadataTriggerHandlerTest {
 		}
 	}
 
-	public class TestFinalizer implements TriggerAction.TriggerFinalizer {
+	public class TestFinalizer implements TriggerAction.DmlFinalizer {
 		public void execute() {
 			finalizerExecuted = true;
 		}
