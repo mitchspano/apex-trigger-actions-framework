@@ -101,7 +101,7 @@ public inherited sharing class MetadataTriggerHandler extends TriggerBase implem
 	}
 
 	@TestVisible
-	protected override void finalizeTrigger() {
+	protected override void finalizeDmlOperation() {
 		List<DML_Finalizer__mdt> sortedFinalizers = getSortedFinalizers();
 		for (DML_Finalizer__mdt finalizerMetadata : sortedFinalizers) {
 			if (finalizerMetadata.Bypass_Execution__c) {

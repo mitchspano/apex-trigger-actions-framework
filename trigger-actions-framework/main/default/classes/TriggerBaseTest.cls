@@ -21,8 +21,10 @@ private class TriggerBaseTest {
 	private static final String BYPASSES_SHOULD_BE_CONFIGURED_CORRECTLY = 'The bypasses should be configured correctly';
 	private static final String FIRST = 'first';
 	private static final String NUMBER_OF_TIMES_SEEN_SHOULD_BE_CORRECT = 'The number of time seen should be populated properly';
-	private static final String RUN_SUCCESS = 'Run should be successful ';
+	private static final String RUN_SUCCESS = 'Run should be successful';
 	private static final String SECOND = 'second';
+	private static final String SHOULD_BE_FINALIZED = 'The DML operation should be finalized';
+	private static final String SHOULD_NOT_BE_FINALIZED = 'The DML operation should not be finalized';
 	private static final String THIRD = 'third';
 
 	private static final Account MY_ACCOUNT = new Account(
@@ -200,11 +202,11 @@ private class TriggerBaseTest {
 
 		base.run();
 
-		System.Assert.isFalse(base.executed, 'The base should not have executed');
+		System.Assert.isFalse(base.executed, SHOULD_NOT_BE_FINALIZED);
 	}
 
 	@IsTest
-	private static void inverseContextsShouldFinalizeTriggerInsert() {
+	private static void inverseContextsShouldFinalizeDmlOperationInsert() {
 		base.triggerOld = null;
 		base.dmlRows = 1;
 		base.context = System.TriggerOperation.BEFORE_INSERT;
@@ -212,11 +214,22 @@ private class TriggerBaseTest {
 		base.context = System.TriggerOperation.AFTER_INSERT;
 		base.run();
 
-		System.Assert.isTrue(base.finalized, 'The base should have finalized');
+		System.Assert.isTrue(base.finalized, SHOULD_BE_FINALIZED);
 	}
 
 	@IsTest
-	private static void inverseContextsShouldFinalizeTriggerDelete() {
+	private static void inverseContextsShouldFinalizeDmlOperationUpdate() {
+		base.dmlRows = 1;
+		base.context = System.TriggerOperation.BEFORE_UPDATE;
+		base.run();
+		base.context = System.TriggerOperation.AFTER_UPDATE;
+		base.run();
+
+		System.Assert.isTrue(base.finalized, SHOULD_BE_FINALIZED);
+	}
+
+	@IsTest
+	private static void inverseContextsShouldFinalizeDmlOperationDelete() {
 		base.triggerNew = null;
 		base.dmlRows = 1;
 		base.context = System.TriggerOperation.BEFORE_DELETE;
@@ -224,7 +237,17 @@ private class TriggerBaseTest {
 		base.context = System.TriggerOperation.AFTER_DELETE;
 		base.run();
 
-		System.Assert.isTrue(base.finalized, 'The base should have finalized');
+		System.Assert.isTrue(base.finalized, SHOULD_BE_FINALIZED);
+	}
+
+	@IsTest
+	private static void inverseContextsShouldFinalizeDmlOperationUndelete() {
+		base.triggerOld = null;
+		base.dmlRows = 1;
+		base.context = System.TriggerOperation.AFTER_UNDELETE;
+		base.run();
+
+		System.Assert.isTrue(base.finalized, SHOULD_BE_FINALIZED);
 	}
 
 	@IsTest
@@ -444,8 +467,8 @@ private class TriggerBaseTest {
 		public void afterUndelete(List<SObject> newList) {
 			this.executed = true;
 		}
-		public override void finalizeTrigger() {
-			super.finalizeTrigger();
+		public override void finalizeDmlOperation() {
+			super.finalizeDmlOperation();
 			finalized = true;
 		}
 		private override Integer getDmlRows() {

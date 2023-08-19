@@ -104,7 +104,7 @@ public inherited sharing virtual class TriggerBase {
 		if (suppressFinalizeExecution == false) {
 			throw new TriggerBaseException(CANNOT_FINALIZE);
 		}
-		instanceToFinalize?.finalizeTrigger();
+		instanceToFinalize?.finalizeDmlOperation();
 	}
 
 	public void run() {
@@ -174,13 +174,13 @@ public inherited sharing virtual class TriggerBase {
 			rowsLeftToProcess = null;
 			existingDmlRowsOffset = getDmlRows();
 			if (!suppressFinalizeExecution) {
-				instanceToFinalize.finalizeTrigger();
+				instanceToFinalize.finalizeDmlOperation();
 			}
 		}
 	}
 
 	@SuppressWarnings('PMD.EmptyStatementBlock')
-	protected virtual void finalizeTrigger() {
+	protected virtual void finalizeDmlOperation() {
 	}
 
 	private void incrementUpdateCounts(

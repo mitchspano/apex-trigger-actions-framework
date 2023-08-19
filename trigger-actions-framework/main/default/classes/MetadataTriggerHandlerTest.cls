@@ -730,7 +730,7 @@ private class MetadataTriggerHandlerTest {
 
 	@IsTest
 	private static void noConfiguredFinalizerShouldTakeNoAction() {
-		handler.finalizeTrigger();
+		handler.finalizeDmlOperation();
 
 		System.Assert.isTrue(
 			finalizerLedger.isEmpty(),
@@ -744,7 +744,7 @@ private class MetadataTriggerHandlerTest {
 			new DML_Finalizer__mdt(Apex_Class_Name__c = FOO_FINALIZER)
 		};
 
-		handler.finalizeTrigger();
+		handler.finalizeDmlOperation();
 
 		System.Assert.areEqual(
 			FOO,
@@ -763,7 +763,7 @@ private class MetadataTriggerHandlerTest {
 			)
 		};
 
-		handler.finalizeTrigger();
+		handler.finalizeDmlOperation();
 
 		System.Assert.isTrue(
 			finalizerLedger.isEmpty(),
@@ -778,7 +778,7 @@ private class MetadataTriggerHandlerTest {
 			new DML_Finalizer__mdt(Apex_Class_Name__c = BAR_FINALIZER, Order__c = 2)
 		};
 
-		handler.finalizeTrigger();
+		handler.finalizeDmlOperation();
 
 		System.Assert.areEqual(
 			FOO,
@@ -799,7 +799,7 @@ private class MetadataTriggerHandlerTest {
 		};
 
 		try {
-			handler.finalizeTrigger();
+			handler.finalizeDmlOperation();
 		} catch (Exception e) {
 			myException = e;
 		}
@@ -823,7 +823,7 @@ private class MetadataTriggerHandlerTest {
 		};
 
 		try {
-			handler.finalizeTrigger();
+			handler.finalizeDmlOperation();
 		} catch (Exception e) {
 			myException = e;
 		}
