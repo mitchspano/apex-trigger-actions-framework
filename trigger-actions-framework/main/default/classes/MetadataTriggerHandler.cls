@@ -20,7 +20,11 @@ public inherited sharing class MetadataTriggerHandler extends TriggerBase implem
 	@TestVisible
 	private static final String INVALID_TYPE_ERROR = 'Please check the Trigger Action Custom Metadata for the {1} context on the {2} sObject. The {0} class does not implement the Trigger Action interface specified for the {1} context.';
 	@TestVisible
+	private static final String INVALID_TYPE_ERROR_FINALIZER = 'Please check the DML Finalizer Custom Metadata. The {0} class does not implement the TriggerAction.DmlFinalizer interface.';
+	@TestVisible
 	private static final String INVALID_CLASS_ERROR = 'Please check the Trigger Action Custom Metadata for the {1} context on the {2} sObject. The {0} class does not exist.';
+	@TestVisible
+	private static final String INVALID_CLASS_ERROR_FINALIZER = 'Please check the DML Finalizer Custom Metadata. The {0} class does not exist.';
 	private static final String QUERY_TEMPLATE = String.join(
 		new List<String>{
 			'SELECT Apex_Class_Name__c,',
@@ -111,13 +115,32 @@ public inherited sharing class MetadataTriggerHandler extends TriggerBase implem
 					finalizerMetadata.Required_Permission__c
 				)
 			) {
-				((TriggerAction.DmlFinalizer) Type.forName(
-							finalizerMetadata.Apex_Class_Name__c
-						)
-						.newInstance())
-					.execute();
+				callReferencedFinalizer(finalizerMetadata);
 			}
 		}
+	}
+
+	private void callReferencedFinalizer(DML_Finalizer__mdt finalizerMetadata) {
+		Object dynamicInstance;
+		String className = finalizerMetadata.Apex_Class_Name__c;
+		try {
+			dynamicInstance = Type.forName(className).newInstance();
+		} catch (System.NullPointerException e) {
+			handleFinalizerException(INVALID_CLASS_ERROR_FINALIZER, className);
+		}
+		TriggerAction.DmlFinalizer finalizer;
+		try {
+			finalizer = (TriggerAction.DmlFinalizer) dynamicInstance;
+		} catch (Exception e) {
+			handleFinalizerException(INVALID_TYPE_ERROR_FINALIZER, className);
+		}
+		finalizer.execute();
+	}
+
+	private void handleFinalizerException(String errorFormat, String className) {
+		throw new MetadataTriggerHandlerException(
+			String.format(errorFormat, new List<String>{ className })
+		);
 	}
 
 	private void populatePermissionMap(String permissionName) {

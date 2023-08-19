@@ -19,8 +19,11 @@
 private class TriggerBaseTest {
 	private static final String ACCOUNT = 'Account';
 	private static final String BYPASSES_SHOULD_BE_CONFIGURED_CORRECTLY = 'The bypasses should be configured correctly';
+	private static final String FIRST = 'first';
 	private static final String NUMBER_OF_TIMES_SEEN_SHOULD_BE_CORRECT = 'The number of time seen should be populated properly';
 	private static final String RUN_SUCCESS = 'Run should be successful ';
+	private static final String SECOND = 'second';
+	private static final String THIRD = 'third';
 
 	private static final Account MY_ACCOUNT = new Account(
 		Id = TriggerTestUtility.getFakeId(Schema.Account.SObjectType),
@@ -308,6 +311,77 @@ private class TriggerBaseTest {
 			TriggerBase.CANNOT_FINALIZE,
 			myException.getMessage(),
 			'There should be an exception when you finalize without waiting'
+		);
+	}
+
+	@IsTest
+	private static void stacksShouldBeAbleToDetermineIftheyAreEmpty() {
+		TriggerBase.Stack stack = new TriggerBase.Stack();
+		stack.push(FIRST);
+		stack.pop();
+
+		System.Assert.isTrue(
+			stack.isEmpty(),
+			'The stack is empty but unable to identify as such'
+		);
+	}
+
+	@IsTest
+	private static void stackShouldBeFirstInLastOut() {
+		TriggerBase.Stack stack = new TriggerBase.Stack();
+		stack.push(FIRST);
+		stack.push(SECOND);
+		stack.push(THIRD);
+
+		String popped = stack.pop();
+		popped = stack.pop();
+
+		System.Assert.areEqual(
+			FIRST,
+			stack.pop(),
+			'The first element in the stack is not the last one returned'
+		);
+	}
+
+	@IsTest
+	private static void stackShouldBeLastInFirstOut() {
+		TriggerBase.Stack stack = new TriggerBase.Stack();
+		stack.push(FIRST);
+		stack.push(SECOND);
+		stack.push(THIRD);
+
+		System.Assert.areEqual(
+			THIRD,
+			stack.pop(),
+			'The last element in the stack is not the first one returned'
+		);
+	}
+
+	@IsTest
+	private static void peekShouldShowMostRecentlyAdded() {
+		TriggerBase.Stack stack = new TriggerBase.Stack();
+		stack.push(FIRST);
+		stack.push(SECOND);
+		stack.push(THIRD);
+
+		System.Assert.areEqual(
+			THIRD,
+			stack.peek(),
+			'The last element in the stack is not peeked'
+		);
+	}
+
+	@IsTest
+	private static void stackDepthShouldBeCalculatedProperly() {
+		TriggerBase.Stack stack = new TriggerBase.Stack();
+		stack.push(FIRST);
+		stack.push(SECOND);
+		stack.push(THIRD);
+
+		System.Assert.areEqual(
+			3,
+			stack.depth(),
+			'The stack is not properly calculating its depth'
 		);
 	}
 

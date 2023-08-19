@@ -22,12 +22,16 @@ private class MetadataTriggerHandlerTest {
 	private static final String ACCOUNT = 'Account';
 	private static final String ACTION_SHOULD_EXECUTE = 'We expect the action to be executed';
 	private static final String ACTION_SHOULD_NOT_EXECUTE = 'We expect the action to not be executed';
+	private static final String BAR = 'bar';
+	private static final String BAR_FINALIZER = 'MetadataTriggerHandlerTest.BarFinalizer';
 	private static final String BOGUS_CLASS_NAME = 'Bogus';
 	private static final String BYPASS_PERMISSION = 'Bogus_Bypass_Permission';
 	private static final String BYPASSES_SHOULD_BE_CONFIGURED_PROPERLY = 'All bypasses should be configured correctly';
 	private static final String EXCEPTION_SHOULD_BE_THROWN = 'An exception should be thrown';
 	private static final String EXCEPTION_SHOULD_HAVE_CORRECT_MESSAGE = 'The exception should have the correct message';
 	private static final String EXCEPTION_SHOULD_NOT_BE_THROWN = 'An exception should not be thrown';
+	private static final String FOO = 'foo';
+	private static final String FOO_FINALIZER = 'MetadataTriggerHandlerTest.FooFinalizer';
 	private static final String METADATA_SHOULD_BE_POPULATED_PROPERLY = 'The metadata should be populated properly';
 	private static final String MY_ACCOUNT = 'My Account';
 	private static final String REQUIRED_PERMISSION = 'Bogus_Required_Permission';
@@ -52,7 +56,7 @@ private class MetadataTriggerHandlerTest {
 	);
 	private static MetadataTriggerHandler handler = new MetadataTriggerHandler();
 	private static Boolean executed = false;
-	private static Boolean finalizerExecuted = false;
+	private static List<String> finalizerLedger = new List<String>();
 	private static Exception myException;
 	private static Trigger_Action__mdt action = new Trigger_Action__mdt(
 		Apex_Class_Name__c = TEST_BEFORE_INSERT,
@@ -728,8 +732,8 @@ private class MetadataTriggerHandlerTest {
 	private static void noConfiguredFinalizerShouldTakeNoAction() {
 		handler.finalizeTrigger();
 
-		System.Assert.isFalse(
-			finalizerExecuted,
+		System.Assert.isTrue(
+			finalizerLedger.isEmpty(),
 			'There are no finalizers so no action should be taken'
 		);
 	}
@@ -737,15 +741,14 @@ private class MetadataTriggerHandlerTest {
 	@IsTest
 	private static void properlyConfiguredFinalizerShouldExecute() {
 		handler.allFinalizers = new List<DML_Finalizer__mdt>{
-			new DML_Finalizer__mdt(
-				Apex_Class_Name__c = 'MetadataTriggerHandlerTest.TestFinalizer'
-			)
+			new DML_Finalizer__mdt(Apex_Class_Name__c = FOO_FINALIZER)
 		};
 
 		handler.finalizeTrigger();
 
-		System.Assert.isTrue(
-			finalizerExecuted,
+		System.Assert.areEqual(
+			FOO,
+			finalizerLedger[0],
 			'The finalizer should be dynamically instantiated and executed'
 		);
 	}
@@ -754,22 +757,86 @@ private class MetadataTriggerHandlerTest {
 	private static void bypassedFinalizerShouldNotExecute() {
 		handler.allFinalizers = new List<DML_Finalizer__mdt>{
 			new DML_Finalizer__mdt(
-				Apex_Class_Name__c = 'Foo',
+				Apex_Class_Name__c = FOO_FINALIZER,
 				Bypass_Execution__c = true,
 				Order__c = 1
-			),
-			new DML_Finalizer__mdt(
-				Apex_Class_Name__c = 'Bar',
-				Bypass_Execution__c = true,
-				Order__c = 2
 			)
 		};
 
 		handler.finalizeTrigger();
 
-		System.Assert.isFalse(
-			finalizerExecuted,
-			'The finalizers should be dynamically instantiated, but no action should be taken because they are bypassed'
+		System.Assert.isTrue(
+			finalizerLedger.isEmpty(),
+			'The finalizer should be dynamically instantiated, but no action should be taken because it is bypassed'
+		);
+	}
+
+	@IsTest
+	private static void finalizersShouldExecuteInOrder() {
+		handler.allFinalizers = new List<DML_Finalizer__mdt>{
+			new DML_Finalizer__mdt(Apex_Class_Name__c = FOO_FINALIZER, Order__c = 1),
+			new DML_Finalizer__mdt(Apex_Class_Name__c = BAR_FINALIZER, Order__c = 2)
+		};
+
+		handler.finalizeTrigger();
+
+		System.Assert.areEqual(
+			FOO,
+			finalizerLedger[0],
+			'The finalizer with the lowest order was not executed first'
+		);
+		System.Assert.areEqual(
+			BAR,
+			finalizerLedger[1],
+			'The finalizer with the highest order was not executed last'
+		);
+	}
+
+	@IsTest
+	private static void invalidFinalizerClassShouldThrowException() {
+		handler.allFinalizers = new List<DML_Finalizer__mdt>{
+			new DML_Finalizer__mdt(Apex_Class_Name__c = BOGUS_CLASS_NAME)
+		};
+
+		try {
+			handler.finalizeTrigger();
+		} catch (Exception e) {
+			myException = e;
+		}
+
+		System.Assert.isNotNull(myException, EXCEPTION_SHOULD_BE_THROWN);
+
+		System.Assert.areEqual(
+			String.format(
+				MetadataTriggerHandler.INVALID_CLASS_ERROR_FINALIZER,
+				new List<String>{ BOGUS_CLASS_NAME }
+			),
+			myException.getMessage(),
+			EXCEPTION_SHOULD_HAVE_CORRECT_MESSAGE
+		);
+	}
+
+	@IsTest
+	private static void referencedClassDoesNotImplementDmlFinalizerShouldThrowException() {
+		handler.allFinalizers = new List<DML_Finalizer__mdt>{
+			new DML_Finalizer__mdt(Apex_Class_Name__c = TEST_BEFORE_INSERT)
+		};
+
+		try {
+			handler.finalizeTrigger();
+		} catch (Exception e) {
+			myException = e;
+		}
+
+		System.Assert.isNotNull(myException, EXCEPTION_SHOULD_BE_THROWN);
+
+		System.Assert.areEqual(
+			String.format(
+				MetadataTriggerHandler.INVALID_TYPE_ERROR_FINALIZER,
+				new List<String>{ TEST_BEFORE_INSERT }
+			),
+			myException.getMessage(),
+			EXCEPTION_SHOULD_HAVE_CORRECT_MESSAGE
 		);
 	}
 
@@ -809,9 +876,15 @@ private class MetadataTriggerHandlerTest {
 		}
 	}
 
-	public class TestFinalizer implements TriggerAction.DmlFinalizer {
+	public class FooFinalizer implements TriggerAction.DmlFinalizer {
 		public void execute() {
-			finalizerExecuted = true;
+			finalizerLedger.add(FOO);
+		}
+	}
+
+	public class BarFinalizer implements TriggerAction.DmlFinalizer {
+		public void execute() {
+			finalizerLedger.add(BAR);
 		}
 	}
 
