@@ -182,9 +182,9 @@ private class TriggerBaseTest {
 			myException,
 			'An exception should be thrown'
 		);
-		System.Assert.isTrue(
-			myException.getMessage()
-				.contains(TriggerBase.HANDLER_OUTSIDE_TRIGGER_MESSAGE),
+		System.Assert.areEqual(
+			TriggerBase.HANDLER_OUTSIDE_TRIGGER_MESSAGE,
+			myException.getMessage(),
 			'The exception should be the one we are looking for'
 		);
 	}
@@ -198,6 +198,30 @@ private class TriggerBaseTest {
 		base.run();
 
 		System.Assert.isFalse(base.executed, 'The base should not have executed');
+	}
+
+	@IsTest
+	private static void inverseContextsShouldFinalizeTriggerInsert() {
+		base.triggerOld = null;
+		base.dmlRows = 1;
+		base.context = System.TriggerOperation.BEFORE_INSERT;
+		base.run();
+		base.context = System.TriggerOperation.AFTER_INSERT;
+		base.run();
+
+		System.Assert.isTrue(base.finalized, 'The base should have finalized');
+	}
+
+	@IsTest
+	private static void inverseContextsShouldFinalizeTriggerDelete() {
+		base.triggerNew = null;
+		base.dmlRows = 1;
+		base.context = System.TriggerOperation.BEFORE_DELETE;
+		base.run();
+		base.context = System.TriggerOperation.AFTER_DELETE;
+		base.run();
+
+		System.Assert.isTrue(base.finalized, 'The base should have finalized');
 	}
 
 	@IsTest
@@ -245,8 +269,86 @@ private class TriggerBaseTest {
 		);
 	}
 
+	@IsTest
+	private static void offsetRowsShouldWork() {
+		TriggerBase.offsetExistingDmlRows();
+
+		System.Assert.areEqual(
+			0,
+			TriggerBase.existingDmlRowsOffset,
+			'Offset is not working properly'
+		);
+	}
+
+	@IsTest
+	private static void waitingThenFinalizingShouldWork() {
+		try {
+			TriggerBase.waitToFinalize();
+			TriggerBase.nowFinalize();
+		} catch (Exception e) {
+			myException = e;
+		}
+
+		System.Assert.areEqual(
+			null,
+			myException,
+			'There should be no exception when you wait to finalize'
+		);
+	}
+
+	@IsTest
+	private static void finalizingWithoutWaitingShouldThrowError() {
+		try {
+			TriggerBase.nowFinalize();
+		} catch (Exception e) {
+			myException = e;
+		}
+
+		System.Assert.areEqual(
+			TriggerBase.CANNOT_FINALIZE,
+			myException.getMessage(),
+			'There should be an exception when you finalize without waiting'
+		);
+	}
+
+	@IsTest
+	private static void peekingStackWhileEmptyShouldThrowException() {
+		TriggerBase.EmptyStackException caught;
+
+		try {
+			new TriggerBase.Stack().peek();
+		} catch (TriggerBase.EmptyStackException e) {
+			caught = e;
+		}
+
+		System.Assert.areNotEqual(
+			null,
+			caught,
+			'There should be an exception when you peek an empty stack'
+		);
+	}
+
+	@IsTest
+	private static void poppingStackWhileEmptyShouldThrowException() {
+		TriggerBase.EmptyStackException caught;
+
+		try {
+			new TriggerBase.Stack().pop();
+		} catch (TriggerBase.EmptyStackException e) {
+			caught = e;
+		}
+
+		System.Assert.areNotEqual(
+			null,
+			caught,
+			'There should be an exception when you pop an empty stack'
+		);
+	}
+
 	class BaseTest extends TriggerBase implements TriggerAction.BeforeInsert, TriggerAction.AfterInsert, TriggerAction.BeforeUpdate, TriggerAction.AfterUpdate, TriggerAction.BeforeDelete, TriggerAction.AfterDelete, TriggerAction.AfterUndelete {
 		public Boolean executed = false;
+		public Boolean finalized = false;
+		public Integer dmlRows;
 		public void beforeInsert(List<SObject> newList) {
 			this.executed = true;
 		}
@@ -267,6 +369,16 @@ private class TriggerBaseTest {
 		}
 		public void afterUndelete(List<SObject> newList) {
 			this.executed = true;
+		}
+		public override void finalizeTrigger() {
+			super.finalizeTrigger();
+			finalized = true;
+		}
+		private override Integer getDmlRows() {
+			if (dmlRows != null) {
+				return dmlRows;
+			}
+			return super.getDmlRows();
 		}
 	}
 }

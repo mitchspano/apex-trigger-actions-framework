@@ -30,6 +30,7 @@ public inherited sharing virtual class TriggerBase {
 
 	@TestVisible
 	private static Set<String> bypassedObjects = new Set<String>();
+	@TestVisible
 	private static Integer existingDmlRowsOffset = 0;
 	private static Integer rowsLeftToProcess;
 	private static TriggerBase.Stack contextStack = new TriggerBase.Stack();
@@ -171,23 +172,15 @@ public inherited sharing virtual class TriggerBase {
 		}
 		if (TriggerBase.contextStack.isEmpty() && rowsLeftToProcess == 0) {
 			rowsLeftToProcess = null;
-			existingDmlRowsOffset = limits.getDmlRows();
+			existingDmlRowsOffset = getDmlRows();
 			if (!suppressFinalizeExecution) {
-				this.finalizeTrigger();
+				instanceToFinalize.finalizeTrigger();
 			}
 		}
 	}
 
 	@SuppressWarnings('PMD.EmptyStatementBlock')
 	protected virtual void finalizeTrigger() {
-	}
-
-	public static Boolean isBypassed(String sObjectName) {
-		return TriggerBase.bypassedObjects.contains(sObjectName);
-	}
-
-	public static void clearAllBypasses() {
-		TriggerBase.bypassedObjects.clear();
 	}
 
 	private void incrementUpdateCounts(
@@ -221,15 +214,20 @@ public inherited sharing virtual class TriggerBase {
 			return;
 		}
 		if (rowsLeftToProcess == null) {
-			rowsLeftToProcess = Limits.getDMLRows() - existingDmlRowsOffset;
+			rowsLeftToProcess = getDMLRows() - existingDmlRowsOffset;
 		}
-		rowsLeftToProcess = rowsLeftToProcess - Trigger.size;
+		rowsLeftToProcess = rowsLeftToProcess - triggerSize;
 	}
 
 	private void setInstanceToFinalize() {
-		if (suppressFinalizeExecution && instanceToFinalize == null) {
+		if (instanceToFinalize == null) {
 			instanceToFinalize = this;
 		}
+	}
+
+	@TestVisible
+	private virtual Integer getDmlRows() {
+		return Limits.getDmlRows();
 	}
 
 	@TestVisible
@@ -286,6 +284,15 @@ public inherited sharing virtual class TriggerBase {
 		private set;
 	}
 
+	private Integer triggerSize {
+		get {
+			return triggerNew != null
+				? triggerNew.size()
+				: triggerOld != null ? triggerOld.size() : 0;
+		}
+	}
+
+	@TestVisible
 	private class Stack {
 		private List<String> data = new List<String>();
 		public void push(String s) {
