@@ -37,15 +37,29 @@ public inherited sharing virtual class TriggerBase {
 	private static Boolean suppressFinalizeExecution = false;
 	private static TriggerBase instanceToFinalize;
 
-	@TestVisible
-	public static Map<Id, Integer> idToNumberOfTimesSeenBeforeUpdate {
-		get;
-		private set;
+	private static final Map<System.TriggerOperation, Map<Id, Integer>> CONTEXT_TO_UPDATE_COUNT {
+		get {
+			if (CONTEXT_TO_UPDATE_COUNT == null) {
+				CONTEXT_TO_UPDATE_COUNT = new Map<System.TriggerOperation, Map<Id, Integer>>{
+					System.TriggerOperation.BEFORE_UPDATE => new Map<Id, Integer>(),
+					System.TriggerOperation.AFTER_UPDATE => new Map<Id, Integer>()
+				};
+			}
+			return CONTEXT_TO_UPDATE_COUNT;
+		}
+		set;
 	}
-	@TestVisible
+
+	public static Map<Id, Integer> idToNumberOfTimesSeenBeforeUpdate {
+		get {
+			return CONTEXT_TO_UPDATE_COUNT.get(System.TriggerOperation.BEFORE_UPDATE);
+		}
+	}
+
 	public static Map<Id, Integer> idToNumberOfTimesSeenAfterUpdate {
-		get;
-		private set;
+		get {
+			return CONTEXT_TO_UPDATE_COUNT.get(System.TriggerOperation.AFTER_UPDATE);
+		}
 	}
 
 	private String contextKey {
@@ -59,11 +73,6 @@ public inherited sharing virtual class TriggerBase {
 				? this.sObjectName + '|' + CONTEXT_TO_INVERSE.get(this.context)
 				: '';
 		}
-	}
-
-	static {
-		idToNumberOfTimesSeenBeforeUpdate = new Map<Id, Integer>();
-		idToNumberOfTimesSeenAfterUpdate = new Map<Id, Integer>();
 	}
 
 	public static void bypass(String sObjectName) {
@@ -108,57 +117,41 @@ public inherited sharing virtual class TriggerBase {
 			this.context == System.TriggerOperation.BEFORE_INSERT &&
 			this instanceof TriggerAction.BeforeInsert
 		) {
-			((TriggerAction.BeforeInsert) this).beforeInsert(triggerNew);
+			((TriggerAction.BeforeInsert) this).beforeInsert(this.triggerNew);
 		} else if (
 			this.context == System.TriggerOperation.AFTER_INSERT &&
 			this instanceof TriggerAction.AfterInsert
 		) {
-			((TriggerAction.AfterInsert) this).afterInsert(triggerNew);
+			((TriggerAction.AfterInsert) this).afterInsert(this.triggerNew);
 		} else if (
 			this.context == System.TriggerOperation.BEFORE_UPDATE &&
 			this instanceof TriggerAction.BeforeUpdate
 		) {
-			for (SObject obj : triggerNew) {
-				if (!idToNumberOfTimesSeenBeforeUpdate.containsKey(obj.id)) {
-					idToNumberOfTimesSeenBeforeUpdate.put(obj.id, 1);
-				} else {
-					idToNumberOfTimesSeenBeforeUpdate.put(
-						obj.id,
-						idToNumberOfTimesSeenBeforeUpdate.get(obj.id) + 1
-					);
-				}
-			}
-			((TriggerAction.BeforeUpdate) this).beforeUpdate(triggerNew, triggerOld);
+			this.incrementUpdateCounts(this.context, this.triggerNew);
+			((TriggerAction.BeforeUpdate) this)
+				.beforeUpdate(this.triggerNew, this.triggerOld);
 		} else if (
 			this.context == System.TriggerOperation.AFTER_UPDATE &&
 			this instanceof TriggerAction.AfterUpdate
 		) {
-			for (SObject obj : triggerNew) {
-				if (!idToNumberOfTimesSeenAfterUpdate.containsKey(obj.id)) {
-					idToNumberOfTimesSeenAfterUpdate.put(obj.id, 1);
-				} else {
-					idToNumberOfTimesSeenAfterUpdate.put(
-						obj.id,
-						idToNumberOfTimesSeenAfterUpdate.get(obj.id) + 1
-					);
-				}
-			}
-			((TriggerAction.AfterUpdate) this).afterUpdate(triggerNew, triggerOld);
+			this.incrementUpdateCounts(this.context, this.triggerNew);
+			((TriggerAction.AfterUpdate) this)
+				.afterUpdate(this.triggerNew, this.triggerOld);
 		} else if (
 			this.context == System.TriggerOperation.BEFORE_DELETE &&
 			this instanceof TriggerAction.BeforeDelete
 		) {
-			((TriggerAction.BeforeDelete) this).beforeDelete(triggerOld);
+			((TriggerAction.BeforeDelete) this).beforeDelete(this.triggerOld);
 		} else if (
 			this.context == System.TriggerOperation.AFTER_DELETE &&
 			this instanceof TriggerAction.AfterDelete
 		) {
-			((TriggerAction.AfterDelete) this).afterDelete(triggerOld);
+			((TriggerAction.AfterDelete) this).afterDelete(this.triggerOld);
 		} else if (
 			this.context == System.TriggerOperation.AFTER_UNDELETE &&
 			this instanceof TriggerAction.AfterUndelete
 		) {
-			((TriggerAction.AfterUndelete) this).afterUndelete(triggerNew);
+			((TriggerAction.AfterUndelete) this).afterUndelete(this.triggerNew);
 		}
 		checkForEndOfTriggerProcessing();
 	}
@@ -187,6 +180,30 @@ public inherited sharing virtual class TriggerBase {
 
 	@SuppressWarnings('PMD.EmptyStatementBlock')
 	protected virtual void finalizeTrigger() {
+	}
+
+	public static Boolean isBypassed(String sObjectName) {
+		return TriggerBase.bypassedObjects.contains(sObjectName);
+	}
+
+	public static void clearAllBypasses() {
+		TriggerBase.bypassedObjects.clear();
+	}
+
+	private void incrementUpdateCounts(
+		System.TriggerOperation triggerContext,
+		List<SObject> records
+	) {
+		for (SObject obj : records) {
+			Map<Id, Integer> idToUpdateCount = CONTEXT_TO_UPDATE_COUNT.get(
+				triggerContext
+			);
+			Integer updateCount = idToUpdateCount.get(obj.Id);
+			if (updateCount == null) {
+				updateCount = 0;
+			}
+			idToUpdateCount.put(obj.Id, ++updateCount);
+		}
 	}
 
 	private Boolean shouldRun() {
@@ -219,7 +236,7 @@ public inherited sharing virtual class TriggerBase {
 	protected String sObjectName {
 		get {
 			if (sObjectName == null) {
-				if (this.TriggerNew != null) {
+				if (this.triggerNew != null) {
 					sObjectName = this.triggerNew[0]
 						.getSObjectType()
 						.getDescribe()

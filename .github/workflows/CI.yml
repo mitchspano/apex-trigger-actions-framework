@@ -23,33 +23,29 @@ jobs:
 
       - name: Install Salesforce CLI + Scanner
         run: |
-          npm install sfdx-cli
-          node_modules/sfdx-cli/bin/run --version
-          node_modules/sfdx-cli/bin/run plugins --core
-          node_modules/sfdx-cli/bin/run plugins:install @salesforce/sfdx-scanner
+          npm install @salesforce/cli -g
+          sf --version
+          sf plugins --core
+          sf plugins install @salesforce/sfdx-scanner
 
       - name: Run SFDX Scanner - Report findings as comments
-        uses: mitchspano/sfdx-scan-pull-request@v0.1.7
+        uses: mitchspano/sfdx-scan-pull-request@v0.1.14
         with:
           severity-threshold: 4
+          report-mode: comments
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Authenticate DevHub
+      - name: Authenticate into DevHub
         run: |
           echo "${SALESFORCE_JWT_SECRET_KEY}" > server.key
-          node_modules/sfdx-cli/bin/run force:auth:jwt:grant --clientid ${{ secrets.SALESFORCE_CONSUMER_KEY }} --jwtkeyfile server.key --username ${{ secrets.SALESFORCE_DEVHUB_USERNAME}} --setdefaultdevhubusername -a devhub
+          sf org login jwt --client-id ${{ secrets.SALESFORCE_CONSUMER_KEY }} --jwt-key-file server.key --username ${{ secrets.SALESFORCE_DEVHUB_USERNAME}} --set-default-dev-hub --alias devhub
         env:
           SALESFORCE_JWT_SECRET_KEY: ${{ secrets.SALESFORCE_JWT_SECRET_KEY }}
 
-      - name: Create Scratch Org
-        run: node_modules/sfdx-cli/bin/run force:org:create -v devhub -s -f config/project-scratch-def.json -a scratchOrg -d 1
-
-      - name: Deploy Source
-        run: node_modules/sfdx-cli/bin/run force:source:push -u scratchOrg
-
-      - name: Run Apex Tests
-        run: node_modules/sfdx-cli/bin/run force:apex:test:run -c -r human
-
-      - name: Delete Scratch Org
-        run: node_modules/sfdx-cli/bin/run force:org:delete -p -u scratchOrg
+      - name: Validate Contents in a Scratch Org
+        run: |
+          sf org create scratch --target-dev-hub devhub --set-default --definition-file config/project-scratch-def.json --alias scratchOrg --duration-days 1
+          sf project deploy start --target-org scratchOrg
+          sf apex run test --code-coverage --result-format human --synchronous
+          sf org delete scratch --no-prompt --target-org scratchOrg
