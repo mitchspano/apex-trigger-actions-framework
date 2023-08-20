@@ -446,6 +446,12 @@ public with sharing class TA_Opportunity_RecalculateCategory implements TriggerA
 }
 ```
 
+#### DML Finalizer Bypasses
+
+Just like everything else within the Apex Trigger Actions Framework, finalizers can be bypassed to suit your needs. On the `DML_Finalizer__mdt` metadata record, use the `Bypass_Execution__c` checkbox to bypass globally and the `Bypass_Permission__c`/`Required_Permission__c` fields to bypass for specific users or profiles.
+
+For static bypasses, call the `bypassFinalizer`, `clearFinalizerBypass`, `finalizerIsBypassed`, and `clearAllFinalizerBypasses` methods within the `MetadataTriggerHandler` class.
+
 ### DML Finalizer Caveats
 
 > [!WARNING]  

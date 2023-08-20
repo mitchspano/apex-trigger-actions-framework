@@ -780,6 +780,21 @@ private class MetadataTriggerHandlerTest {
 	}
 
 	@IsTest
+	private static void staticallyBypassedFinalizerShouldNotExecute() {
+		handler.allFinalizers = new List<DML_Finalizer__mdt>{
+			new DML_Finalizer__mdt(Apex_Class_Name__c = FOO_FINALIZER, Order__c = 1)
+		};
+
+		MetadataTriggerHandler.bypassFinalizer(FOO_FINALIZER);
+		handler.finalizeDmlOperation();
+
+		System.Assert.isTrue(
+			finalizerLedger.isEmpty(),
+			'The finalizer should be dynamically instantiated, but no action should be taken because it is statically bypassed'
+		);
+	}
+
+	@IsTest
 	private static void finalizersShouldExecuteInOrder() {
 		handler.allFinalizers = new List<DML_Finalizer__mdt>{
 			new DML_Finalizer__mdt(Apex_Class_Name__c = FOO_FINALIZER, Order__c = 1),
@@ -866,6 +881,50 @@ private class MetadataTriggerHandlerTest {
 			MetadataTriggerHandler.DML_IN_FINALIZER_ERROR,
 			myException.getMessage(),
 			EXCEPTION_SHOULD_HAVE_CORRECT_MESSAGE
+		);
+	}
+
+	@IsTest
+	private static void bypassFinalizerShouldSucceed() {
+		MetadataTriggerHandler.bypassFinalizer(FOO_FINALIZER);
+
+		System.Assert.isTrue(
+			MetadataTriggerHandler.bypassedFinalizers.contains(FOO_FINALIZER),
+			BYPASSES_SHOULD_BE_CONFIGURED_PROPERLY
+		);
+	}
+
+	@IsTest
+	private static void clearFinalizerBypassShouldSucceed() {
+		MetadataTriggerHandler.bypassFinalizer(FOO_FINALIZER);
+		MetadataTriggerHandler.clearFinalizerBypass(FOO_FINALIZER);
+
+		System.Assert.isFalse(
+			MetadataTriggerHandler.bypassedFinalizers.contains(FOO_FINALIZER),
+			BYPASSES_SHOULD_BE_CONFIGURED_PROPERLY
+		);
+	}
+
+	@IsTest
+	private static void finalizerIsBypassedShouldSucceed() {
+		Boolean isBypassed;
+		MetadataTriggerHandler.bypassFinalizer(FOO_FINALIZER);
+
+		isBypassed = MetadataTriggerHandler.finalizerIsBypassed(FOO_FINALIZER);
+
+		System.Assert.isTrue(isBypassed, BYPASSES_SHOULD_BE_CONFIGURED_PROPERLY);
+	}
+
+	@IsTest
+	private static void clearAllFinalizerBypassesShouldSucceed() {
+		MetadataTriggerHandler.bypass(FOO_FINALIZER);
+
+		MetadataTriggerHandler.clearAllFinalizerBypasses();
+
+		System.Assert.areEqual(
+			0,
+			MetadataTriggerHandler.bypassedFinalizers.size(),
+			BYPASSES_SHOULD_BE_CONFIGURED_PROPERLY
 		);
 	}
 

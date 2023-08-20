@@ -63,6 +63,8 @@ public inherited sharing class MetadataTriggerHandler extends TriggerBase implem
 	@TestVisible
 	private static Set<String> bypassedActions = new Set<String>();
 	@TestVisible
+	private static Set<String> bypassedFinalizers = new Set<String>();
+	@TestVisible
 	private static Selector selector = new Selector();
 	@TestVisible
 	private static Map<String, Boolean> permissionMap = new Map<String, Boolean>();
@@ -82,6 +84,22 @@ public inherited sharing class MetadataTriggerHandler extends TriggerBase implem
 
 	public static void clearAllBypasses() {
 		MetadataTriggerHandler.bypassedActions.clear();
+	}
+
+	public static void bypassFinalizer(String finalizerName) {
+		MetadataTriggerHandler.bypassedFinalizers.add(finalizerName);
+	}
+
+	public static void clearFinalizerBypass(String finalizerName) {
+		MetadataTriggerHandler.bypassedFinalizers.remove(finalizerName);
+	}
+
+	public static Boolean finalizerIsBypassed(String finalizerName) {
+		return MetadataTriggerHandler.bypassedFinalizers.contains(finalizerName);
+	}
+
+	public static void clearAllFinalizerBypasses() {
+		MetadataTriggerHandler.bypassedFinalizers.clear();
 	}
 
 	public void beforeInsert(List<SObject> newList) {
@@ -135,6 +153,9 @@ public inherited sharing class MetadataTriggerHandler extends TriggerBase implem
 	private void callReferencedFinalizer(DML_Finalizer__mdt finalizerMetadata) {
 		Object dynamicInstance;
 		String className = finalizerMetadata.Apex_Class_Name__c;
+		if (MetadataTriggerHandler.finalizerIsBypassed(className)) {
+			return;
+		}
 		try {
 			dynamicInstance = Type.forName(className).newInstance();
 		} catch (System.NullPointerException e) {
