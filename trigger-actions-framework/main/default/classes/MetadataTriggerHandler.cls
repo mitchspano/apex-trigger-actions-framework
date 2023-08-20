@@ -131,7 +131,7 @@ public inherited sharing class MetadataTriggerHandler extends TriggerBase implem
 		TriggerAction.DmlFinalizer finalizer;
 		try {
 			finalizer = (TriggerAction.DmlFinalizer) dynamicInstance;
-		} catch (Exception e) {
+		} catch (System.TypeException e) {
 			handleFinalizerException(INVALID_TYPE_ERROR_FINALIZER, className);
 		}
 		finalizer.execute();
