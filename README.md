@@ -423,7 +423,7 @@ Then create a corresponding row of `DML_Finalizer__mdt` to invoke your finalizer
 
 ![DML Finalizer](images/dmlFinalizer.png)
 
-Finally, use static variables or within your trigger actions to register data to be used in the finalizer's execution.
+Finally, use static variables within your trigger actions to register data to be used in the finalizer's execution.
 
 ```java
 public with sharing class TA_Opportunity_RecalculateCategory implements TriggerAction.AfterUpdate {
@@ -467,18 +467,22 @@ To use a DML Finalizer, the Apex Trigger Actions Framework must be enabled on ev
 
 Detecting when to finalize the operation requires knowledge of the total number of records passed to the DML operation. Unfortunately, there is no bulletproof way of how to do this currently in Apex; the best thing we can do is to rely on `Limits.getDmlRows()` to infer the number of records passed to the DML operation.
 
-This works in most cases, but certain operations such as setting a `System.Savepoint` consume a DML row which can throw off the counts and remove our ability to detect when to finalize. In order to avoid this problem, use the `TriggerBase.offsetExistingDmlRows()` method before calling the first DML operation within your Apex.
+This works in most cases, but certain operations such as setting a `System.Savepoint` consume a DML row, and there are certain sObjects where triggers are not supported like `CaseTeamMember` which can throw off the counts and remove our ability to detect when to finalize. In order to avoid this problem, use the `TriggerBase.offsetExistingDmlRows()` method before calling the first DML operation within your Apex.
 
 ```java
-List<Account> toInsert = new List<Account>();
-for (Integer i = 0; i < 250; i++) {
-	toInsert.add(new Account(Name = 'Acme' + i));
-}
-
-Savepoint sp = Database.setSavepoint();
+Savepoint sp = Database.setSavepoint(); // adds to Limits.getDmlRows()
 TriggerBase.offsetExistingDmlRows();
-insert toInsert;
+insert accounts;
 ```
+
+```java
+insert caseTeamMembers; // additions to Limits.getDmlRows() are not able to be automatically handled because there is no trigger on `CaseTeamMember`
+TriggerBase.offsetExistingDmlRows();
+update cases;
+```
+
+> [!NOTE]  
+> Please consider upvoting [this idea](https://ideas.salesforce.com/s/idea/a0B8W00000GdpidUAB/total-dml-size-trigger-context-variable) to help avoid this quirky reliance on `Limits.getDmlRows()`
 
 #### Wait to Finalize
 
@@ -520,7 +524,7 @@ public static void foo(){
 
 #### Handle Multiple Finalizers per Transaction
 
-Sometimes it is infeasible for the system to be told to `waitToFinalize` - for example: when the composite API is called. To make sure our finalizers can safely these scenarios, be sure to guard your finalizers against multiple invocations in one transaction by clearing out any collections of records you need to process:
+Sometimes it is infeasible for the system to be told to `waitToFinalize` - for example: when the composite API is called. To make sure our finalizers can safely handle these scenarios, be sure to guard your finalizers against multiple invocations in one transaction by clearing out any collections of records you need to process:
 
 ```java
 public void execute(MetadataTriggerHandler.DmlFinalizerContext context) {
