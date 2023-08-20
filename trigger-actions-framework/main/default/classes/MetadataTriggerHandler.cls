@@ -48,6 +48,16 @@ public inherited sharing class MetadataTriggerHandler extends TriggerBase implem
 	);
 	private static final String RELATIONSHIP_SUFFIX = '__r';
 
+	private static final Map<System.TriggerOperation, MetadataTriggerHandler.DmlOperation> TRIGGER_OPERATION_TO_DML_OPERATION = new Map<System.TriggerOperation, MetadataTriggerHandler.DmlOperation>{
+		System.TriggerOperation.BEFORE_INSERT => DmlOperation.DML_INSERT,
+		System.TriggerOperation.AFTER_INSERT => DmlOperation.DML_INSERT,
+		System.TriggerOperation.BEFORE_UPDATE => DmlOperation.DML_UPDATE,
+		System.TriggerOperation.AFTER_UPDATE => DmlOperation.DML_UPDATE,
+		System.TriggerOperation.BEFORE_DELETE => DmlOperation.DML_DELETE,
+		System.TriggerOperation.AFTER_DELETE => DmlOperation.DML_DELETE,
+		System.TriggerOperation.AFTER_UNDELETE => DmlOperation.DML_UNDELETE
+	};
+
 	@TestVisible
 	private static Set<String> bypassedActions = new Set<String>();
 	@TestVisible
@@ -134,7 +144,12 @@ public inherited sharing class MetadataTriggerHandler extends TriggerBase implem
 		} catch (System.TypeException e) {
 			handleFinalizerException(INVALID_TYPE_ERROR_FINALIZER, className);
 		}
-		finalizer.execute();
+		finalizer.execute(
+			new DmlFinalizerContext(
+				this.sObjectType,
+				TRIGGER_OPERATION_TO_DML_OPERATION.get(this.context)
+			)
+		);
 	}
 
 	private void handleFinalizerException(String errorFormat, String className) {
@@ -511,6 +526,22 @@ public inherited sharing class MetadataTriggerHandler extends TriggerBase implem
 		public virtual List<SObject> query(String queryString) {
 			return Database.query(queryString);
 		}
+	}
+
+	public class DmlFinalizerContext {
+		public SObjectType objectType { public get; private set; }
+		public DmlOperation operation { public get; private set; }
+		public DmlFinalizerContext(SObjectType objectType, DmlOperation operation) {
+			this.objectType = objectType;
+			this.operation = operation;
+		}
+	}
+
+	public enum DmlOperation {
+		DML_INSERT,
+		DML_UPDATE,
+		DML_DELETE,
+		DML_UNDELETE
 	}
 
 	private class MetadataTriggerHandlerException extends Exception {

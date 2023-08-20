@@ -877,13 +877,13 @@ private class MetadataTriggerHandlerTest {
 	}
 
 	public class FooFinalizer implements TriggerAction.DmlFinalizer {
-		public void execute() {
+		public void execute(MetadataTriggerHandler.DmlFinalizerContext context) {
 			finalizerLedger.add(FOO);
 		}
 	}
 
 	public class BarFinalizer implements TriggerAction.DmlFinalizer {
-		public void execute() {
+		public void execute(MetadataTriggerHandler.DmlFinalizerContext context) {
 			finalizerLedger.add(BAR);
 		}
 	}

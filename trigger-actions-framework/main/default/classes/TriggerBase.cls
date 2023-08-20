@@ -68,6 +68,7 @@ public inherited sharing virtual class TriggerBase {
 			return this.sObjectName + '|' + this.context.name();
 		}
 	}
+
 	private String inverseContext {
 		get {
 			return CONTEXT_TO_INVERSE.containsKey(this.context)
@@ -175,6 +176,7 @@ public inherited sharing virtual class TriggerBase {
 			existingDmlRowsOffset = getDmlRows();
 			if (!suppressFinalizeExecution) {
 				instanceToFinalize.finalizeDmlOperation();
+				instanceToFinalize = null;
 			}
 		}
 	}
@@ -231,20 +233,25 @@ public inherited sharing virtual class TriggerBase {
 	}
 
 	@TestVisible
+	protected Schema.SObjectType sObjectType {
+		get {
+			if (sObjectType == null) {
+				if (this.triggerNew != null) {
+					sObjectType = this.triggerNew[0].getSObjectType();
+				} else {
+					sObjectType = this.triggerOld[0].getSObjectType();
+				}
+			}
+			return sObjectType;
+		}
+		private set;
+	}
+
+	@TestVisible
 	protected String sObjectName {
 		get {
 			if (sObjectName == null) {
-				if (this.triggerNew != null) {
-					sObjectName = this.triggerNew[0]
-						.getSObjectType()
-						.getDescribe()
-						.getName();
-				} else {
-					sObjectName = this.triggerOld[0]
-						.getSObjectType()
-						.getDescribe()
-						.getName();
-				}
+				sObjectName = this.sObjectType.getDescribe().getName();
 			}
 			return sObjectName;
 		}
@@ -252,7 +259,7 @@ public inherited sharing virtual class TriggerBase {
 	}
 
 	@TestVisible
-	private System.TriggerOperation context {
+	protected System.TriggerOperation context {
 		get {
 			if (context == null) {
 				context = Trigger.operationType;

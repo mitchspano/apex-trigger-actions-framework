@@ -404,7 +404,7 @@ public with sharing class OpportunityCategoryCalculator implements Queueable, Tr
     toProcess.addAll(toRecalculate);
   }
 
-  public void execute() {
+  public void execute(MetadataTriggerHandler.DmlFinalizerContext context) {
     if (!toProcess.isEmpty()) {
       this.currentlyProcessing = toProcess;
       System.enqueueJob(this);
@@ -519,7 +519,7 @@ public static void foo(){
 Sometimes it is infeasible for the system to be told to `waitToFinalize` - for example: when the composite API is called. To make sure our finalizers can safely these scenarios, be sure to guard your finalizers against multiple invocations in one transaction by clearing out any collections of records you need to process:
 
 ```java
-public void execute() {
+public void execute(MetadataTriggerHandler.DmlFinalizerContext context) {
   if (!toProcess.isEmpty()) {
     this.currentlyProcessing = toProcess;
     System.enqueueJob(this);

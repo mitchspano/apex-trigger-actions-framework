@@ -45,6 +45,6 @@ public class TriggerAction {
 	}
 
 	public interface DmlFinalizer {
-		void execute();
+		void execute(MetadataTriggerHandler.DmlFinalizerContext context);
 	}
 }
