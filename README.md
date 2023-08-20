@@ -451,6 +451,10 @@ public with sharing class TA_Opportunity_RecalculateCategory implements TriggerA
 > [!WARNING]  
 > DML Finalizers are brand new and should be considered as _experimental_. If you encounter any issues when using them, please create an issue on the GitHub repository.
 
+#### No Further DML Allowed
+
+DML Finalizers are not allowed to call any other DML operations; otherwise they wouldn't be able to guarantee their final nature. If a finalizer calls another DML operation, a runtime error will be thrown.
+
 #### Independent of SObject
 
 To ensure that cascading DML operations are supported, all configured finalizers within the org are invoked at the end of any DML operation, regardless of the SObject of the original triggering operation.

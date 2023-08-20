@@ -15,6 +15,8 @@
  */
 @SuppressWarnings('PMD.ApexDoc, PMD.CognitiveComplexity')
 public inherited sharing class MetadataTriggerHandler extends TriggerBase implements TriggerAction.BeforeInsert, TriggerAction.AfterInsert, TriggerAction.BeforeUpdate, TriggerAction.AfterUpdate, TriggerAction.BeforeDelete, TriggerAction.AfterDelete, TriggerAction.AfterUndelete {
+	@TestVisible
+	private static final String DML_IN_FINALIZER_ERROR = 'DML is not allowed within the finalizer context.';
 	private static final String DOUBLE_UNDERSCORE = '__';
 	private static final String EMPTY_STRING = '';
 	@TestVisible
@@ -144,12 +146,16 @@ public inherited sharing class MetadataTriggerHandler extends TriggerBase implem
 		} catch (System.TypeException e) {
 			handleFinalizerException(INVALID_TYPE_ERROR_FINALIZER, className);
 		}
+		Integer dmlOperationsBefore = Limits.getDmlStatements();
 		finalizer.execute(
 			new DmlFinalizerContext(
 				this.sObjectType,
 				TRIGGER_OPERATION_TO_DML_OPERATION.get(this.context)
 			)
 		);
+		if (limits.getDmlStatements() > dmlOperationsBefore) {
+			throw new MetadataTriggerHandlerException(DML_IN_FINALIZER_ERROR);
+		}
 	}
 
 	private void handleFinalizerException(String errorFormat, String className) {

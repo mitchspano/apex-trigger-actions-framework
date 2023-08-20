@@ -30,6 +30,7 @@ private class MetadataTriggerHandlerTest {
 	private static final String EXCEPTION_SHOULD_BE_THROWN = 'An exception should be thrown';
 	private static final String EXCEPTION_SHOULD_HAVE_CORRECT_MESSAGE = 'The exception should have the correct message';
 	private static final String EXCEPTION_SHOULD_NOT_BE_THROWN = 'An exception should not be thrown';
+	private static final String FINALIZER_WITH_DML = 'MetadataTriggerHandlerTest.FinalizerWithDml';
 	private static final String FOO = 'foo';
 	private static final String FOO_FINALIZER = 'MetadataTriggerHandlerTest.FooFinalizer';
 	private static final String METADATA_SHOULD_BE_POPULATED_PROPERLY = 'The metadata should be populated properly';
@@ -730,6 +731,13 @@ private class MetadataTriggerHandlerTest {
 
 	@IsTest
 	private static void noConfiguredFinalizerShouldTakeNoAction() {
+		System.Assert.isNotNull(
+			handler.allFinalizers,
+			'By default, allHandlers should return a non-null value'
+		);
+
+		handler.allFinalizers = new List<DML_Finalizer__mdt>();
+
 		handler.finalizeDmlOperation();
 
 		System.Assert.isTrue(
@@ -840,6 +848,27 @@ private class MetadataTriggerHandlerTest {
 		);
 	}
 
+	@IsTest
+	private static void finalizerThatInvokesDmlShouldCauseException() {
+		handler.allFinalizers = new List<DML_Finalizer__mdt>{
+			new DML_Finalizer__mdt(Apex_Class_Name__c = FINALIZER_WITH_DML)
+		};
+
+		try {
+			handler.finalizeDmlOperation();
+		} catch (Exception e) {
+			myException = e;
+		}
+
+		System.Assert.isNotNull(myException, EXCEPTION_SHOULD_BE_THROWN);
+
+		System.Assert.areEqual(
+			MetadataTriggerHandler.DML_IN_FINALIZER_ERROR,
+			myException.getMessage(),
+			EXCEPTION_SHOULD_HAVE_CORRECT_MESSAGE
+		);
+	}
+
 	public class TestBeforeInsert implements TriggerAction.BeforeInsert {
 		public void beforeInsert(List<SObject> newList) {
 			MetadataTriggerHandlerTest.executed = true;
@@ -885,6 +914,14 @@ private class MetadataTriggerHandlerTest {
 	public class BarFinalizer implements TriggerAction.DmlFinalizer {
 		public void execute(MetadataTriggerHandler.DmlFinalizerContext context) {
 			finalizerLedger.add(BAR);
+		}
+	}
+
+	public class FinalizerWithDml implements TriggerAction.DmlFinalizer {
+		public void execute(MetadataTriggerHandler.DmlFinalizerContext context) {
+			TriggerBase.bypass(Account.class.getName());
+			insert new Account(Name = 'Acme');
+			TriggerBase.clearBypass(Account.class.getName());
 		}
 	}
 
