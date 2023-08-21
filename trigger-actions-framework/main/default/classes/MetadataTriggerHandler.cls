@@ -15,18 +15,12 @@
  */
 @SuppressWarnings('PMD.ApexDoc, PMD.CognitiveComplexity')
 public inherited sharing class MetadataTriggerHandler extends TriggerBase implements TriggerAction.BeforeInsert, TriggerAction.AfterInsert, TriggerAction.BeforeUpdate, TriggerAction.AfterUpdate, TriggerAction.BeforeDelete, TriggerAction.AfterDelete, TriggerAction.AfterUndelete {
-	@TestVisible
-	private static final String DML_IN_FINALIZER_ERROR = 'DML is not allowed within the finalizer context.';
 	private static final String DOUBLE_UNDERSCORE = '__';
 	private static final String EMPTY_STRING = '';
 	@TestVisible
 	private static final String INVALID_TYPE_ERROR = 'Please check the Trigger Action Custom Metadata for the {1} context on the {2} sObject. The {0} class does not implement the Trigger Action interface specified for the {1} context.';
 	@TestVisible
-	private static final String INVALID_TYPE_ERROR_FINALIZER = 'Please check the DML Finalizer Custom Metadata. The {0} class does not implement the TriggerAction.DmlFinalizer interface.';
-	@TestVisible
 	private static final String INVALID_CLASS_ERROR = 'Please check the Trigger Action Custom Metadata for the {1} context on the {2} sObject. The {0} class does not exist.';
-	@TestVisible
-	private static final String INVALID_CLASS_ERROR_FINALIZER = 'Please check the DML Finalizer Custom Metadata. The {0} class does not exist.';
 	private static final String QUERY_TEMPLATE = String.join(
 		new List<String>{
 			'SELECT Apex_Class_Name__c,',
@@ -49,26 +43,15 @@ public inherited sharing class MetadataTriggerHandler extends TriggerBase implem
 		' '
 	);
 	private static final String RELATIONSHIP_SUFFIX = '__r';
-
-	private static final Map<System.TriggerOperation, MetadataTriggerHandler.DmlOperation> TRIGGER_OPERATION_TO_DML_OPERATION = new Map<System.TriggerOperation, MetadataTriggerHandler.DmlOperation>{
-		System.TriggerOperation.BEFORE_INSERT => DmlOperation.DML_INSERT,
-		System.TriggerOperation.AFTER_INSERT => DmlOperation.DML_INSERT,
-		System.TriggerOperation.BEFORE_UPDATE => DmlOperation.DML_UPDATE,
-		System.TriggerOperation.AFTER_UPDATE => DmlOperation.DML_UPDATE,
-		System.TriggerOperation.BEFORE_DELETE => DmlOperation.DML_DELETE,
-		System.TriggerOperation.AFTER_DELETE => DmlOperation.DML_DELETE,
-		System.TriggerOperation.AFTER_UNDELETE => DmlOperation.DML_UNDELETE
-	};
-
 	@TestVisible
 	private static Set<String> bypassedActions = new Set<String>();
-	@TestVisible
-	private static Set<String> bypassedFinalizers = new Set<String>();
 	@TestVisible
 	private static Selector selector = new Selector();
 	@TestVisible
 	private static Map<String, Boolean> permissionMap = new Map<String, Boolean>();
 	private static Map<String, Map<String, List<Trigger_Action__mdt>>> sObjectToContextToActions = new Map<String, Map<String, List<Trigger_Action__mdt>>>();
+	@TestVisible
+	private static FinalizerHandler finalizerHandler = new FinalizerHandler();
 
 	public static void bypass(String actionName) {
 		MetadataTriggerHandler.bypassedActions.add(actionName);
@@ -84,22 +67,6 @@ public inherited sharing class MetadataTriggerHandler extends TriggerBase implem
 
 	public static void clearAllBypasses() {
 		MetadataTriggerHandler.bypassedActions.clear();
-	}
-
-	public static void bypassFinalizer(String finalizerName) {
-		MetadataTriggerHandler.bypassedFinalizers.add(finalizerName);
-	}
-
-	public static void clearFinalizerBypass(String finalizerName) {
-		MetadataTriggerHandler.bypassedFinalizers.remove(finalizerName);
-	}
-
-	public static Boolean finalizerIsBypassed(String finalizerName) {
-		return MetadataTriggerHandler.bypassedFinalizers.contains(finalizerName);
-	}
-
-	public static void clearAllFinalizerBypasses() {
-		MetadataTriggerHandler.bypassedFinalizers.clear();
 	}
 
 	public void beforeInsert(List<SObject> newList) {
@@ -132,57 +99,7 @@ public inherited sharing class MetadataTriggerHandler extends TriggerBase implem
 
 	@TestVisible
 	protected override void finalizeDmlOperation() {
-		List<DML_Finalizer__mdt> sortedFinalizers = getSortedFinalizers();
-		for (DML_Finalizer__mdt finalizerMetadata : sortedFinalizers) {
-			if (finalizerMetadata.Bypass_Execution__c) {
-				return;
-			}
-			populatePermissionMap(finalizerMetadata.Bypass_Permission__c);
-			populatePermissionMap(finalizerMetadata.Required_Permission__c);
-			if (
-				isNotBypassed(
-					finalizerMetadata.Bypass_Permission__c,
-					finalizerMetadata.Required_Permission__c
-				)
-			) {
-				callReferencedFinalizer(finalizerMetadata);
-			}
-		}
-	}
-
-	private void callReferencedFinalizer(DML_Finalizer__mdt finalizerMetadata) {
-		Object dynamicInstance;
-		String className = finalizerMetadata.Apex_Class_Name__c;
-		if (MetadataTriggerHandler.finalizerIsBypassed(className)) {
-			return;
-		}
-		try {
-			dynamicInstance = Type.forName(className).newInstance();
-		} catch (System.NullPointerException e) {
-			handleFinalizerException(INVALID_CLASS_ERROR_FINALIZER, className);
-		}
-		TriggerAction.DmlFinalizer finalizer;
-		try {
-			finalizer = (TriggerAction.DmlFinalizer) dynamicInstance;
-		} catch (System.TypeException e) {
-			handleFinalizerException(INVALID_TYPE_ERROR_FINALIZER, className);
-		}
-		Integer dmlOperationsBefore = Limits.getDmlStatements();
-		finalizer.execute(
-			new DmlFinalizerContext(
-				this.sObjectType,
-				TRIGGER_OPERATION_TO_DML_OPERATION.get(this.context)
-			)
-		);
-		if (limits.getDmlStatements() > dmlOperationsBefore) {
-			throw new MetadataTriggerHandlerException(DML_IN_FINALIZER_ERROR);
-		}
-	}
-
-	private void handleFinalizerException(String errorFormat, String className) {
-		throw new MetadataTriggerHandlerException(
-			String.format(errorFormat, new List<String>{ className })
-		);
+		finalizerHandler.handleDynamicFinalizers(this.sObjectType, this.context);
 	}
 
 	private void populatePermissionMap(String permissionName) {
@@ -419,19 +336,6 @@ public inherited sharing class MetadataTriggerHandler extends TriggerBase implem
 		);
 	}
 
-	private List<DML_Finalizer__mdt> getSortedFinalizers() {
-		List<FinalizerSorter> sorters = new List<FinalizerSorter>();
-		for (DML_Finalizer__mdt finalizer : this.allFinalizers) {
-			sorters.add(new FinalizerSorter(finalizer));
-		}
-		List<DML_Finalizer__mdt> results = new List<DML_Finalizer__mdt>();
-		sorters.sort();
-		for (FinalizerSorter sorter : sorters) {
-			results.add(sorter.metadata);
-		}
-		return results;
-	}
-
 	@TestVisible
 	private List<Trigger_Action__mdt> beforeInsertActionMetadata {
 		get {
@@ -524,51 +428,10 @@ public inherited sharing class MetadataTriggerHandler extends TriggerBase implem
 	}
 
 	@TestVisible
-	private List<DML_Finalizer__mdt> allFinalizers {
-		get {
-			if (allFinalizers == null) {
-				allFinalizers = DML_Finalizer__mdt.getAll().values();
-			}
-			return allFinalizers;
-		}
-		private set;
-	}
-
-	private class FinalizerSorter implements Comparable {
-		public final DML_Finalizer__mdt metadata;
-
-		public FinalizerSorter(DML_Finalizer__mdt metadata) {
-			this.metadata = metadata;
-		}
-
-		public Integer compareTo(Object other) {
-			Decimal difference = (this.metadata.Order__c -
-			((FinalizerSorter) other).metadata.Order__c);
-			return difference < 0 ? -1 : difference == 0 ? 0 : 1;
-		}
-	}
-
-	@TestVisible
 	private virtual inherited sharing class Selector {
 		public virtual List<SObject> query(String queryString) {
 			return Database.query(queryString);
 		}
-	}
-
-	public class DmlFinalizerContext {
-		public SObjectType objectType { public get; private set; }
-		public DmlOperation operation { public get; private set; }
-		public DmlFinalizerContext(SObjectType objectType, DmlOperation operation) {
-			this.objectType = objectType;
-			this.operation = operation;
-		}
-	}
-
-	public enum DmlOperation {
-		DML_INSERT,
-		DML_UPDATE,
-		DML_DELETE,
-		DML_UNDELETE
 	}
 
 	private class MetadataTriggerHandlerException extends Exception {

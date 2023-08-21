@@ -57,7 +57,6 @@ private class MetadataTriggerHandlerTest {
 	);
 	private static MetadataTriggerHandler handler = new MetadataTriggerHandler();
 	private static Boolean executed = false;
-	private static List<String> finalizerLedger = new List<String>();
 	private static Exception myException;
 	private static Trigger_Action__mdt action = new Trigger_Action__mdt(
 		Apex_Class_Name__c = TEST_BEFORE_INSERT,
@@ -530,6 +529,15 @@ private class MetadataTriggerHandlerTest {
 	}
 
 	@IsTest
+	private static void finalizerShouldSucceed() {
+		MetadataTriggerHandler.finalizerHandler = new TestFinalizerHandler();
+
+		handler.finalizeDmlOperation();
+
+		System.Assert.isTrue(executed, ACTION_SHOULD_EXECUTE);
+	}
+
+	@IsTest
 	private static void actionMetadataShouldConstruct() {
 		System.Assert.areNotEqual(
 			null,
@@ -729,205 +737,6 @@ private class MetadataTriggerHandlerTest {
 		System.Assert.areEqual(null, myException, EXCEPTION_SHOULD_NOT_BE_THROWN);
 	}
 
-	@IsTest
-	private static void noConfiguredFinalizerShouldTakeNoAction() {
-		System.Assert.isNotNull(
-			handler.allFinalizers,
-			'By default, allHandlers should return a non-null value'
-		);
-
-		handler.allFinalizers = new List<DML_Finalizer__mdt>();
-
-		handler.finalizeDmlOperation();
-
-		System.Assert.isTrue(
-			finalizerLedger.isEmpty(),
-			'There are no finalizers so no action should be taken'
-		);
-	}
-
-	@IsTest
-	private static void properlyConfiguredFinalizerShouldExecute() {
-		handler.allFinalizers = new List<DML_Finalizer__mdt>{
-			new DML_Finalizer__mdt(Apex_Class_Name__c = FOO_FINALIZER)
-		};
-
-		handler.finalizeDmlOperation();
-
-		System.Assert.areEqual(
-			FOO,
-			finalizerLedger[0],
-			'The finalizer should be dynamically instantiated and executed'
-		);
-	}
-
-	@IsTest
-	private static void bypassedFinalizerShouldNotExecute() {
-		handler.allFinalizers = new List<DML_Finalizer__mdt>{
-			new DML_Finalizer__mdt(
-				Apex_Class_Name__c = FOO_FINALIZER,
-				Bypass_Execution__c = true,
-				Order__c = 1
-			)
-		};
-
-		handler.finalizeDmlOperation();
-
-		System.Assert.isTrue(
-			finalizerLedger.isEmpty(),
-			'The finalizer should be dynamically instantiated, but no action should be taken because it is bypassed'
-		);
-	}
-
-	@IsTest
-	private static void staticallyBypassedFinalizerShouldNotExecute() {
-		handler.allFinalizers = new List<DML_Finalizer__mdt>{
-			new DML_Finalizer__mdt(Apex_Class_Name__c = FOO_FINALIZER, Order__c = 1)
-		};
-
-		MetadataTriggerHandler.bypassFinalizer(FOO_FINALIZER);
-		handler.finalizeDmlOperation();
-
-		System.Assert.isTrue(
-			finalizerLedger.isEmpty(),
-			'The finalizer should be dynamically instantiated, but no action should be taken because it is statically bypassed'
-		);
-	}
-
-	@IsTest
-	private static void finalizersShouldExecuteInOrder() {
-		handler.allFinalizers = new List<DML_Finalizer__mdt>{
-			new DML_Finalizer__mdt(Apex_Class_Name__c = FOO_FINALIZER, Order__c = 1),
-			new DML_Finalizer__mdt(Apex_Class_Name__c = BAR_FINALIZER, Order__c = 2)
-		};
-
-		handler.finalizeDmlOperation();
-
-		System.Assert.areEqual(
-			FOO,
-			finalizerLedger[0],
-			'The finalizer with the lowest order was not executed first'
-		);
-		System.Assert.areEqual(
-			BAR,
-			finalizerLedger[1],
-			'The finalizer with the highest order was not executed last'
-		);
-	}
-
-	@IsTest
-	private static void invalidFinalizerClassShouldThrowException() {
-		handler.allFinalizers = new List<DML_Finalizer__mdt>{
-			new DML_Finalizer__mdt(Apex_Class_Name__c = BOGUS_CLASS_NAME)
-		};
-
-		try {
-			handler.finalizeDmlOperation();
-		} catch (Exception e) {
-			myException = e;
-		}
-
-		System.Assert.isNotNull(myException, EXCEPTION_SHOULD_BE_THROWN);
-
-		System.Assert.areEqual(
-			String.format(
-				MetadataTriggerHandler.INVALID_CLASS_ERROR_FINALIZER,
-				new List<String>{ BOGUS_CLASS_NAME }
-			),
-			myException.getMessage(),
-			EXCEPTION_SHOULD_HAVE_CORRECT_MESSAGE
-		);
-	}
-
-	@IsTest
-	private static void referencedClassDoesNotImplementDmlFinalizerShouldThrowException() {
-		handler.allFinalizers = new List<DML_Finalizer__mdt>{
-			new DML_Finalizer__mdt(Apex_Class_Name__c = TEST_BEFORE_INSERT)
-		};
-
-		try {
-			handler.finalizeDmlOperation();
-		} catch (Exception e) {
-			myException = e;
-		}
-
-		System.Assert.isNotNull(myException, EXCEPTION_SHOULD_BE_THROWN);
-
-		System.Assert.areEqual(
-			String.format(
-				MetadataTriggerHandler.INVALID_TYPE_ERROR_FINALIZER,
-				new List<String>{ TEST_BEFORE_INSERT }
-			),
-			myException.getMessage(),
-			EXCEPTION_SHOULD_HAVE_CORRECT_MESSAGE
-		);
-	}
-
-	@IsTest
-	private static void finalizerThatInvokesDmlShouldCauseException() {
-		handler.allFinalizers = new List<DML_Finalizer__mdt>{
-			new DML_Finalizer__mdt(Apex_Class_Name__c = FINALIZER_WITH_DML)
-		};
-
-		try {
-			handler.finalizeDmlOperation();
-		} catch (Exception e) {
-			myException = e;
-		}
-
-		System.Assert.isNotNull(myException, EXCEPTION_SHOULD_BE_THROWN);
-
-		System.Assert.areEqual(
-			MetadataTriggerHandler.DML_IN_FINALIZER_ERROR,
-			myException.getMessage(),
-			EXCEPTION_SHOULD_HAVE_CORRECT_MESSAGE
-		);
-	}
-
-	@IsTest
-	private static void bypassFinalizerShouldSucceed() {
-		MetadataTriggerHandler.bypassFinalizer(FOO_FINALIZER);
-
-		System.Assert.isTrue(
-			MetadataTriggerHandler.bypassedFinalizers.contains(FOO_FINALIZER),
-			BYPASSES_SHOULD_BE_CONFIGURED_PROPERLY
-		);
-	}
-
-	@IsTest
-	private static void clearFinalizerBypassShouldSucceed() {
-		MetadataTriggerHandler.bypassFinalizer(FOO_FINALIZER);
-		MetadataTriggerHandler.clearFinalizerBypass(FOO_FINALIZER);
-
-		System.Assert.isFalse(
-			MetadataTriggerHandler.bypassedFinalizers.contains(FOO_FINALIZER),
-			BYPASSES_SHOULD_BE_CONFIGURED_PROPERLY
-		);
-	}
-
-	@IsTest
-	private static void finalizerIsBypassedShouldSucceed() {
-		Boolean isBypassed;
-		MetadataTriggerHandler.bypassFinalizer(FOO_FINALIZER);
-
-		isBypassed = MetadataTriggerHandler.finalizerIsBypassed(FOO_FINALIZER);
-
-		System.Assert.isTrue(isBypassed, BYPASSES_SHOULD_BE_CONFIGURED_PROPERLY);
-	}
-
-	@IsTest
-	private static void clearAllFinalizerBypassesShouldSucceed() {
-		MetadataTriggerHandler.bypass(FOO_FINALIZER);
-
-		MetadataTriggerHandler.clearAllFinalizerBypasses();
-
-		System.Assert.areEqual(
-			0,
-			MetadataTriggerHandler.bypassedFinalizers.size(),
-			BYPASSES_SHOULD_BE_CONFIGURED_PROPERLY
-		);
-	}
-
 	public class TestBeforeInsert implements TriggerAction.BeforeInsert {
 		public void beforeInsert(List<SObject> newList) {
 			MetadataTriggerHandlerTest.executed = true;
@@ -963,24 +772,12 @@ private class MetadataTriggerHandlerTest {
 			MetadataTriggerHandlerTest.executed = true;
 		}
 	}
-
-	public class FooFinalizer implements TriggerAction.DmlFinalizer {
-		public void execute(MetadataTriggerHandler.DmlFinalizerContext context) {
-			finalizerLedger.add(FOO);
-		}
-	}
-
-	public class BarFinalizer implements TriggerAction.DmlFinalizer {
-		public void execute(MetadataTriggerHandler.DmlFinalizerContext context) {
-			finalizerLedger.add(BAR);
-		}
-	}
-
-	public class FinalizerWithDml implements TriggerAction.DmlFinalizer {
-		public void execute(MetadataTriggerHandler.DmlFinalizerContext context) {
-			TriggerBase.bypass(Account.class.getName());
-			insert new Account(Name = 'Acme');
-			TriggerBase.clearBypass(Account.class.getName());
+	public class TestFinalizerHandler extends FinalizerHandler {
+		public override void handleDynamicFinalizers(
+			Schema.SObjectType sobjectType,
+			System.TriggerOperation triggerOperation
+		) {
+			MetadataTriggerHandlerTest.executed = true;
 		}
 	}
 

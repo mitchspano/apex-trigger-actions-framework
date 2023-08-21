@@ -404,7 +404,7 @@ public with sharing class OpportunityCategoryCalculator implements Queueable, Tr
     toProcess.addAll(toRecalculate);
   }
 
-  public void execute(MetadataTriggerHandler.DmlFinalizerContext context) {
+  public void execute(FinalizerHandler.Context context) {
     if (!toProcess.isEmpty()) {
       this.currentlyProcessing = toProcess;
       System.enqueueJob(this);
@@ -450,7 +450,7 @@ public with sharing class TA_Opportunity_RecalculateCategory implements TriggerA
 
 Just like everything else within the Apex Trigger Actions Framework, finalizers can be bypassed to suit your needs. On the `DML_Finalizer__mdt` metadata record, use the `Bypass_Execution__c` checkbox to bypass globally and the `Bypass_Permission__c`/`Required_Permission__c` fields to bypass for specific users or profiles.
 
-For static bypasses, call the `bypassFinalizer`, `clearFinalizerBypass`, `finalizerIsBypassed`, and `clearAllFinalizerBypasses` methods within the `MetadataTriggerHandler` class.
+For static bypasses, call the `bypass`, `clearBypass`, `sBypassed`, and `clearAlBypasses` methods within the `FinalizerHandler` class.
 
 ### DML Finalizer Caveats
 
@@ -533,7 +533,7 @@ public static void foo(){
 Sometimes it is infeasible for the system to be told to `waitToFinalize` - for example: when the composite API is called. To make sure our finalizers can safely handle these scenarios, be sure to guard your finalizers against multiple invocations in one transaction by clearing out any collections of records you need to process:
 
 ```java
-public void execute(MetadataTriggerHandler.DmlFinalizerContext context) {
+public void execute(MetadataTriggerHandler.Context context) {
   if (!toProcess.isEmpty()) {
     this.currentlyProcessing = toProcess;
     System.enqueueJob(this);
