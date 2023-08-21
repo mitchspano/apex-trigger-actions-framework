@@ -126,7 +126,7 @@ public with sharing virtual class FinalizerHandler {
 		);
 	}
 
-	private static boolean isNotBypassed(
+	private boolean isNotBypassed(
 		String requiredPermission,
 		String bypassPermission
 	) {

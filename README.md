@@ -393,7 +393,7 @@ This is notably different than the final action within a given trigger context. 
 
 DML finalizers can be very helpful for things such as _enqueuing a queuable operation_ or _inserting a collection of gathered logs_.
 
-Finalizers within the Apex Trigger Actions Framework operate using many of the same mechanisms. First define a class which implements the `TriggerAction.DmlFinalizer` interface.
+Finalizers within the Apex Trigger Actions Framework operate using many of the same mechanisms. First define a class which implements the `TriggerAction.DmlFinalizer` interface. Include public static variables/methods so that the trigger actions executing can register objects to be processed during the finalizer's execution.
 
 ```java
 public with sharing class OpportunityCategoryCalculator implements Queueable, TriggerAction.DmlFinalizer {
@@ -423,7 +423,7 @@ Then create a corresponding row of `DML_Finalizer__mdt` to invoke your finalizer
 
 ![DML Finalizer](images/dmlFinalizer.png)
 
-Finally, use static variables within your trigger actions to register data to be used in the finalizer's execution.
+Finally, use the static variables/methods of the finalizer within your trigger action to register data to be used in the finalizer's execution.
 
 ```java
 public with sharing class TA_Opportunity_RecalculateCategory implements TriggerAction.AfterUpdate {
