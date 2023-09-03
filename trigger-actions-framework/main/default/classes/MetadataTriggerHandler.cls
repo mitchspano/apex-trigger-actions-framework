@@ -50,6 +50,24 @@ public inherited sharing class MetadataTriggerHandler extends TriggerBase implem
 	@TestVisible
 	private static Map<String, Boolean> permissionMap = new Map<String, Boolean>();
 	private static Map<String, Map<String, List<Trigger_Action__mdt>>> sObjectToContextToActions = new Map<String, Map<String, List<Trigger_Action__mdt>>>();
+	@TestVisible
+	private static FinalizerHandler finalizerHandler = new FinalizerHandler();
+
+	public static void bypass(String actionName) {
+		MetadataTriggerHandler.bypassedActions.add(actionName);
+	}
+
+	public static void clearBypass(String actionName) {
+		MetadataTriggerHandler.bypassedActions.remove(actionName);
+	}
+
+	public static Boolean isBypassed(String actionName) {
+		return MetadataTriggerHandler.bypassedActions.contains(actionName);
+	}
+
+	public static void clearAllBypasses() {
+		MetadataTriggerHandler.bypassedActions.clear();
+	}
 
 	public void beforeInsert(List<SObject> newList) {
 		this.executeActions(TriggerOperation.BEFORE_INSERT, newList, null);
@@ -77,6 +95,20 @@ public inherited sharing class MetadataTriggerHandler extends TriggerBase implem
 
 	public void afterUndelete(List<SObject> newList) {
 		this.executeActions(TriggerOperation.AFTER_UNDELETE, newList, null);
+	}
+
+	@TestVisible
+	protected override void finalizeDmlOperation() {
+		finalizerHandler.handleDynamicFinalizers();
+	}
+
+	private void populatePermissionMap(String permissionName) {
+		if (permissionName != null && !permissionMap.containsKey(permissionName)) {
+			permissionMap.put(
+				permissionName,
+				FeatureManagement.checkPermission(permissionName)
+			);
+		}
 	}
 
 	private list<Trigger_Action__mdt> getActionMetadata(String relationshipName) {
@@ -146,14 +178,7 @@ public inherited sharing class MetadataTriggerHandler extends TriggerBase implem
 				sObjectRequiredPermissionName
 			}
 		) {
-			if (
-				permissionName != null && !permissionMap.containsKey(permissionName)
-			) {
-				permissionMap.put(
-					permissionName,
-					FeatureManagement.checkPermission(permissionName)
-				);
-			}
+			populatePermissionMap(permissionName);
 		}
 
 		return isNotBypassed(
@@ -294,6 +319,23 @@ public inherited sharing class MetadataTriggerHandler extends TriggerBase implem
 		}
 	}
 
+	private void handleException(
+		String error,
+		String className,
+		TriggerOperation triggerOperation
+	) {
+		throw new MetadataTriggerHandlerException(
+			String.format(
+				error,
+				new List<String>{
+					className,
+					String.valueOf(triggerOperation),
+					this.sObjectName
+				}
+			)
+		);
+	}
+
 	@TestVisible
 	private List<Trigger_Action__mdt> beforeInsertActionMetadata {
 		get {
@@ -383,39 +425,6 @@ public inherited sharing class MetadataTriggerHandler extends TriggerBase implem
 			return afterUndeleteActionMetadata;
 		}
 		set;
-	}
-
-	private void handleException(
-		String error,
-		String className,
-		TriggerOperation triggerOperation
-	) {
-		throw new MetadataTriggerHandlerException(
-			String.format(
-				error,
-				new List<String>{
-					className,
-					String.valueOf(triggerOperation),
-					this.sObjectName
-				}
-			)
-		);
-	}
-
-	public static void bypass(String actionName) {
-		MetadataTriggerHandler.bypassedActions.add(actionName);
-	}
-
-	public static void clearBypass(String actionName) {
-		MetadataTriggerHandler.bypassedActions.remove(actionName);
-	}
-
-	public static Boolean isBypassed(String actionName) {
-		return MetadataTriggerHandler.bypassedActions.contains(actionName);
-	}
-
-	public static void clearAllBypasses() {
-		MetadataTriggerHandler.bypassedActions.clear();
 	}
 
 	@TestVisible

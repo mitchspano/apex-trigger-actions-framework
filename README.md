@@ -4,9 +4,9 @@
   <img src="https://raw.githubusercontent.com/afawcett/githubsfdeploy/master/src/main/webapp/resources/img/deploy.png" alt="Deploy to Salesforce" />
 </a>
 
-#### [Unlocked Package Installation (Production)](https://login.salesforce.com/packaging/installPackage.apexp?p0=04t3h000004OYREAA4)
+#### [Unlocked Package Installation (Production)](https://login.salesforce.com/packaging/installPackage.apexp?p0=04t3h000004OYTPAA4)
 
-#### [Unlocked Package Installation (Sandbox)](https://test.salesforce.com/packaging/installPackage.apexp?p0=04t3h000004OYREAA4)
+#### [Unlocked Package Installation (Sandbox)](https://test.salesforce.com/packaging/installPackage.apexp?p0=04t3h000004OYTPAA4)
 
 ---
 
@@ -380,3 +380,168 @@ private static void invalidStageChangeShouldPreventSave() {
 ```
 
 Notice how we performed _zero_ DML operations yet we were able to cover all of the logic of our class in this particular test. This can help save a lot of computational time and allow for much faster execution of Apex tests.
+
+---
+
+## DML Finalizers
+
+The Apex Trigger Actions Framework now has support for a novel feature not found in other Trigger frameworks; DML finalizers.
+
+A DML finalizer is a piece of code that executes **exactly one time** at the very end of a DML operation.
+
+This is notably different than the final action within a given trigger context. The final configured action can be executed multiple times in case of cascading DML operations within trigger logic or when more than 200 records are included in the original DML operation. This can lead to challenges capturing logs or invoking asynchronous logic.
+
+DML finalizers can be very helpful for things such as _enqueuing a queuable operation_ or _inserting a collection of gathered logs_.
+
+Finalizers within the Apex Trigger Actions Framework operate using many of the same mechanisms. First define a class which implements the `TriggerAction.DmlFinalizer` interface. Include public static variables/methods so that the trigger actions executing can register objects to be processed during the finalizer's execution.
+
+```java
+public with sharing class OpportunityCategoryCalculator implements Queueable, TriggerAction.DmlFinalizer {
+  private static List<Opportunity> toProcess = new List<Opportunity>();
+  private List<Opportunity> currentlyProcessing;
+
+  public static void registerOpportunities(List<Opportunity> toRecalculate) {
+    toProcess.addAll(toRecalculate);
+  }
+
+  public void execute(FinalizerHandler.Context context) {
+    if (!toProcess.isEmpty()) {
+      this.currentlyProcessing = toProcess;
+      System.enqueueJob(this);
+      toProcess.clear();
+    }
+  }
+
+  public void execute(System.QueueableContext qc) {
+    // do some stuff
+  }
+}
+
+```
+
+Then create a corresponding row of `DML_Finalizer__mdt` to invoke your finalizer in the order specified.
+
+![DML Finalizer](images/dmlFinalizer.png)
+
+Finally, use the static variables/methods of the finalizer within your trigger action to register data to be used in the finalizer's execution.
+
+```java
+public with sharing class TA_Opportunity_RecalculateCategory implements TriggerAction.AfterUpdate {
+
+  public void afterUpdate(
+    List<Opportunity> newList,
+    List<Opportunity> oldList
+  ) {
+    Map<Id, Opportunity> oldMap = new Map<Id, Opportunity>(oldList);
+    List<Opportunity> toRecalculate = new List<Opportunity>();
+    for (Opportunity opp : newList) {
+      if (opp.Amount != oldMap.get(opp.Id).Amount) {
+        toRecalculate.add(opp);
+      }
+    }
+    if (!toRecalculate.isEmpty()) {
+      OpportunityCategoryCalculator.registerOpportunities(toRecalculate);
+    }
+  }
+}
+```
+
+#### DML Finalizer Bypasses
+
+Just like everything else within the Apex Trigger Actions Framework, finalizers can be bypassed to suit your needs. On the `DML_Finalizer__mdt` metadata record, use the `Bypass_Execution__c` checkbox to bypass globally and the `Bypass_Permission__c`/`Required_Permission__c` fields to bypass for specific users or profiles.
+
+For static bypasses, call the `bypass`, `clearBypass`, `sBypassed`, and `clearAlBypasses` methods within the `FinalizerHandler` class.
+
+### DML Finalizer Caveats
+
+> [!WARNING]  
+> DML Finalizers are brand new and should be considered as _experimental_. If you encounter any issues when using them, please create an issue on the GitHub repository.
+
+#### No Further DML Allowed
+
+DML Finalizers are not allowed to call any other DML operations; otherwise they wouldn't be able to guarantee their final nature. If a finalizer calls another DML operation, a runtime error will be thrown.
+
+#### Independent of SObject
+
+To ensure that cascading DML operations are supported, all configured finalizers within the org are invoked at the end of any DML operation, regardless of the SObject of the original triggering operation.
+
+#### Empty Context Specification
+
+The `FinalizerHandler.Context` object specified in the `TriggerAction.DmlFinalizer` interface's `execute` method currently **is empty**; there are no properties on this object. We are establishing the interface to include the context to help future-proof the interface's specifications.
+
+#### Universal Adoption
+
+To use a DML Finalizer, the Apex Trigger Actions Framework must be enabled on every SObject which supports triggers which will have a DML operation on it during a transaction, and enabled in all trigger contexts on those sObjects. If DML is performed on an SObject that has a trigger which does not use the framework, the system will not be able to detect when to finalize the DML operation.
+
+#### Offsetting the Number of DML Rows
+
+Detecting when to finalize the operation requires knowledge of the total number of records passed to the DML operation. Unfortunately, there is no bulletproof way of how to do this currently in Apex; the best thing we can do is to rely on `Limits.getDmlRows()` to infer the number of records passed to the DML operation.
+
+This works in most cases, but certain operations such as setting a `System.Savepoint` consume a DML row, and there are certain sObjects where triggers are not supported like `CaseTeamMember` which can throw off the counts and remove our ability to detect when to finalize. In order to avoid this problem, use the `TriggerBase.offsetExistingDmlRows()` method before calling the first DML operation within your Apex.
+
+```java
+Savepoint sp = Database.setSavepoint(); // adds to Limits.getDmlRows()
+TriggerBase.offsetExistingDmlRows();
+insert accounts;
+```
+
+```java
+insert caseTeamMembers; // additions to Limits.getDmlRows() are not able to be automatically handled because there is no trigger on `CaseTeamMember`
+TriggerBase.offsetExistingDmlRows();
+update cases;
+```
+
+> [!NOTE]  
+> Please consider upvoting [this idea](https://ideas.salesforce.com/s/idea/a0B8W00000GdpidUAB/total-dml-size-trigger-context-variable) to help avoid this quirky reliance on `Limits.getDmlRows()`
+
+#### Wait to Finalize
+
+It could be the case that you have multiple DML operations in a row and you would like the system to wait to finalize until they are all complete. For example, in a Lightning Web Component's controller:
+
+```java
+@AuraEnabled
+public static void foo(){
+  Account acme = new Account(
+    Name = 'Acme'
+  );
+  insert acme; // finalizer is called here
+  Account acmeExplosives = new Account(
+    Name = 'Acme-Explosives',
+    ParentId = acme.Id,
+  );
+  insert acmeExplosives; // second finalizer is called here
+}
+```
+
+To facilitate these needs, call the `TriggerBase.waitToFinalize()` and `TriggerBase.nowFinalize()` methods:
+
+```java
+@AuraEnabled
+public static void foo(){
+  TriggerBase.waitToFinalize();
+  Account acme = new Account(
+    Name = 'Acme'
+  );
+  insert acme;
+  Account acmeExplosives = new Account(
+    Name = 'Acme-Explosives',
+    ParentId = acme.Id,
+  );
+  insert acmeExplosives;
+  TriggerBase.nowFinalize();  // single finalizer is called here
+}
+```
+
+#### Handle Multiple Finalizers per Transaction
+
+Sometimes it is infeasible for the system to be told to `waitToFinalize` - for example: when the composite API is called. To make sure our finalizers can safely handle these scenarios, be sure to guard your finalizers against multiple invocations in one transaction by clearing out any collections of records you need to process:
+
+```java
+public void execute(FinalizerHandler.Context context) {
+  if (!toProcess.isEmpty()) {
+    this.currentlyProcessing = toProcess;
+    System.enqueueJob(this);
+    toProcess.clear();
+  }
+}
+```

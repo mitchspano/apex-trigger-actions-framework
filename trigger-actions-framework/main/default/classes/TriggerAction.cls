@@ -43,4 +43,8 @@ public class TriggerAction {
 	public interface AfterUndelete {
 		void afterUndelete(List<SObject> newList);
 	}
+
+	public interface DmlFinalizer {
+		void execute(FinalizerHandler.Context context);
+	}
 }

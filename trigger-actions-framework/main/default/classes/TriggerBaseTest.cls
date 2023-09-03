@@ -19,8 +19,13 @@
 private class TriggerBaseTest {
 	private static final String ACCOUNT = 'Account';
 	private static final String BYPASSES_SHOULD_BE_CONFIGURED_CORRECTLY = 'The bypasses should be configured correctly';
+	private static final String FIRST = 'first';
 	private static final String NUMBER_OF_TIMES_SEEN_SHOULD_BE_CORRECT = 'The number of time seen should be populated properly';
-	private static final String RUN_SUCCESS = 'Run should be successful ';
+	private static final String RUN_SUCCESS = 'Run should be successful';
+	private static final String SECOND = 'second';
+	private static final String SHOULD_BE_FINALIZED = 'The DML operation should be finalized';
+	private static final String SHOULD_NOT_BE_FINALIZED = 'The DML operation should not be finalized';
+	private static final String THIRD = 'third';
 
 	private static final Account MY_ACCOUNT = new Account(
 		Id = TriggerTestUtility.getFakeId(Schema.Account.SObjectType),
@@ -182,9 +187,9 @@ private class TriggerBaseTest {
 			myException,
 			'An exception should be thrown'
 		);
-		System.Assert.isTrue(
-			myException.getMessage()
-				.contains(TriggerBase.HANDLER_OUTSIDE_TRIGGER_MESSAGE),
+		System.Assert.areEqual(
+			TriggerBase.HANDLER_OUTSIDE_TRIGGER_MESSAGE,
+			myException.getMessage(),
 			'The exception should be the one we are looking for'
 		);
 	}
@@ -197,7 +202,52 @@ private class TriggerBaseTest {
 
 		base.run();
 
-		System.Assert.isFalse(base.executed, 'The base should not have executed');
+		System.Assert.isFalse(base.executed, SHOULD_NOT_BE_FINALIZED);
+	}
+
+	@IsTest
+	private static void inverseContextsShouldFinalizeDmlOperationInsert() {
+		base.triggerOld = null;
+		base.dmlRows = 1;
+		base.context = System.TriggerOperation.BEFORE_INSERT;
+		base.run();
+		base.context = System.TriggerOperation.AFTER_INSERT;
+		base.run();
+
+		System.Assert.isTrue(base.finalized, SHOULD_BE_FINALIZED);
+	}
+
+	@IsTest
+	private static void inverseContextsShouldFinalizeDmlOperationUpdate() {
+		base.dmlRows = 1;
+		base.context = System.TriggerOperation.BEFORE_UPDATE;
+		base.run();
+		base.context = System.TriggerOperation.AFTER_UPDATE;
+		base.run();
+
+		System.Assert.isTrue(base.finalized, SHOULD_BE_FINALIZED);
+	}
+
+	@IsTest
+	private static void inverseContextsShouldFinalizeDmlOperationDelete() {
+		base.triggerNew = null;
+		base.dmlRows = 1;
+		base.context = System.TriggerOperation.BEFORE_DELETE;
+		base.run();
+		base.context = System.TriggerOperation.AFTER_DELETE;
+		base.run();
+
+		System.Assert.isTrue(base.finalized, SHOULD_BE_FINALIZED);
+	}
+
+	@IsTest
+	private static void inverseContextsShouldFinalizeDmlOperationUndelete() {
+		base.triggerOld = null;
+		base.dmlRows = 1;
+		base.context = System.TriggerOperation.AFTER_UNDELETE;
+		base.run();
+
+		System.Assert.isTrue(base.finalized, SHOULD_BE_FINALIZED);
 	}
 
 	@IsTest
@@ -245,8 +295,157 @@ private class TriggerBaseTest {
 		);
 	}
 
+	@IsTest
+	private static void offsetRowsShouldWork() {
+		TriggerBase.offsetExistingDmlRows();
+
+		System.Assert.areEqual(
+			0,
+			TriggerBase.existingDmlRowsOffset,
+			'Offset is not working properly'
+		);
+	}
+
+	@IsTest
+	private static void waitingThenFinalizingShouldWork() {
+		try {
+			TriggerBase.waitToFinalize();
+			TriggerBase.nowFinalize();
+		} catch (Exception e) {
+			myException = e;
+		}
+
+		System.Assert.areEqual(
+			null,
+			myException,
+			'There should be no exception when you wait to finalize'
+		);
+	}
+
+	@IsTest
+	private static void finalizingWithoutWaitingShouldThrowError() {
+		try {
+			TriggerBase.nowFinalize();
+		} catch (Exception e) {
+			myException = e;
+		}
+
+		System.Assert.areEqual(
+			TriggerBase.CANNOT_FINALIZE,
+			myException.getMessage(),
+			'There should be an exception when you finalize without waiting'
+		);
+	}
+
+	@IsTest
+	private static void stacksShouldBeAbleToDetermineIftheyAreEmpty() {
+		TriggerBase.Stack stack = new TriggerBase.Stack();
+		stack.push(FIRST);
+		stack.pop();
+
+		System.Assert.isTrue(
+			stack.isEmpty(),
+			'The stack is empty but unable to identify as such'
+		);
+	}
+
+	@IsTest
+	private static void stackShouldBeFirstInLastOut() {
+		TriggerBase.Stack stack = new TriggerBase.Stack();
+		stack.push(FIRST);
+		stack.push(SECOND);
+		stack.push(THIRD);
+
+		String popped = stack.pop();
+		popped = stack.pop();
+
+		System.Assert.areEqual(
+			FIRST,
+			stack.pop(),
+			'The first element in the stack is not the last one returned'
+		);
+	}
+
+	@IsTest
+	private static void stackShouldBeLastInFirstOut() {
+		TriggerBase.Stack stack = new TriggerBase.Stack();
+		stack.push(FIRST);
+		stack.push(SECOND);
+		stack.push(THIRD);
+
+		System.Assert.areEqual(
+			THIRD,
+			stack.pop(),
+			'The last element in the stack is not the first one returned'
+		);
+	}
+
+	@IsTest
+	private static void peekShouldShowMostRecentlyAdded() {
+		TriggerBase.Stack stack = new TriggerBase.Stack();
+		stack.push(FIRST);
+		stack.push(SECOND);
+		stack.push(THIRD);
+
+		System.Assert.areEqual(
+			THIRD,
+			stack.peek(),
+			'The last element in the stack is not peeked'
+		);
+	}
+
+	@IsTest
+	private static void stackDepthShouldBeCalculatedProperly() {
+		TriggerBase.Stack stack = new TriggerBase.Stack();
+		stack.push(FIRST);
+		stack.push(SECOND);
+		stack.push(THIRD);
+
+		System.Assert.areEqual(
+			3,
+			stack.depth(),
+			'The stack is not properly calculating its depth'
+		);
+	}
+
+	@IsTest
+	private static void peekingStackWhileEmptyShouldThrowException() {
+		TriggerBase.EmptyStackException caught;
+
+		try {
+			new TriggerBase.Stack().peek();
+		} catch (TriggerBase.EmptyStackException e) {
+			caught = e;
+		}
+
+		System.Assert.areNotEqual(
+			null,
+			caught,
+			'There should be an exception when you peek an empty stack'
+		);
+	}
+
+	@IsTest
+	private static void poppingStackWhileEmptyShouldThrowException() {
+		TriggerBase.EmptyStackException caught;
+
+		try {
+			new TriggerBase.Stack().pop();
+		} catch (TriggerBase.EmptyStackException e) {
+			caught = e;
+		}
+
+		System.Assert.areNotEqual(
+			null,
+			caught,
+			'There should be an exception when you pop an empty stack'
+		);
+	}
+
 	class BaseTest extends TriggerBase implements TriggerAction.BeforeInsert, TriggerAction.AfterInsert, TriggerAction.BeforeUpdate, TriggerAction.AfterUpdate, TriggerAction.BeforeDelete, TriggerAction.AfterDelete, TriggerAction.AfterUndelete {
 		public Boolean executed = false;
+		public Boolean finalized = false;
+		public Integer dmlRows;
 		public void beforeInsert(List<SObject> newList) {
 			this.executed = true;
 		}
@@ -267,6 +466,16 @@ private class TriggerBaseTest {
 		}
 		public void afterUndelete(List<SObject> newList) {
 			this.executed = true;
+		}
+		public override void finalizeDmlOperation() {
+			super.finalizeDmlOperation();
+			finalized = true;
+		}
+		private override Integer getDmlRows() {
+			if (dmlRows != null) {
+				return dmlRows;
+			}
+			return super.getDmlRows();
 		}
 	}
 }

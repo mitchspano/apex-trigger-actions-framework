@@ -22,12 +22,17 @@ private class MetadataTriggerHandlerTest {
 	private static final String ACCOUNT = 'Account';
 	private static final String ACTION_SHOULD_EXECUTE = 'We expect the action to be executed';
 	private static final String ACTION_SHOULD_NOT_EXECUTE = 'We expect the action to not be executed';
+	private static final String BAR = 'bar';
+	private static final String BAR_FINALIZER = 'MetadataTriggerHandlerTest.BarFinalizer';
 	private static final String BOGUS_CLASS_NAME = 'Bogus';
 	private static final String BYPASS_PERMISSION = 'Bogus_Bypass_Permission';
 	private static final String BYPASSES_SHOULD_BE_CONFIGURED_PROPERLY = 'All bypasses should be configured correctly';
 	private static final String EXCEPTION_SHOULD_BE_THROWN = 'An exception should be thrown';
 	private static final String EXCEPTION_SHOULD_HAVE_CORRECT_MESSAGE = 'The exception should have the correct message';
 	private static final String EXCEPTION_SHOULD_NOT_BE_THROWN = 'An exception should not be thrown';
+	private static final String FINALIZER_WITH_DML = 'MetadataTriggerHandlerTest.FinalizerWithDml';
+	private static final String FOO = 'foo';
+	private static final String FOO_FINALIZER = 'MetadataTriggerHandlerTest.FooFinalizer';
 	private static final String METADATA_SHOULD_BE_POPULATED_PROPERLY = 'The metadata should be populated properly';
 	private static final String MY_ACCOUNT = 'My Account';
 	private static final String REQUIRED_PERMISSION = 'Bogus_Required_Permission';
@@ -524,6 +529,15 @@ private class MetadataTriggerHandlerTest {
 	}
 
 	@IsTest
+	private static void finalizerShouldSucceed() {
+		MetadataTriggerHandler.finalizerHandler = new TestFinalizerHandler();
+
+		handler.finalizeDmlOperation();
+
+		System.Assert.isTrue(executed, ACTION_SHOULD_EXECUTE);
+	}
+
+	@IsTest
 	private static void actionMetadataShouldConstruct() {
 		System.Assert.areNotEqual(
 			null,
@@ -755,6 +769,11 @@ private class MetadataTriggerHandlerTest {
 	}
 	public class TestAfterUndelete implements TriggerAction.AfterUndelete {
 		public void afterUndelete(List<SObject> newList) {
+			MetadataTriggerHandlerTest.executed = true;
+		}
+	}
+	public class TestFinalizerHandler extends FinalizerHandler {
+		public override void handleDynamicFinalizers() {
 			MetadataTriggerHandlerTest.executed = true;
 		}
 	}
