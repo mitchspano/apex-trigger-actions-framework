@@ -251,7 +251,10 @@ public inherited sharing virtual class TriggerBase {
 	protected String sObjectName {
 		get {
 			if (sObjectName == null) {
-				sObjectName = this.sObjectType.getDescribe().getName();
+				sObjectName = this.sObjectType.getDescribe(
+						SObjectDescribeOptions.DEFERRED
+					)
+					.getName();
 			}
 			return sObjectName;
 		}
