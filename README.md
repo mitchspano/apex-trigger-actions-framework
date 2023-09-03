@@ -465,6 +465,10 @@ DML Finalizers are not allowed to call any other DML operations; otherwise they 
 
 To ensure that cascading DML operations are supported, all configured finalizers within the org are invoked at the end of any DML operation, regardless of the SObject of the original triggering operation.
 
+#### Empty Context Specification
+
+The `FinalizerHandler.Context` object specified in the `TriggerAction.DmlFinalizer` interface's `execute` method currently **is empty**; there are no properties on this object. We are establishing the interface to include the context to help future-proof the interface's specifications.
+
 #### Universal Adoption
 
 To use a DML Finalizer, the Apex Trigger Actions Framework must be enabled on every SObject which supports triggers which will have a DML operation on it during a transaction, and enabled in all trigger contexts on those sObjects. If DML is performed on an SObject that has a trigger which does not use the framework, the system will not be able to detect when to finalize the DML operation.
@@ -533,7 +537,7 @@ public static void foo(){
 Sometimes it is infeasible for the system to be told to `waitToFinalize` - for example: when the composite API is called. To make sure our finalizers can safely handle these scenarios, be sure to guard your finalizers against multiple invocations in one transaction by clearing out any collections of records you need to process:
 
 ```java
-public void execute(MetadataTriggerHandler.Context context) {
+public void execute(FinalizerHandler.Context context) {
   if (!toProcess.isEmpty()) {
     this.currentlyProcessing = toProcess;
     System.enqueueJob(this);

@@ -22,16 +22,6 @@ public with sharing virtual class FinalizerHandler {
 	@TestVisible
 	private static final String INVALID_CLASS_ERROR_FINALIZER = 'Please check the DML Finalizer Custom Metadata. The {0} class does not exist.';
 
-	private static final Map<System.TriggerOperation, FinalizerHandler.DmlOperation> TRIGGER_OPERATION_TO_DML_OPERATION = new Map<System.TriggerOperation, FinalizerHandler.DmlOperation>{
-		System.TriggerOperation.BEFORE_INSERT => DmlOperation.DML_INSERT,
-		System.TriggerOperation.AFTER_INSERT => DmlOperation.DML_INSERT,
-		System.TriggerOperation.BEFORE_UPDATE => DmlOperation.DML_UPDATE,
-		System.TriggerOperation.AFTER_UPDATE => DmlOperation.DML_UPDATE,
-		System.TriggerOperation.BEFORE_DELETE => DmlOperation.DML_DELETE,
-		System.TriggerOperation.AFTER_DELETE => DmlOperation.DML_DELETE,
-		System.TriggerOperation.AFTER_UNDELETE => DmlOperation.DML_UNDELETE
-	};
-
 	@TestVisible
 	private static Set<String> bypassedFinalizers = new Set<String>();
 
@@ -54,14 +44,8 @@ public with sharing virtual class FinalizerHandler {
 		FinalizerHandler.bypassedFinalizers.clear();
 	}
 
-	public virtual void handleDynamicFinalizers(
-		Schema.SObjectType sobjectType,
-		System.TriggerOperation triggerOperation
-	) {
-		Context context = new Context(
-			sObjectType,
-			TRIGGER_OPERATION_TO_DML_OPERATION.get(triggerOperation)
-		);
+	public virtual void handleDynamicFinalizers() {
+		Context context = new Context();
 		List<DML_Finalizer__mdt> sortedFinalizers = getSortedFinalizers();
 		for (DML_Finalizer__mdt finalizerMetadata : sortedFinalizers) {
 			if (finalizerMetadata.Bypass_Execution__c) {
@@ -169,20 +153,12 @@ public with sharing virtual class FinalizerHandler {
 		}
 	}
 
+	/**
+	 * @description Context to be passed to the implementation's `.execute` method
+	 * Currently, this object's definition is empty. We are establishing the interface
+	 * to include the context to help future-proof the interface's specifications.
+	 */
 	public class Context {
-		public SObjectType objectType { public get; private set; }
-		public DmlOperation operation { public get; private set; }
-		public Context(SObjectType objectType, DmlOperation operation) {
-			this.objectType = objectType;
-			this.operation = operation;
-		}
-	}
-
-	public enum DmlOperation {
-		DML_INSERT,
-		DML_UPDATE,
-		DML_DELETE,
-		DML_UNDELETE
 	}
 
 	private class FinalizerException extends Exception {

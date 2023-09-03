@@ -99,7 +99,7 @@ public inherited sharing class MetadataTriggerHandler extends TriggerBase implem
 
 	@TestVisible
 	protected override void finalizeDmlOperation() {
-		finalizerHandler.handleDynamicFinalizers(this.sObjectType, this.context);
+		finalizerHandler.handleDynamicFinalizers();
 	}
 
 	private void populatePermissionMap(String permissionName) {

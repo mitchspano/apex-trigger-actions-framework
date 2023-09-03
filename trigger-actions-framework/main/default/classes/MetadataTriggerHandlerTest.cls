@@ -773,10 +773,7 @@ private class MetadataTriggerHandlerTest {
 		}
 	}
 	public class TestFinalizerHandler extends FinalizerHandler {
-		public override void handleDynamicFinalizers(
-			Schema.SObjectType sobjectType,
-			System.TriggerOperation triggerOperation
-		) {
+		public override void handleDynamicFinalizers() {
 			MetadataTriggerHandlerTest.executed = true;
 		}
 	}

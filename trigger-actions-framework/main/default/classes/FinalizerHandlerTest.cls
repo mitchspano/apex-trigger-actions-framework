@@ -47,7 +47,7 @@ private with sharing class FinalizerHandlerTest {
 
 		handler.allFinalizers = new List<DML_Finalizer__mdt>();
 
-		handler.handleDynamicFinalizers(SOBJECT_TYPE, OPERATION);
+		handler.handleDynamicFinalizers();
 
 		System.Assert.isTrue(
 			finalizerLedger.isEmpty(),
@@ -64,7 +64,7 @@ private with sharing class FinalizerHandlerTest {
 			)
 		};
 
-		handler.handleDynamicFinalizers(SOBJECT_TYPE, OPERATION);
+		handler.handleDynamicFinalizers();
 
 		System.Assert.areEqual(
 			FOO,
@@ -83,7 +83,7 @@ private with sharing class FinalizerHandlerTest {
 			)
 		};
 
-		handler.handleDynamicFinalizers(SOBJECT_TYPE, OPERATION);
+		handler.handleDynamicFinalizers();
 
 		System.Assert.isTrue(
 			finalizerLedger.isEmpty(),
@@ -101,7 +101,7 @@ private with sharing class FinalizerHandlerTest {
 		};
 
 		FinalizerHandler.bypass(TEST_FOO_FINALIZER);
-		handler.handleDynamicFinalizers(SOBJECT_TYPE, OPERATION);
+		handler.handleDynamicFinalizers();
 
 		System.Assert.isTrue(
 			finalizerLedger.isEmpty(),
@@ -120,7 +120,7 @@ private with sharing class FinalizerHandlerTest {
 		};
 
 		FinalizerHandler.permissionMap.put(BYPASS_PERMISSION, true);
-		handler.handleDynamicFinalizers(SOBJECT_TYPE, OPERATION);
+		handler.handleDynamicFinalizers();
 
 		System.Assert.isTrue(
 			finalizerLedger.isEmpty(),
@@ -139,7 +139,7 @@ private with sharing class FinalizerHandlerTest {
 		};
 
 		FinalizerHandler.permissionMap.put(REQUIRED_PERMISSION, false);
-		handler.handleDynamicFinalizers(SOBJECT_TYPE, OPERATION);
+		handler.handleDynamicFinalizers();
 
 		System.Assert.isTrue(
 			finalizerLedger.isEmpty(),
@@ -160,7 +160,7 @@ private with sharing class FinalizerHandlerTest {
 			)
 		};
 
-		handler.handleDynamicFinalizers(SOBJECT_TYPE, OPERATION);
+		handler.handleDynamicFinalizers();
 
 		System.Assert.areEqual(
 			FOO,
@@ -181,7 +181,7 @@ private with sharing class FinalizerHandlerTest {
 		};
 
 		try {
-			handler.handleDynamicFinalizers(SOBJECT_TYPE, OPERATION);
+			handler.handleDynamicFinalizers();
 		} catch (Exception e) {
 			myException = e;
 		}
@@ -205,7 +205,7 @@ private with sharing class FinalizerHandlerTest {
 		};
 
 		try {
-			handler.handleDynamicFinalizers(SOBJECT_TYPE, OPERATION);
+			handler.handleDynamicFinalizers();
 		} catch (Exception e) {
 			myException = e;
 		}
@@ -229,7 +229,7 @@ private with sharing class FinalizerHandlerTest {
 		};
 
 		try {
-			handler.handleDynamicFinalizers(SOBJECT_TYPE, OPERATION);
+			handler.handleDynamicFinalizers();
 		} catch (Exception e) {
 			myException = e;
 		}
