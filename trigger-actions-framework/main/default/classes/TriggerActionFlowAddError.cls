@@ -14,29 +14,20 @@
    limitations under the License.
  */
 
+@SuppressWarnings('PMD.ApexDoc')
 public inherited sharing class TriggerActionFlowAddError {
-	@TestVisible
-	private static final String CLASS_NAME = 'TriggerActionFlowAddError';
-	@TestVisible
-	private static final String INVALID_REQUEST = String.format(
-		TriggerActionFlow.INVALID_BYPASS_REQUEST,
-		new List<String>{ CLASS_NAME }
-	);
-
 	@InvocableMethod(
 		category='Trigger Action Flow'
 		label='Add Error'
 		description='Adds an error to an sObject'
 	)
 	public static void addError(List<Request> requests) {
-		if (requests.size() != 1) {
-			throw new TriggerActionFlowAddErrorException(INVALID_REQUEST);
-		}
-		if (!String.isBlank(requests[0].fieldName)) {
-			requests[0]
-				.record.addError(requests[0].fieldName, requests[0].errorMessage);
-		} else {
-			requests[0].record.addError(requests[0].errorMessage);
+		for (Request myRequest : requests) {
+			if (!String.isBlank(myRequest.fieldName)) {
+				myRequest.record.addError(myRequest.fieldName, myRequest.errorMessage);
+			} else {
+				myRequest.record.addError(myRequest.errorMessage);
+			}
 		}
 	}
 
@@ -58,8 +49,5 @@ public inherited sharing class TriggerActionFlowAddError {
 			required=true
 		)
 		public String errorMessage;
-	}
-
-	public class TriggerActionFlowAddErrorException extends Exception {
 	}
 }

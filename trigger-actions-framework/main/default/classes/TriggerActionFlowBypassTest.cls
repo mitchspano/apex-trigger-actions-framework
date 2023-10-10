@@ -14,6 +14,7 @@
    limitations under the License.
  */
 
+@SuppressWarnings('PMD.ApexDoc, PMD.ApexUnitTestClassShouldHaveRunAs')
 @IsTest(isParallel=true)
 private class TriggerActionFlowBypassTest {
 	private static final String MY_STRING = 'MY_STRING';
@@ -24,13 +25,12 @@ private class TriggerActionFlowBypassTest {
 	@IsTest
 	private static void bypassObjectShouldSucceedWithValidRequest() {
 		request.Name = MY_STRING;
-		request.bypassType = TriggerActionFlow.OBJECT_STRING;
+		request.bypassType = TriggerActionConstants.OBJECT_STRING;
 		requests.add(request);
 
 		TriggerActionFlowBypass.bypass(requests);
 
-		System.assertEquals(
-			true,
+		System.Assert.isTrue(
 			TriggerBase.isBypassed(MY_STRING),
 			'The Object should be bypassed'
 		);
@@ -39,13 +39,12 @@ private class TriggerActionFlowBypassTest {
 	@IsTest
 	private static void bypassApexShouldSucceedWithValidRequest() {
 		request.Name = MY_STRING;
-		request.bypassType = TriggerActionFlow.APEX_STRING;
+		request.bypassType = TriggerActionConstants.APEX_STRING;
 		requests.add(request);
 
 		TriggerActionFlowBypass.bypass(requests);
 
-		System.assertEquals(
-			true,
+		System.Assert.isTrue(
 			MetadataTriggerHandler.isBypassed(MY_STRING),
 			'The Apex should be bypassed'
 		);
@@ -54,41 +53,14 @@ private class TriggerActionFlowBypassTest {
 	@IsTest
 	private static void bypassFlowShouldSucceedWithValidRequest() {
 		request.Name = MY_STRING;
-		request.bypassType = TriggerActionFlow.FLOW_STRING;
+		request.bypassType = TriggerActionConstants.FLOW_STRING;
 		requests.add(request);
 
 		TriggerActionFlowBypass.bypass(requests);
 
-		System.assertEquals(
-			true,
+		System.Assert.isTrue(
 			TriggerActionFlow.isBypassed(MY_STRING),
 			'The Flow should be bypassed'
-		);
-	}
-
-	@IsTest
-	private static void bypassShouldFailWithInvalidRequest() {
-		try {
-			TriggerActionFlowBypass.bypass(
-				new List<TriggerActionFlowBypass.Request>()
-			);
-		} catch (Exception e) {
-			myException = e;
-		}
-
-		System.assertNotEquals(
-			null,
-			myException,
-			'We should have an exception thrown in this scenario'
-		);
-		System.assert(
-			myException instanceof TriggerActionFlowBypass.TriggerActionFlowBypassObjectException,
-			'The exception should be of the correct type'
-		);
-		System.assertEquals(
-			myException.getMessage(),
-			TriggerActionFlowBypass.INVALID_REQUEST,
-			'The exeption should contain the message we are looking for'
 		);
 	}
 
@@ -104,18 +76,19 @@ private class TriggerActionFlowBypassTest {
 			myException = e;
 		}
 
-		System.assertNotEquals(
+		System.Assert.areNotEqual(
 			null,
 			myException,
 			'We should have an exception thrown in this scenario'
 		);
-		System.assert(
-			myException instanceof TriggerActionFlowBypass.TriggerActionFlowBypassObjectException,
+		Assert.isInstanceOfType(
+			myException,
+			IllegalArgumentException.class,
 			'The exception should be of the correct type'
 		);
-		System.assertEquals(
+		System.Assert.areEqual(
 			myException.getMessage(),
-			TriggerActionFlow.INVALID_TYPE,
+			TriggerActionConstants.INVALID_TYPE,
 			'The exeption should contain the message we are looking for'
 		);
 	}

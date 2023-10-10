@@ -14,37 +14,17 @@
    limitations under the License.
  */
 
+@SuppressWarnings('PMD.ApexDoc, PMD.CognitiveComplexity')
 public inherited sharing class TriggerActionFlowBypass {
-	@TestVisible
-	private static final String CLASS_NAME = 'TriggerActionFlowBypass';
-	@TestVisible
-	private static final String INVALID_REQUEST = String.format(
-		TriggerActionFlow.INVALID_BYPASS_REQUEST,
-		new List<String>{ CLASS_NAME }
-	);
-
 	@InvocableMethod(
 		category='Trigger Action Flow'
 		label='Bypass'
 		description='Sets the static bypass to true for this object, apex action, or flow action.'
 	)
 	public static void bypass(List<Request> requests) {
-		if (requests.size() != 1) {
-			throw new TriggerActionFlowBypassObjectException(INVALID_REQUEST);
-		}
-		if (!TriggerActionFlow.REQUEST_TYPES.contains(requests[0].bypassType)) {
-			throw new TriggerActionFlowBypassObjectException(
-				TriggerActionFlow.INVALID_TYPE
-			);
-		}
-		if (requests[0].bypassType == TriggerActionFlow.OBJECT_STRING) {
-			TriggerBase.bypass(requests[0].name);
-		}
-		if (requests[0].bypassType == TriggerActionFlow.APEX_STRING) {
-			MetadataTriggerHandler.bypass(requests[0].name);
-		}
-		if (requests[0].bypassType == TriggerActionFlow.FLOW_STRING) {
-			TriggerActionFlow.bypass(requests[0].name);
+		TriggerActionFlowBypassProcessor bypassProcessor = new FlowBypassProcessor();
+		for (Request myRequest : requests) {
+			bypassProcessor.execute(myRequest.bypassType, myRequest.name);
 		}
 	}
 
@@ -63,6 +43,17 @@ public inherited sharing class TriggerActionFlowBypass {
 		public String bypassType;
 	}
 
-	public class TriggerActionFlowBypassObjectException extends Exception {
+	private class FlowBypassProcessor extends TriggerActionFlowBypassProcessor {
+		protected override void processApexBypasses(String name) {
+			MetadataTriggerHandler.bypass(name);
+		}
+
+		protected override void processFlowBypasses(String name) {
+			TriggerActionFlow.bypass(name);
+		}
+
+		protected override void processObjectBypasses(String name) {
+			TriggerBase.bypass(name);
+		}
 	}
 }

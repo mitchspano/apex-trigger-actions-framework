@@ -14,6 +14,7 @@
    limitations under the License.
  */
 
+@SuppressWarnings('PMD.ApexDoc, PMD.CyclomaticComplexity')
 public class TriggerAction {
 	public interface BeforeInsert {
 		void beforeInsert(List<SObject> newList);
@@ -41,5 +42,9 @@ public class TriggerAction {
 
 	public interface AfterUndelete {
 		void afterUndelete(List<SObject> newList);
+	}
+
+	public interface DmlFinalizer {
+		void execute(FinalizerHandler.Context context);
 	}
 }

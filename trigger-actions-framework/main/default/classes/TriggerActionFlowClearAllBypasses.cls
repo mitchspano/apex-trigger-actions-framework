@@ -13,43 +13,31 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-
+@SuppressWarnings('PMD.ApexDoc, PMD.CognitiveComplexity')
 public inherited sharing class TriggerActionFlowClearAllBypasses {
-	@TestVisible
-	private static final String CLASS_NAME = 'TriggerActionFlowClearAllBypasses';
-	@TestVisible
-	private static final String INVALID_REQUEST = String.format(
-		TriggerActionFlow.INVALID_BYPASS_REQUEST,
-		new List<String>{ CLASS_NAME }
-	);
-
 	@InvocableMethod(
 		category='Trigger Action Flow'
 		label='Clear All Bypasses'
 		description='Sets the static bypass to false for all objects, apex actions, or flow actions.'
 	)
 	public static void clearAllBypasses(List<String> requests) {
-		if (requests.size() != 1) {
-			throw new TriggerActionFlowClearAllBypassesObjectException(
-				INVALID_REQUEST
-			);
-		}
-		if (!TriggerActionFlow.REQUEST_TYPES.contains(requests[0])) {
-			throw new TriggerActionFlowClearAllBypassesObjectException(
-				TriggerActionFlow.INVALID_TYPE
-			);
-		}
-		if (requests[0] == TriggerActionFlow.OBJECT_STRING) {
-			TriggerBase.clearAllBypasses();
-		}
-		if (requests[0] == TriggerActionFlow.APEX_STRING) {
-			MetadataTriggerHandler.clearAllBypasses();
-		}
-		if (requests[0] == TriggerActionFlow.FLOW_STRING) {
-			TriggerActionFlow.clearAllBypasses();
+		TriggerActionFlowBypassProcessor bypassProcessor = new ClearBypassesProcessor();
+		for (String myRequest : requests) {
+			bypassProcessor.execute(myRequest, myRequest);
 		}
 	}
 
-	public class TriggerActionFlowClearAllBypassesObjectException extends Exception {
+	private class ClearBypassesProcessor extends TriggerActionFlowBypassProcessor {
+		protected override void processApexBypasses(String name) {
+			MetadataTriggerHandler.clearAllBypasses();
+		}
+
+		protected override void processFlowBypasses(String name) {
+			TriggerActionFlow.clearAllBypasses();
+		}
+
+		protected override void processObjectBypasses(String name) {
+			TriggerBase.clearAllBypasses();
+		}
 	}
 }

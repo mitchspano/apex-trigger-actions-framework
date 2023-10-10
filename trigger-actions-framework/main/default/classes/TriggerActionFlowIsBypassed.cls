@@ -13,41 +13,21 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-
+@SuppressWarnings('PMD.ApexDoc, PMD.CognitiveComplexity')
 public inherited sharing class TriggerActionFlowIsBypassed {
-	@TestVisible
-	private static final String CLASS_NAME = 'TriggerActionFlowIsBypassed';
-	@TestVisible
-	private static final String INVALID_REQUEST = String.format(
-		TriggerActionFlow.INVALID_BYPASS_REQUEST,
-		new List<String>{ CLASS_NAME }
-	);
-
 	@InvocableMethod(
 		category='Trigger Action Flow'
 		label='Is Bypassed'
 		description='Returns if the bypass for this object, apex action, or flow action is set to true.'
 	)
 	public static List<Boolean> isBypassed(List<Request> requests) {
-		if (requests.size() != 1) {
-			throw new TriggerActionFlowIsBypassedObjectException(INVALID_REQUEST);
+		List<Boolean> results = new List<Boolean>();
+		FlowIsBypassedProcesser bypassProcesser = new FlowIsBypassedProcesser();
+		for (Request myRequest : requests) {
+			bypassProcesser.execute(myRequest.bypassType, myRequest.name);
+			results.add(bypassProcesser.getHasBeenBypassed());
 		}
-		if (!TriggerActionFlow.REQUEST_TYPES.contains(requests[0].bypassType)) {
-			throw new TriggerActionFlowIsBypassedObjectException(
-				TriggerActionFlow.INVALID_TYPE
-			);
-		}
-		Boolean result = false;
-		if (requests[0].bypassType == TriggerActionFlow.OBJECT_STRING) {
-			result = TriggerBase.isBypassed(requests[0].name);
-		}
-		if (requests[0].bypassType == TriggerActionFlow.APEX_STRING) {
-			result = MetadataTriggerHandler.isBypassed(requests[0].name);
-		}
-		if (requests[0].bypassType == TriggerActionFlow.FLOW_STRING) {
-			result = TriggerActionFlow.isBypassed(requests[0].name);
-		}
-		return new List<Boolean>{ result };
+		return results;
 	}
 
 	public class Request {
@@ -57,6 +37,23 @@ public inherited sharing class TriggerActionFlowIsBypassed {
 		public String bypassType;
 	}
 
-	public class TriggerActionFlowIsBypassedObjectException extends Exception {
+	private class FlowIsBypassedProcesser extends TriggerActionFlowBypassProcessor {
+		private Boolean hasBeenBypassed = false;
+
+		public Boolean getHasBeenBypassed() {
+			return this.hasBeenBypassed;
+		}
+
+		protected override void processApexBypasses(String name) {
+			this.hasBeenBypassed = MetadataTriggerHandler.isBypassed(name);
+		}
+
+		protected override void processFlowBypasses(String name) {
+			this.hasBeenBypassed = TriggerActionFlow.isBypassed(name);
+		}
+
+		protected override void processObjectBypasses(String name) {
+			this.hasBeenBypassed = TriggerBase.isBypassed(name);
+		}
 	}
 }

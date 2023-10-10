@@ -14,13 +14,13 @@
    limitations under the License.
  */
 
-@isTest
+@SuppressWarnings('PMD.ApexDoc, PMD.ApexUnitTestClassShouldHaveRunAs')
+@IsTest
 private class TriggerActionFlowAddErrorTest {
 	private static final String MY_STRING = 'MY_STRING';
 	private static final String NAME = 'Name';
 	private static List<TriggerActionFlowAddError.Request> requests = new List<TriggerActionFlowAddError.Request>();
 	private static TriggerActionFlowAddError.Request request = new TriggerActionFlowAddError.Request();
-	private static Exception myException;
 
 	@IsTest
 	private static void addErrorShouldSucceedWithValidRequest() {
@@ -31,17 +31,16 @@ private class TriggerActionFlowAddErrorTest {
 
 		TriggerActionFlowAddError.addError(requests);
 
-		System.assertEquals(
-			true,
+		System.Assert.isTrue(
 			account.hasErrors(),
 			'The Account should have an error'
 		);
-		System.assertEquals(
+		System.Assert.areEqual(
 			1,
 			account.getErrors().size(),
 			'There should only be one error'
 		);
-		System.assertEquals(
+		System.Assert.areEqual(
 			MY_STRING,
 			account.getErrors()[0].getMessage(),
 			'The error should contain the message we are looking for'
@@ -58,46 +57,19 @@ private class TriggerActionFlowAddErrorTest {
 
 		TriggerActionFlowAddError.addError(requests);
 
-		System.assertEquals(
-			true,
+		System.Assert.isTrue(
 			account.hasErrors(),
 			'The Account should have an error'
 		);
-		System.assertEquals(
+		System.Assert.areEqual(
 			1,
 			account.getErrors().size(),
 			'There should only be one error'
 		);
-		System.assertEquals(
+		System.Assert.areEqual(
 			MY_STRING,
 			account.getErrors()[0].getMessage(),
 			'The error should contain the message we are looking for'
-		);
-	}
-
-	@IsTest
-	private static void addErrorShouldFailWithInvlaidRequest() {
-		try {
-			TriggerActionFlowAddError.addError(
-				new List<TriggerActionFlowAddError.Request>()
-			);
-		} catch (Exception e) {
-			myException = e;
-		}
-
-		System.assertNotEquals(
-			null,
-			myException,
-			'We should have an exception thrown in this scenario'
-		);
-		System.assert(
-			myException instanceof TriggerActionFlowAddError.TriggerActionFlowAddErrorException,
-			'The exception should be of the correct type'
-		);
-		System.assertEquals(
-			myException.getMessage(),
-			TriggerActionFlowAddError.INVALID_REQUEST,
-			'The exeption should contain the message we are looking for'
 		);
 	}
 }

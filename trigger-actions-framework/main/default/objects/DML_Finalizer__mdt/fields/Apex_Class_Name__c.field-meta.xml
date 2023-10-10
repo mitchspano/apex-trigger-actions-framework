@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Apex_Class_Name__c</fullName>
+    <caseSensitive>false</caseSensitive>
+    <description>Enter the name of the Apex Class which defines the action to be taken</description>
+    <externalId>false</externalId>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <inlineHelpText>Enter the name of the Apex Class which defines the action to be taken</inlineHelpText>
+    <label>Apex Class Name</label>
+    <length>255</length>
+    <required>true</required>
+    <type>Text</type>
+    <unique>true</unique>
+</CustomField>
