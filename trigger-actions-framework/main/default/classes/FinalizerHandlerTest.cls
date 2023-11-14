@@ -16,7 +16,6 @@
 @IsTest(isParallel=true)
 @SuppressWarnings('PMD.ApexDoc, PMD.ApexUnitTestClassShouldHaveRunAs')
 private with sharing class FinalizerHandlerTest {
-	private static final String ACCOUNT = 'Account';
 	private static final String BAR = 'bar';
 	private static final String BOGUS_CLASS_NAME = 'Bogus';
 	private static final String BYPASS_PERMISSION = 'Bogus_Bypass_Permission';
@@ -29,9 +28,6 @@ private with sharing class FinalizerHandlerTest {
 	private static final String TEST_BAR_FINALIZER = 'FinalizerHandlerTest.BarFinalizer';
 	private static final String TEST_FINALIZER_WITH_DML = 'FinalizerHandlerTest.FinalizerWithDml';
 	private static final String TEST_FOO_FINALIZER = 'FinalizerHandlerTest.FooFinalizer';
-
-	private static final Schema.SObjectType SOBJECT_TYPE = Schema.Account.SObjectType;
-	private static final System.TriggerOperation OPERATION = System.TriggerOperation.BEFORE_INSERT;
 
 	private static List<String> finalizerLedger = new List<String>();
 
