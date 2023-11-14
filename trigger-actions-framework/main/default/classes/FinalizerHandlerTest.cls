@@ -300,9 +300,7 @@ private with sharing class FinalizerHandlerTest {
 
 	public class FinalizerWithDml implements TriggerAction.DmlFinalizer {
 		public void execute(FinalizerHandler.Context context) {
-			TriggerBase.bypass(Account.class.getName());
-			insert new Account(Name = 'Acme');
-			TriggerBase.clearBypass(Account.class.getName());
+            EventBus.publish(new ProcessExceptionEvent());
 		}
 	}
 }
