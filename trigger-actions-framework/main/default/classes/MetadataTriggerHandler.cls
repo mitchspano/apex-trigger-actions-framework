@@ -24,6 +24,7 @@ public inherited sharing class MetadataTriggerHandler extends TriggerBase implem
 	private static final String QUERY_TEMPLATE = String.join(
 		new List<String>{
 			'SELECT Apex_Class_Name__c,',
+			'DeveloperName,',
 			'Order__c,',
 			'Flow_Name__c,',
 			'Bypass_Permission__c,',
@@ -248,6 +249,12 @@ public inherited sharing class MetadataTriggerHandler extends TriggerBase implem
 			if (
 				!MetadataTriggerHandler.isBypassed(
 					triggerMetadata.Apex_Class_Name__c
+				) &&
+				!MetadataTriggerHandler.isBypassed(
+					triggerMetadata.DeveloperName
+				) &&
+				!MetadataTriggerHandler.isBypassed(
+					triggerMetadata.Flow_Name__c
 				) && !TriggerBase.isBypassed(this.sObjectName)
 			) {
 				this.validateType(
