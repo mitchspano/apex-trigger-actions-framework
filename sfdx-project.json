@@ -1,32 +1,33 @@
 {
-	"packageDirectories": [
-		{
-			"path": "trigger-actions-framework",
-			"default": true,
-			"package": "Trigger Actions Framework",
-			"versionName": "Version 0.2",
-			"versionNumber": "0.2.1.NEXT"
-		}
-	],
-	"namespace": "",
-	"sfdcLoginUrl": "https://login.salesforce.com",
-	"sourceApiVersion": "56.0",
-	"packageAliases": {
-		"Trigger Actions Framework": "0Ho3h0000008Om4CAE",
-		"Trigger Actions Framework@0.1.0-1": "04t3h000004VaHaAAK",
-		"Trigger Actions Framework@0.1.2": "04t3h000004VaIdAAK",
-		"Trigger Actions Framework@0.1.3": "04t3h000004VaInAAK",
-		"Trigger Actions Framework@0.1.4-0": "04t3h000004VaJWAA0",
-		"Trigger Actions Framework@0.1.4-1": "04t3h000004VaJbAAK",
-		"Trigger Actions Framework@0.1.5-0": "04t3h000004VaJqAAK",
-		"Trigger Actions Framework@0.1.6": "04t3h000004VaLDAA0",
-		"Trigger Actions Framework@0.1.7": "04t3h000004VaLIAA0",
-		"Trigger Actions Framework@0.1.8": "04t3h000004VaLNAA0",
-		"Trigger Actions Framework@0.1.9": "04t3h000004VaLSAA0",
-		"Trigger Actions Framework@0.2.0": "04t3h000004VaLmAAK",
-		"Trigger Actions Framework@0.2.1": "04t3h000004VaVFAA0",
-		"Trigger Actions Framework@0.2.2-1": "04t3h000004OYREAA4",
-		"Trigger Actions Framework@0.2.3-1": "04t3h000004OYTKAA4",
-		"Trigger Actions Framework@0.2.5-1": "04t3h000004OYUDAA4"
-	}
+  "packageDirectories": [
+    {
+      "path": "trigger-actions-framework",
+      "default": true,
+      "package": "Trigger Actions Framework",
+      "versionName": "Version 0.2",
+      "versionNumber": "0.2.1.NEXT"
+    }
+  ],
+  "namespace": "",
+  "sfdcLoginUrl": "https://login.salesforce.com",
+  "sourceApiVersion": "56.0",
+  "packageAliases": {
+    "Trigger Actions Framework": "0Ho3h0000008Om4CAE",
+    "Trigger Actions Framework@0.1.0-1": "04t3h000004VaHaAAK",
+    "Trigger Actions Framework@0.1.2": "04t3h000004VaIdAAK",
+    "Trigger Actions Framework@0.1.3": "04t3h000004VaInAAK",
+    "Trigger Actions Framework@0.1.4-0": "04t3h000004VaJWAA0",
+    "Trigger Actions Framework@0.1.4-1": "04t3h000004VaJbAAK",
+    "Trigger Actions Framework@0.1.5-0": "04t3h000004VaJqAAK",
+    "Trigger Actions Framework@0.1.6": "04t3h000004VaLDAA0",
+    "Trigger Actions Framework@0.1.7": "04t3h000004VaLIAA0",
+    "Trigger Actions Framework@0.1.8": "04t3h000004VaLNAA0",
+    "Trigger Actions Framework@0.1.9": "04t3h000004VaLSAA0",
+    "Trigger Actions Framework@0.2.0": "04t3h000004VaLmAAK",
+    "Trigger Actions Framework@0.2.1": "04t3h000004VaVFAA0",
+    "Trigger Actions Framework@0.2.2-1": "04t3h000004OYREAA4",
+    "Trigger Actions Framework@0.2.3-1": "04t3h000004OYTKAA4",
+    "Trigger Actions Framework@0.2.5-1": "04t3h000004OYUDAA4",
+    "Trigger Actions Framework@0.2.6-1": "04t3h000004juLaAAI"
+  }
 }
