@@ -13,7 +13,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-
+@SuppressWarnings('PMD.ApexDoc')
 public with sharing class FlowChangeEventHeader {
 	@InvocableVariable
 	@AuraEnabled
@@ -84,5 +84,9 @@ public with sharing class FlowChangeEventHeader {
 				this.changedFields == other.changedFields;
 		}
 		return false;
+	}
+
+	public Integer hashCode() {
+		return JSON.serialize(this).hashCode();
 	}
 }

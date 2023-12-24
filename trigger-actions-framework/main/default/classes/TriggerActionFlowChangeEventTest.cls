@@ -13,7 +13,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-
+@SuppressWarnings('PMD.ApexDoc')
 @IsTest(isParallel=true)
 private with sharing class TriggerActionFlowChangeEventTest {
 	private static IllegalArgumentException caught;

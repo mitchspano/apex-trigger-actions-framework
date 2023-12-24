@@ -13,7 +13,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-
+@SuppressWarnings('PMD.ApexDoc')
 public with sharing class TriggerActionFlowChangeEvent extends TriggerActionFlow {
 	@TestVisible
 	private static final String CHANGE_EVENT_HEADER = 'ChangeEventHeader';

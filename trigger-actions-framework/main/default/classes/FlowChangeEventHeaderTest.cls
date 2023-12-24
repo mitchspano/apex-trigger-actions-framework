@@ -15,6 +15,7 @@
  */
 
 @IsTest(isParallel=true)
+@SuppressWarnings('PMD.ApexDoc')
 private with sharing class FlowChangeEventHeaderTest {
 	private static FlowChangeEventHeader header = new FlowChangeEventHeader(
 		new EventBus.ChangeEventHeader()
@@ -23,6 +24,11 @@ private with sharing class FlowChangeEventHeaderTest {
 	@IsTest
 	private static void shouldBeAbleToConstruct() {
 		Assert.isNotNull(header, 'Unable to construct a FlowChangeEventHeader');
+	}
+
+	@IsTest
+	private static void shouldBeAbleToGenerateHashCode() {
+		Assert.isNotNull(header.hashCode(), 'Hash code was not generated');
 	}
 
 	@IsTest
