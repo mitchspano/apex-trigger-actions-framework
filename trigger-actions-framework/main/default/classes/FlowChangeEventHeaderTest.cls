@@ -26,11 +26,6 @@ private with sharing class FlowChangeEventHeaderTest {
 	}
 
 	@IsTest
-	private static void shouldBeAbleToGenerateHashCode() {
-		Assert.isNotNull(header.hashCode(), 'Hash code was not generated');
-	}
-
-	@IsTest
 	private static void shouldBeAbleToCompare() {
 		FlowChangeEventHeader other = new FlowChangeEventHeader(
 			new EventBus.ChangeEventHeader()

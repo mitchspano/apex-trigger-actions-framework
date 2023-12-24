@@ -85,8 +85,4 @@ public with sharing class FlowChangeEventHeader {
 		}
 		return false;
 	}
-
-	public Integer hashCode() {
-		return System.hashCode(this);
-	}
 }
