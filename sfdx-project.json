@@ -5,7 +5,7 @@
 			"default": true,
 			"package": "Trigger Actions Framework",
 			"versionName": "Version 0.2",
-			"versionNumber": "0.2.7.NEXT"
+			"versionNumber": "0.2.8.NEXT"
 		}
 	],
 	"namespace": "",
@@ -28,6 +28,7 @@
 		"Trigger Actions Framework@0.2.2-1": "04t3h000004OYREAA4",
 		"Trigger Actions Framework@0.2.3-1": "04t3h000004OYTKAA4",
 		"Trigger Actions Framework@0.2.5-1": "04t3h000004OYUDAA4",
-		"Trigger Actions Framework@0.2.6-1": "04t3h000004juLaAAI"
+		"Trigger Actions Framework@0.2.6-1": "04t3h000004juLaAAI",
+		"Trigger Actions Framework@0.2.8": "04t3h000004juLuAAI"
 	}
 }
