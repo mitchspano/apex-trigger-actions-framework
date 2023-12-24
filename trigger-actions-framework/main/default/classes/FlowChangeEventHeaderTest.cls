@@ -16,11 +16,41 @@
 
 @IsTest(isParallel=true)
 private with sharing class FlowChangeEventHeaderTest {
+	private static FlowChangeEventHeader header = new FlowChangeEventHeader(
+		new EventBus.ChangeEventHeader()
+	);
+
 	@IsTest
 	private static void shouldBeAbleToConstruct() {
-		Assert.isNotNull(
+		Assert.isNotNull(header, 'Unable to construct a FlowChangeEventHeader');
+	}
+
+	@IsTest
+	private static void shouldBeAbleToGenerateHashCode() {
+		Assert.isNotNull(header.hashCode(), 'Hash code was not generated');
+	}
+
+	@IsTest
+	private static void shouldBeAbleToCompare() {
+		FlowChangeEventHeader other = new FlowChangeEventHeader(
+			new EventBus.ChangeEventHeader()
+		);
+		other.changeType = 'CREATE';
+
+		Assert.areEqual(
 			new FlowChangeEventHeader(new EventBus.ChangeEventHeader()),
-			'Unable to construct a FlowChangeEventHeader'
+			header,
+			'Unable to detect identical FlowChangeEventHeader objects'
+		);
+		Assert.areNotEqual(
+			header,
+			other,
+			'Unable to detect different FlowChangeEventHeader objects'
+		);
+		Assert.areNotEqual(
+			header,
+			null,
+			'Unable to detect difference between FlowChangeEventHeader and null'
 		);
 	}
 }

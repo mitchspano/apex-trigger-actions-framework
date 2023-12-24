@@ -66,4 +66,27 @@ public with sharing class FlowChangeEventHeader {
 		this.diffFields = header.diffFields;
 		this.changedFields = header.changedFields;
 	}
+
+	public Boolean equals(Object obj) {
+		if (obj != null && obj instanceof FlowChangeEventHeader) {
+			FlowChangeEventHeader other = (FlowChangeEventHeader) obj;
+			return this.entityName == other.entityName &&
+				this.recordIds == other.recordIds &&
+				this.changeType == other.changeType &&
+				this.changeOrigin == other.changeOrigin &&
+				this.transactionKey == other.transactionKey &&
+				this.sequenceNumber == other.sequenceNumber &&
+				this.commitTimestamp == other.commitTimestamp &&
+				this.commitUser == other.commitUser &&
+				this.commitNumber == other.commitNumber &&
+				this.nulledFields == other.nulledFields &&
+				this.diffFields == other.diffFields &&
+				this.changedFields == other.changedFields;
+		}
+		return false;
+	}
+
+	public Integer hashCode() {
+		return System.hashCode(this);
+	}
 }

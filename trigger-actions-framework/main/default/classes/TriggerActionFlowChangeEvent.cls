@@ -20,10 +20,9 @@ public with sharing class TriggerActionFlowChangeEvent extends TriggerActionFlow
 	@TestVisible
 	private static final String HEADER = 'header';
 	@TestVisible
-	private static final String NOT_CHANGE_EVENT_ERROR = 'TriggerActionFlowChangeEvent can only be used on shange events during After Insert context';
-	@TestVisible
-	private static final String RECORD = 'record';
+	private static final String NOT_CHANGE_EVENT_ERROR = 'TriggerActionFlowChangeEvent can only be used on change events.';
 
+	@TestVisible
 	protected override List<Map<String, Object>> getInterviewInputs(
 		List<SObject> records,
 		String variableName
@@ -47,7 +46,9 @@ public with sharing class TriggerActionFlowChangeEvent extends TriggerActionFlow
 		if (records == null || records.isEmpty()) {
 			return;
 		}
-		if (variableName != RECORD || records[0].get(CHANGE_EVENT_HEADER) == null) {
+		try {
+			records[0].get(CHANGE_EVENT_HEADER);
+		} catch (System.SObjectException e) {
 			throw new IllegalArgumentException(NOT_CHANGE_EVENT_ERROR);
 		}
 	}
