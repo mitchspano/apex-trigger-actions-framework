@@ -3,5 +3,5 @@
     <fullName>Flow_Name</fullName>
     <active>true</active>
     <errorConditionFormula>NOT(ISBLANK( Flow_Name__c ))  &amp;&amp;  Apex_Class_Name__c != &quot;TriggerActionFlow&quot; &amp;&amp; Apex_Class_Name__c != &quot;TriggerActionFlowChangeEvent&quot;</errorConditionFormula>
-    <errorMessage>The Apex Class Name must equal &quot;TriggerActionFlow&quot; if the Flow Name is populated.</errorMessage>
+    <errorMessage>The Apex Class Name must equal &quot;TriggerActionFlow&quot; or &quot;TriggerActionFlowChangeEvent&quot; if the Flow Name is populated.</errorMessage>
 </ValidationRule>
