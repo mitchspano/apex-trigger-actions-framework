@@ -15,7 +15,7 @@
  */
 
 @SuppressWarnings('PMD.ApexDoc, PMD.CyclomaticComplexity')
-public inherited sharing class TriggerActionFlow implements TriggerAction.BeforeInsert, TriggerAction.AfterInsert, TriggerAction.BeforeUpdate, TriggerAction.AfterUpdate, TriggerAction.BeforeDelete, TriggerAction.AfterDelete, TriggerAction.AfterUndelete {
+public virtual inherited sharing class TriggerActionFlow implements TriggerAction.BeforeInsert, TriggerAction.AfterInsert, TriggerAction.BeforeUpdate, TriggerAction.AfterUpdate, TriggerAction.BeforeDelete, TriggerAction.AfterDelete, TriggerAction.AfterUndelete {
 	@TestVisible
 	private static final String RECORD_VARIABLE_NOT_FOUND_ERROR = 'There must be a variable defined in this flow with api name of "record" and type of "record" that is marked as "available for output"';
 	@TestVisible
@@ -229,7 +229,7 @@ public inherited sharing class TriggerActionFlow implements TriggerAction.Before
 		return result;
 	}
 
-	private List<Map<String, Object>> getInterviewInputs(
+	protected virtual List<Map<String, Object>> getInterviewInputs(
 		List<SObject> records,
 		String variableName
 	) {

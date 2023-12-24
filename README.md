@@ -4,9 +4,9 @@
   <img src="https://raw.githubusercontent.com/afawcett/githubsfdeploy/master/src/main/webapp/resources/img/deploy.png" alt="Deploy to Salesforce" />
 </a>
 
-#### [Unlocked Package Installation (Production)](https://login.salesforce.com/packaging/installPackage.apexp?p0=04t3h000004juLaAAI)
+#### [Unlocked Package Installation (Production)](https://login.salesforce.com/packaging/installPackage.apexp?p0=04t3h000004juLuAAI)
 
-#### [Unlocked Package Installation (Sandbox)](https://test.salesforce.com/packaging/installPackage.apexp?p0=04t3h000004juLaAAI)
+#### [Unlocked Package Installation (Sandbox)](https://test.salesforce.com/packaging/installPackage.apexp?p0=04t3h000004juLuAAI)
 
 ---
 
@@ -32,15 +32,15 @@ The related lists on the `SObject_Trigger_Setting__mdt` record provide a consoli
 
 The Trigger Actions Framework conforms strongly to the [Open–closed principle](https://en.wikipedia.org/wiki/Open%E2%80%93closed_principle) and the [Single-responsibility principle](https://en.wikipedia.org/wiki/Single-responsibility_principle). To add or modify trigger logic in our Salesforce org, we won't need to keep modifying the body of a TriggerHandler class; we can create a class or a flow with responsibility scoped to the automation we are trying to build and configure these actions to run in a specified order within a given trigger context.
 
-The work is performed in the `MetadataTriggerHandler` class which implements the the [Strategy Pattern](https://en.wikipedia.org/wiki/Strategy_pattern) by fetching all Trigger Action metadata that is configured in the org for the given trigger context and uses [reflection](https://en.wikipedia.org/wiki/Reflective_programming) to dynamically instantiate an object which implements a `TriggerAction` interface, then casts the object to the appropriate interface as specified in the metadata and calls the respective context methods in the order specified.
+The work is performed in the `MetadataTriggerHandler` class which implements the [Strategy Pattern](https://en.wikipedia.org/wiki/Strategy_pattern) by fetching all Trigger Action metadata that is configured in the org for the given trigger context and uses [reflection](https://en.wikipedia.org/wiki/Reflective_programming) to dynamically instantiate an object that implements a `TriggerAction`` interface, then casts the object to the appropriate interface as specified in the metadata and calls the respective context methods in the order specified.
 
 Note that if an Apex class is specified in metadata and it does not exist or does not implement the correct interface, a runtime error will occur.
 
 ---
 
-### Enabling on an SObject
+### Enabling for an SObject
 
-To get started, call the the `MetadataTriggerHandler` class within the body of the trigger of the sObject:
+To get started, call the `MetadataTriggerHandler` class within the body of the trigger of the sObject:
 
 ```java
 trigger OpportunityTrigger on Opportunity (
@@ -100,12 +100,27 @@ To make your flows usable, they must be auto-launched flows and you need to crea
 
 | Variable Name | Variable Type | Available for Input | Available for Output | Description                                        | Available Contexts       |
 | ------------- | ------------- | ------------------- | -------------------- | -------------------------------------------------- | ------------------------ |
-| record        | record        | yes                 | yes                  | the new version of the record in the DML operation | insert, update, undelete |
-| recordPrior   | record        | yes                 | no                   | the old version of the record in the DML operation | update, delete           |
+| `record`      | record        | yes                 | yes                  | the new version of the record in the DML operation | insert, update, undelete |
+| `recordPrior` | record        | yes                 | no                   | the old version of the record in the DML operation | update, delete           |
 
-To enable this flow, simply insert a trigger action record with `Apex_Class_Name__` equal to `TriggerActionFlow` and set the `Flow_Name__c` field with the API name of the flow itself. You can select the `Allow_Flow_Recursion__c` checkbox to allow flows to run recursively (advanced).
+To enable this flow, simply insert a trigger action record with `Apex_Class_Name__c` equal to `TriggerActionFlow` and set the `Flow_Name__c` field with the API name of the flow itself. You can select the `Allow_Flow_Recursion__c` checkbox to allow flows to run recursively (advanced).
 
 ![Flow Trigger Action](images/flowTriggerAction.png)
+
+### Flow Actions for Change Data Capture Events
+
+Trigger Action Flows can also be used to process Change Data Capture events, but there are two minor modifications necessary:
+
+#### Adjust the Flow Variables
+
+| Variable Name | Variable Type                          | Available for Input | Available for Output | Description                                                                                                                                                                               |
+| ------------- | -------------------------------------- | ------------------- | -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `record`      | record                                 | yes                 | no                   | the changeEvent object                                                                                                                                                                    |
+| `header`      | `FlowChangeEventHeader` (Apex Defined) | yes                 | no                   | a flow-accessible version of the [`ChangeEventHeader` object](https://developer.salesforce.com/docs/atlas.en-us.change_data_capture.meta/change_data_capture/cdc_event_fields_header.htm) |
+
+#### Adjust the `Trigger_Action__mdt` Record
+
+Create a trigger action record with `Apex_Class_Name__c` equal to `TriggerActionFlowChangeEvent` (instead of `TriggerActionFlow`) and set the `Flow_Name__c` field with the API name of the flow itself.
 
 ---
 
@@ -220,7 +235,7 @@ Developers can enter the API name of a permission in the `Bypass_Permission__c` 
 
 #### Required Permission
 
-Developers can enter the API name of a permission in the `Required_Permission__c` field. If this field has a value, then the trigger/action will only execute if the running user has the custom permission identified. This can be allow for new functionality to be released to a subset of users.
+Developers can enter the API name of a permission in the `Required_Permission__c` field. If this field has a value, then the trigger/action will only execute if the running user has the custom permission identified. This can allow for new functionality to be released to a subset of users.
 
 ---
 
@@ -288,7 +303,7 @@ public class TA_Opportunity_StandardizeName implements TriggerAction.BeforeInser
 ```
 
 **Note:**
-In the example above, the top level class is the implementation of the Singleton pattern, but we also define an inner class called `Service` which is the actual Trigger Action itself. When using this pattern for query management, the `Apex_Class_Name__c` value on the `Trigger_Action__mdt` row would be `TA_Opportunity_Queries.Service`.
+In the example above, the top-level class is the implementation of the Singleton pattern, but we also define an inner class called `Service` which is the actual Trigger Action itself. When using this pattern for query management, the `Apex_Class_Name__c` value on the `Trigger_Action__mdt` row would be `TA_Opportunity_Queries.Service`.
 
 ![Query Setup](images/queriesService.png)
 
@@ -389,11 +404,11 @@ The Apex Trigger Actions Framework now has support for a novel feature not found
 
 A DML finalizer is a piece of code that executes **exactly one time** at the very end of a DML operation.
 
-This is notably different than the final action within a given trigger context. The final configured action can be executed multiple times in case of cascading DML operations within trigger logic or when more than 200 records are included in the original DML operation. This can lead to challenges capturing logs or invoking asynchronous logic.
+This is notably different than the final action within a given trigger context. The final configured action can be executed multiple times in case of cascading DML operations within trigger logic or when more than 200 records are included in the original DML operation. This can lead to challenges when capturing logs or invoking asynchronous logic.
 
 DML finalizers can be very helpful for things such as _enqueuing a queuable operation_ or _inserting a collection of gathered logs_.
 
-Finalizers within the Apex Trigger Actions Framework operate using many of the same mechanisms. First define a class which implements the `TriggerAction.DmlFinalizer` interface. Include public static variables/methods so that the trigger actions executing can register objects to be processed during the finalizer's execution.
+Finalizers within the Apex Trigger Actions Framework operate using many of the same mechanisms. First, define a class that implements the `TriggerAction.DmlFinalizer` interface. Include public static variables/methods so that the trigger actions executing can register objects to be processed during the finalizer's execution.
 
 ```java
 public with sharing class OpportunityCategoryCalculator implements Queueable, TriggerAction.DmlFinalizer {
@@ -471,13 +486,13 @@ The `FinalizerHandler.Context` object specified in the `TriggerAction.DmlFinaliz
 
 #### Universal Adoption
 
-To use a DML Finalizer, the Apex Trigger Actions Framework must be enabled on every SObject which supports triggers which will have a DML operation on it during a transaction, and enabled in all trigger contexts on those sObjects. If DML is performed on an SObject that has a trigger which does not use the framework, the system will not be able to detect when to finalize the DML operation.
+To use a DML Finalizer, the Apex Trigger Actions Framework must be enabled on every SObject that supports triggers and will have a DML operation on it during a transaction, and enabled in all trigger contexts on those sObjects. If DML is performed on an SObject that has a trigger that does not use the framework, the system will not be able to detect when to finalize the DML operation.
 
 #### Offsetting the Number of DML Rows
 
-Detecting when to finalize the operation requires knowledge of the total number of records passed to the DML operation. Unfortunately, there is no bulletproof way of how to do this currently in Apex; the best thing we can do is to rely on `Limits.getDmlRows()` to infer the number of records passed to the DML operation.
+Detecting when to finalize the operation requires knowledge of the total number of records passed to the DML operation. Unfortunately, there is no bulletproof way to do this currently in Apex; the best thing we can do is to rely on `Limits.getDmlRows()` to infer the number of records passed to the DML operation.
 
-This works in most cases, but certain operations such as setting a `System.Savepoint` consume a DML row, and there are certain sObjects where triggers are not supported like `CaseTeamMember` which can throw off the counts and remove our ability to detect when to finalize. In order to avoid this problem, use the `TriggerBase.offsetExistingDmlRows()` method before calling the first DML operation within your Apex.
+This works in most cases, but certain operations (such as setting a `System.Savepoint`) consume a DML row, and there are certain sObjects where triggers are not supported like `CaseTeamMember` which can throw off the counts and remove our ability to detect when to finalize. In order to avoid this problem, use the `TriggerBase.offsetExistingDmlRows()` method before calling the first DML operation within your Apex.
 
 ```java
 Savepoint sp = Database.setSavepoint(); // adds to Limits.getDmlRows()
