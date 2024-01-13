@@ -107,6 +107,16 @@ To enable this flow, simply insert a trigger action record with `Apex_Class_Name
 
 ![Flow Trigger Action](images/flowTriggerAction.png)
 
+> [!WARNING]
+>
+> ⚠️ Trigger Action Flows and Recursion Depth ⚠️
+>
+> - **Key Point:** Trigger Action Flows are executed using the [`Invocable.Action` class](https://developer.salesforce.com/docs/atlas.en-us.apexref.meta/apexref/apex_class_Invocable_Action.htm) and are therefore subject to the (undocumented) "maximum recursion depth of 3" which is lower than the usual [trigger depth limit of 16](https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_gov_limits.htm).
+> - **Why It Matters:** This limit can be reached when Trigger Action Flows perform DML operations that cascade across multiple objects with their own Trigger Action Flows.
+> - **When to Be Careful:** Exercise caution when using Trigger Action Flows in scenarios involving multiple DML operations or complex trigger chains.
+> - **Safe Use Cases:** Same-record updates, using the `addError` action to add a custom error message, and actions like workflow email alerts are generally safe.
+> - **Potential Solution (Developer Preview):** [This idea](https://github.com/mitchspano/apex-trigger-actions-framework/issues/135) aims to reduce the likelihood of hitting the limit, but the technology is still under development.
+
 ### Flow Actions for Change Data Capture Events
 
 Trigger Action Flows can also be used to process Change Data Capture events, but there are two minor modifications necessary:
