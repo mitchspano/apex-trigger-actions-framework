@@ -109,7 +109,7 @@ To enable this flow, simply insert a trigger action record with `Apex_Class_Name
 
 > [!WARNING]
 >
-> ⚠️ Trigger Action Flows and Recursion Depth ⚠️
+> **Trigger Action Flows and Recursion Depth**
 >
 > - **Key Point:** Trigger Action Flows are executed using the [`Invocable.Action` class](https://developer.salesforce.com/docs/atlas.en-us.apexref.meta/apexref/apex_class_Invocable_Action.htm) and are therefore subject to the (undocumented) "maximum recursion depth of 3" which is lower than the usual [trigger depth limit of 16](https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_gov_limits.htm).
 > - **Why It Matters:** This limit can be reached when Trigger Action Flows perform DML operations that cascade across multiple objects with their own Trigger Action Flows.
