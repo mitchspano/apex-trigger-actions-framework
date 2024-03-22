@@ -88,7 +88,7 @@
         <style>CustomLinks</style>
     </layoutSections>
     <relatedLists>
-        <fields>DeveloperName</fields>
+        <fields>MasterLabel</fields>
         <fields>Apex_Class_Name__c</fields>
         <fields>Flow_Name__c</fields>
         <fields>Description__c</fields>
@@ -98,7 +98,7 @@
         <sortOrder>Asc</sortOrder>
     </relatedLists>
     <relatedLists>
-        <fields>DeveloperName</fields>
+        <fields>MasterLabel</fields>
         <fields>Apex_Class_Name__c</fields>
         <fields>Flow_Name__c</fields>
         <fields>Description__c</fields>
@@ -108,7 +108,7 @@
         <sortOrder>Asc</sortOrder>
     </relatedLists>
     <relatedLists>
-        <fields>DeveloperName</fields>
+        <fields>MasterLabel</fields>
         <fields>Apex_Class_Name__c</fields>
         <fields>Flow_Name__c</fields>
         <fields>Description__c</fields>
@@ -118,7 +118,7 @@
         <sortOrder>Asc</sortOrder>
     </relatedLists>
     <relatedLists>
-        <fields>DeveloperName</fields>
+        <fields>MasterLabel</fields>
         <fields>Apex_Class_Name__c</fields>
         <fields>Flow_Name__c</fields>
         <fields>Description__c</fields>
@@ -128,7 +128,7 @@
         <sortOrder>Asc</sortOrder>
     </relatedLists>
     <relatedLists>
-        <fields>DeveloperName</fields>
+        <fields>MasterLabel</fields>
         <fields>Apex_Class_Name__c</fields>
         <fields>Flow_Name__c</fields>
         <fields>Description__c</fields>
@@ -138,7 +138,7 @@
         <sortOrder>Asc</sortOrder>
     </relatedLists>
     <relatedLists>
-        <fields>DeveloperName</fields>
+        <fields>MasterLabel</fields>
         <fields>Apex_Class_Name__c</fields>
         <fields>Flow_Name__c</fields>
         <fields>Description__c</fields>
@@ -148,7 +148,7 @@
         <sortOrder>Asc</sortOrder>
     </relatedLists>
     <relatedLists>
-        <fields>DeveloperName</fields>
+        <fields>MasterLabel</fields>
         <fields>Apex_Class_Name__c</fields>
         <fields>Flow_Name__c</fields>
         <fields>Description__c</fields>
