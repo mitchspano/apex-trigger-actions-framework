@@ -33,7 +33,7 @@
  * The `TriggerAction` interface defines the methods that should be implemented by trigger actions.
  */
 @SuppressWarnings(
-	'PMD.StdCyclomaticComplexity, PMD.CyclomaticComplexity, PMD.cognitivecomplexity'
+	'PMD.StdCyclomaticComplexity, PMD.CyclomaticComplexity, PMD.cognitivecomplexity, PMD.PropertyNamingConventions'
 )
 public inherited sharing virtual class TriggerBase {
 	@TestVisible
@@ -56,15 +56,15 @@ public inherited sharing virtual class TriggerBase {
 	private static Boolean suppressFinalizeExecution = false;
 	private static TriggerBase instanceToFinalize;
 
-	private static final Map<System.TriggerOperation, Map<Id, Integer>> contextToUpdateCount {
+	private static final Map<System.TriggerOperation, Map<Id, Integer>> CONTEXT_TO_UPDATE_COUNT {
 		get {
-			if (contextToUpdateCount == null) {
-				contextToUpdateCount = new Map<System.TriggerOperation, Map<Id, Integer>>{
+			if (CONTEXT_TO_UPDATE_COUNT == null) {
+				CONTEXT_TO_UPDATE_COUNT = new Map<System.TriggerOperation, Map<Id, Integer>>{
 					System.TriggerOperation.BEFORE_UPDATE => new Map<Id, Integer>(),
 					System.TriggerOperation.AFTER_UPDATE => new Map<Id, Integer>()
 				};
 			}
-			return contextToUpdateCount;
+			return CONTEXT_TO_UPDATE_COUNT;
 		}
 		set;
 	}
@@ -78,7 +78,7 @@ public inherited sharing virtual class TriggerBase {
 	 */
 	public static Map<Id, Integer> idToNumberOfTimesSeenBeforeUpdate {
 		get {
-			return contextToUpdateCount.get(System.TriggerOperation.BEFORE_UPDATE);
+			return CONTEXT_TO_UPDATE_COUNT.get(System.TriggerOperation.BEFORE_UPDATE);
 		}
 	}
 
@@ -91,7 +91,7 @@ public inherited sharing virtual class TriggerBase {
 	 */
 	public static Map<Id, Integer> idToNumberOfTimesSeenAfterUpdate {
 		get {
-			return contextToUpdateCount.get(System.TriggerOperation.AFTER_UPDATE);
+			return CONTEXT_TO_UPDATE_COUNT.get(System.TriggerOperation.AFTER_UPDATE);
 		}
 	}
 
@@ -252,7 +252,7 @@ public inherited sharing virtual class TriggerBase {
 		List<SObject> records
 	) {
 		for (SObject obj : records) {
-			Map<Id, Integer> idToUpdateCount = contextToUpdateCount.get(
+			Map<Id, Integer> idToUpdateCount = CONTEXT_TO_UPDATE_COUNT.get(
 				triggerContext
 			);
 			Integer updateCount = idToUpdateCount.get(obj.Id);

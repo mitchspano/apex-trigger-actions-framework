@@ -29,7 +29,7 @@ jobs:
           sf plugins install @salesforce/sfdx-scanner
 
       - name: Run SFDX Scanner - Report findings as comments
-        uses: mitchspano/sfdx-scan-pull-request@v0.1.15
+        uses: mitchspano/sfdx-scan-pull-request@v0.1.16
         with:
           severity-threshold: 4
           report-mode: comments
