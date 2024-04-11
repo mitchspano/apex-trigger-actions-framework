@@ -15,6 +15,7 @@
  */
 
 /**
+ * @group Trigger Actions Framework
  * @description The `MetadataTriggerHandler` class is a trigger handler that executes Trigger
  * Actions defined in Custom Metadata.
  *
@@ -27,7 +28,7 @@
  * - `BeforeDelete`
  * - `AfterDelete`
  * - `AfterUndelete`
- *
+ * ---
  * The `MetadataTriggerHandler` class reads from the `Trigger_Action__mdt` Custom Metadata type to
  * define Trigger Actions.
  *
@@ -39,6 +40,7 @@
  * - `Bypass_Permission__c`: The permission required to bypass the Trigger Action (optional).
  * - `Required_Permission__c`: The permission required to execute the Trigger Action (optional).
  * - `Allow_Flow_Recursion__c`: Whether or not to allow the Flow to recurse (optional).
+ * ---
  *
  * The `MetadataTriggerHandler` class also uses the `sObject_Trigger_Setting__mdt` Custom Metadata type to define
  * Trigger Action settings for specific sObjects.
@@ -47,10 +49,12 @@
  *
  * - `Bypass_Permission__c`: The permission required to bypass the Trigger Action for the specified sObject (optional).
  * - `Required_Permission__c`: The permission required to execute the Trigger Action for the specified sObject (optional).
+ * ---
  *
  * To use the `MetadataTriggerHandler` class, you must create a Trigger on the desired sObject and specify the
  *  `MetadataTriggerHandler` class as the handler.
  * You can then define Trigger Actions and sObject Trigger Settings in Custom Metadata to control the behavior of the Trigger.
+ *
  *
  * **Example:**
  *

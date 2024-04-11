@@ -15,6 +15,7 @@
  */
 
 /**
+ * @group Trigger Actions Framework
  * @description This class provides an Invocable method that can be used to bypass a trigger action flow, Apex class, or Object trigger.
  *
  * The Invocable method is called `bypass` and it takes a list of `Request` objects as input.

@@ -15,6 +15,7 @@
  */
 
 /**
+ * @group Trigger Actions Framework
  * @description The `TriggerAction` class defines the interfaces that should be implemented by Trigger Actions.
  *
  * Trigger Actions are classes that define the logic that should be executed before or after a DML operation on a record.
@@ -28,33 +29,12 @@
  * - `AfterDelete`: This interface defines the logic that should be executed after a record is deleted.
  * - `AfterUndelete`: This interface defines the logic that should be executed after a record is undeleted.
  * - `DmlFinalizer`: This interface defines the logic that should be executed after all DML operations have completed.
- *
+ * ---
  * To implement a Trigger Action, you must create a class that implements one or more of the `TriggerAction` interfaces.
  * The class must also be annotated with the `@AuraEnabled` annotation.
  *
  * Once you have created a Trigger Action class, you can register it with the `TriggerActionRegistry` class.
  * The `TriggerActionRegistry` class is responsible for managing the execution of Trigger Actions.
- *
- * **Example:**
- *
- * ```
- * @AuraEnabled
- * public class MyTriggerAction implements TriggerAction.BeforeInsert, TriggerAction.AfterInsert {
- *
- *     public void beforeInsert(List<SObject> newList) {
- *         // ...
- *     }
- *
- *     public void afterInsert(List<SObject> newList) {
- *         // ...
- *     }
- * }
- * ```
- *
- * This example defines a Trigger Action class that implements the `BeforeInsert` and `AfterInsert` interfaces.
- * The `beforeInsert` method is called before any new records are inserted, and the `afterInsert` method is
- * called after all new records have been inserted.
- *
  */
 @SuppressWarnings('PMD.CyclomaticComplexity')
 public class TriggerAction {

@@ -15,6 +15,7 @@
  */
 
 /**
+ * @group Trigger Actions Framework
  * @description A flow-accessible version of the ChangeEventHeader class for use in
  * a flow handler of a change data capture event.
  *

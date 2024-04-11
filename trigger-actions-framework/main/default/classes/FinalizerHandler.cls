@@ -15,6 +15,7 @@
  */
 
 /**
+ * @group Trigger Actions Framework
  * @description The `FinalizerHandler` class is a utility class that handles the execution of dynamic finalizers.
  *
  * Finalizers are classes that implement the `TriggerAction.DmlFinalizer` interface and are defined in Custom Metadata.
@@ -26,7 +27,7 @@
  * - A way to check if a specific finalizer is bypassed.
  * - A way to clear all bypasses.
  * - A way to handle dynamic finalizers.
- *
+ * ---
  * To use the `FinalizerHandler` class, you must first create a Custom Metadata type called `DML_Finalizer__mdt`.
  * The `DML_Finalizer__mdt` Custom Metadata type must have the following fields:
  *
@@ -35,7 +36,7 @@
  * - `Bypass_Execution__c`: A flag that indicates whether or not the finalizer should be bypassed.
  * - `Bypass_Permission__c`: The permission required to bypass the finalizer.
  * - `Required_Permission__c`: The permission required to execute the finalizer.
- *
+ * ---
  * Once you have created the `DML_Finalizer__mdt` Custom Metadata type, you can create finalizers by creating records
  * in the `DML_Finalizer__mdt` object.
  *
@@ -237,7 +238,7 @@ public with sharing virtual class FinalizerHandler {
 	}
 
 	/**
-	 * @description @description Context to be passed to the implementation's `.execute` methodis object's definition is empty. We are establishing the interface
+	 * @description Context to be passed to the implementation's `.execute` methodis object's definition is empty. We are establishing the interface
 	 * to include the context to help future-proof the interface's specifications.
 	 */
 	public class Context {

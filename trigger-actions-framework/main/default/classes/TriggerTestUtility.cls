@@ -15,6 +15,7 @@
  */
 
 /**
+ * @group Trigger Actions Framework
  * @description The `TriggerTestUtility` class is a utility class that provides helper methods for writing
  * Apex test classes for trigger handlers.
  *

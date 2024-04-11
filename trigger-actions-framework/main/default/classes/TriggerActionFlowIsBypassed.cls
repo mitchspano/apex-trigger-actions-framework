@@ -15,6 +15,7 @@
  */
 
 /**
+ * @group Trigger Actions Framework
  * @description The `TriggerActionFlowIsBypassed` class is a utility class that handles the checking of
  * bypasses for objects, Apex actions, or Flow actions.
  *

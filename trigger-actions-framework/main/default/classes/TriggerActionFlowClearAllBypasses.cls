@@ -15,6 +15,7 @@
  */
 
 /**
+ * @group Trigger Actions Framework
  * @description The `TriggerActionFlowClearAllBypasses` class is a utility class that handles the
  * clearing of all bypasses for objects, Apex actions, or Flow actions.
  *

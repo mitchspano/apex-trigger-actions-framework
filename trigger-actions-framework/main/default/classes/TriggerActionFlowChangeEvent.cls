@@ -15,6 +15,7 @@
  */
 
 /**
+ * @group Trigger Actions Framework
  * @description The `TriggerActionFlowChangeEvent` class is a subclass of the `TriggerActionFlow`
  * class that is used to handle change events.
  *

@@ -16,7 +16,7 @@
 
 @SuppressWarnings('PMD.ApexDoc, PMD.ApexUnitTestClassShouldHaveRunAs')
 @IsTest(isParallel=true)
-public class TriggerActionFlowTest {
+private class TriggerActionFlowTest {
 	private static final String BOGUS = 'Bogus';
 	private static final String BYPASSES_SHOULD_BE_POPULATED_CORRECTLY = 'Static bypasses should be populated properly';
 	private static final String ERROR_MESSAGE_SHOULD_MATCH = 'The message should be what we expect';

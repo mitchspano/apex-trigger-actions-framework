@@ -15,6 +15,7 @@
  */
 
 /**
+ * @group Trigger Actions Framework
  * @description  This abstract class provides a framework for processing bypass requests for
  * trigger action flows, Apex classes, and Object triggers.
  *

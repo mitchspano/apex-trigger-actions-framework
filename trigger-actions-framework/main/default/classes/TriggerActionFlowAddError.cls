@@ -15,6 +15,7 @@
  */
 
 /**
+ * @group Trigger Actions Framework
  * @description This class provides an Invocable method that can be used to add an error to an sObject.
  *
  * The Invocable method is called `addError` and it takes a list of `Request` objects as input.
@@ -23,6 +24,8 @@
  * - `record`: The sObject to add the error to.
  * - `fieldName`: The API name of the field to add the error to.
  * - `errorMessage`: The error message to add.
+ *
+ * ---
  *
  * If the `fieldName` property is not specified, the error message will be added to the sObject without a field name.
  *

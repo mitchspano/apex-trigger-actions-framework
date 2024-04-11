@@ -14,6 +14,11 @@
    limitations under the License.
  */
 
+/**
+ * @group Trigger Actions Framework
+ * @description This class implements the TriggerAction interface and provides a framework for
+ * executing Flows before or after the insert, update, delete, or undelete of records.
+ */
 @SuppressWarnings('PMD.CyclomaticComplexity')
 public virtual inherited sharing class TriggerActionFlow implements TriggerAction.BeforeInsert, TriggerAction.AfterInsert, TriggerAction.BeforeUpdate, TriggerAction.AfterUpdate, TriggerAction.BeforeDelete, TriggerAction.AfterDelete, TriggerAction.AfterUndelete {
 	@TestVisible

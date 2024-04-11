@@ -15,6 +15,7 @@
  */
 
 /**
+ * @group Trigger Actions Framework
  * @description This class contains constants used by the TriggerAction framework.
  */
 public class TriggerActionConstants {

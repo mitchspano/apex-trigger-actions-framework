@@ -15,6 +15,7 @@
  */
 
 /**
+ * @group Trigger Actions Framework
  * @description The `TriggerBase` class is a base class for all trigger handlers.
  *
  * Trigger handlers are classes that define the logic that should be executed before or after
@@ -27,7 +28,7 @@
  * - A way to offset the number of existing DML rows.
  * - A way to wait to finalize the DML operation.
  * - A way to now finalize the DML operation.
- *
+ * ---
  * To use the `TriggerBase` class, you must create a subclass that implements the `TriggerAction` interface.
  * The `TriggerAction` interface defines the methods that should be implemented by trigger actions.
  */
