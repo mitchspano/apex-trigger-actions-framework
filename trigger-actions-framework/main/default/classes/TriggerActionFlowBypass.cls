@@ -25,7 +25,7 @@
  * - `bypassType`: The type of bypass to perform. Valid values are `Apex`, `Flow`, or `Object`.
  *
  */
-@SuppressWarnings('PMD.ApexDoc, PMD.CognitiveComplexity')
+@SuppressWarnings('PMD.CognitiveComplexity')
 public inherited sharing class TriggerActionFlowBypass {
 	/**
 	 * @description This Invocable method bypasses a trigger action flow, Apex class, or Object trigger.
