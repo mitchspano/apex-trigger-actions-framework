@@ -14,8 +14,25 @@
    limitations under the License.
  */
 
-@SuppressWarnings('PMD.ApexDoc')
+/**
+ * @description This class provides an Invocable method that can be used to add an error to an sObject.
+ *
+ * The Invocable method is called `addError` and it takes a list of `Request` objects as input.
+ * Each `Request` object contains the following properties:
+ *
+ * - `record`: The sObject to add the error to.
+ * - `fieldName`: The API name of the field to add the error to.
+ * - `errorMessage`: The error message to add.
+ *
+ * If the `fieldName` property is not specified, the error message will be added to the sObject without a field name.
+ *
+ */
 public inherited sharing class TriggerActionFlowAddError {
+	/**
+	 * @description This Invocable method adds an error to an sObject.
+	 *
+	 * @param requests A list of `Request` objects.
+	 */
 	@InvocableMethod(
 		category='Trigger Action Flow'
 		label='Add Error'
@@ -31,6 +48,9 @@ public inherited sharing class TriggerActionFlowAddError {
 		}
 	}
 
+	/**
+	 * @description This class represents a request to add an error to an sObject.
+	 */
 	public class Request {
 		@InvocableVariable(
 			label='Record'

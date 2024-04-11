@@ -13,7 +13,20 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-@SuppressWarnings('PMD.ApexDoc')
+
+/**
+ * @description The `TriggerActionFlowChangeEvent` class is a subclass of the `TriggerActionFlow`
+ * class that is used to handle change events.
+ *
+ * Change events are events that are generated when a record is created, updated, or deleted.
+ * The `TriggerActionFlowChangeEvent` class provides the ability to access the change event header in the Flow interview.
+ *
+ * To use the `TriggerActionFlowChangeEvent` class, you must first create a Flow that accepts a variable of
+ * type `FlowChangeEventHeader`.
+ *
+ * You can then use the `TriggerActionFlowChangeEvent` class to invoke the Flow and pass the change event header
+ * as the input variable.
+ */
 public with sharing class TriggerActionFlowChangeEvent extends TriggerActionFlow {
 	@TestVisible
 	private static final String CHANGE_EVENT_HEADER = 'ChangeEventHeader';

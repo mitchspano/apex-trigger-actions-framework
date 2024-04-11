@@ -14,37 +14,146 @@
    limitations under the License.
  */
 
-@SuppressWarnings('PMD.ApexDoc, PMD.CyclomaticComplexity')
+/**
+ * @description The `TriggerAction` class defines the interfaces that should be implemented by Trigger Actions.
+ *
+ * Trigger Actions are classes that define the logic that should be executed before or after a DML operation on a record.
+ * The `TriggerAction` class defines the following interfaces:
+ *
+ * - `BeforeInsert`: This interface defines the logic that should be executed before a new record is inserted.
+ * - `AfterInsert`: This interface defines the logic that should be executed after a new record is inserted.
+ * - `BeforeUpdate`: This interface defines the logic that should be executed before a record is updated.
+ * - `AfterUpdate`: This interface defines the logic that should be executed after a record is updated.
+ * - `BeforeDelete`: This interface defines the logic that should be executed before a record is deleted.
+ * - `AfterDelete`: This interface defines the logic that should be executed after a record is deleted.
+ * - `AfterUndelete`: This interface defines the logic that should be executed after a record is undeleted.
+ * - `DmlFinalizer`: This interface defines the logic that should be executed after all DML operations have completed.
+ *
+ * To implement a Trigger Action, you must create a class that implements one or more of the `TriggerAction` interfaces.
+ * The class must also be annotated with the `@AuraEnabled` annotation.
+ *
+ * Once you have created a Trigger Action class, you can register it with the `TriggerActionRegistry` class.
+ * The `TriggerActionRegistry` class is responsible for managing the execution of Trigger Actions.
+ *
+ * **Example:**
+ *
+ * ```
+ * @AuraEnabled
+ * public class MyTriggerAction implements TriggerAction.BeforeInsert, TriggerAction.AfterInsert {
+ *
+ *     public void beforeInsert(List<SObject> newList) {
+ *         // ...
+ *     }
+ *
+ *     public void afterInsert(List<SObject> newList) {
+ *         // ...
+ *     }
+ * }
+ * ```
+ *
+ * This example defines a Trigger Action class that implements the `BeforeInsert` and `AfterInsert` interfaces.
+ * The `beforeInsert` method is called before any new records are inserted, and the `afterInsert` method is
+ * called after all new records have been inserted.
+ *
+ */
+@SuppressWarnings('PMD.CyclomaticComplexity')
 public class TriggerAction {
+	/**
+	 * @description This interface defines the logic that should be executed before
+	 * a new record is inserted.
+	 */
 	public interface BeforeInsert {
+		/**
+		 * @description This method is called before a new record is inserted.
+		 *
+		 * @param newList The list of new records that are being inserted.
+		 */
 		void beforeInsert(List<SObject> newList);
 	}
 
+	/**
+	 * @description This interface defines the logic that should be executed after a new record is inserted.
+	 */
 	public interface AfterInsert {
+		/**
+		 * @description This method is called after a new record is inserted.
+		 *
+		 * @param newList The list of new records that were inserted.
+		 */
 		void afterInsert(List<SObject> newList);
 	}
 
+	/**
+	 * @description This interface defines the logic that should be executed before a record is updated.
+	 */
 	public interface BeforeUpdate {
+		/**
+		 * @description This method is called before a record is updated.
+		 *
+		 * @param newList The list of new records that are being updated.
+		 * @param oldList The list of old records that are being updated.
+		 */
 		void beforeUpdate(List<SObject> newList, List<SObject> oldList);
 	}
 
+	/**
+	 * @description This interface defines the logic that should be executed after a record is updated.
+	 */
 	public interface AfterUpdate {
+		/**
+		 * @description This method is called after a record is updated.
+		 *
+		 * @param newList The list of new records that were updated.
+		 * @param oldList The list of old records that were updated.
+		 */
 		void afterUpdate(List<SObject> newList, List<SObject> oldList);
 	}
 
+	/**
+	 * @description This interface defines the logic that should be executed before a record is deleted.
+	 */
 	public interface BeforeDelete {
+		/**
+		 * @description This method is called before a record is deleted.
+		 *
+		 * @param oldList The list of old records that are being deleted.
+		 */
 		void beforeDelete(List<SObject> oldList);
 	}
 
+	/**
+	 * @description This interface defines the logic that should be executed after a record is deleted.
+	 */
 	public interface AfterDelete {
+		/**
+		 * @description This method is called after a record is deleted.
+		 *
+		 * @param oldList The list of old records that were deleted.
+		 */
 		void afterDelete(List<SObject> oldList);
 	}
 
+	/**
+	 * @description This interface defines the logic that should be executed after a record is undeleted.
+	 */
 	public interface AfterUndelete {
+		/**
+		 * @description This method is called after a record is undeleted.
+		 *
+		 * @param newList The list of new records that were undeleted.
+		 */
 		void afterUndelete(List<SObject> newList);
 	}
 
+	/**
+	 * @description This interface defines the logic that should be executed after all DML operations have completed.
+	 */
 	public interface DmlFinalizer {
+		/**
+		 * @description This method is called after all DML operations have completed.
+		 *
+		 * @param context The context of the finalizer.
+		 */
 		void execute(FinalizerHandler.Context context);
 	}
 }

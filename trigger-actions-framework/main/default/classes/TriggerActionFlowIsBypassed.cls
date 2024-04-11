@@ -13,8 +13,33 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-@SuppressWarnings('PMD.ApexDoc, PMD.CognitiveComplexity')
+
+/**
+ * @description The `TriggerActionFlowIsBypassed` class is a utility class that handles the checking of
+ * bypasses for objects, Apex actions, or Flow actions.
+ *
+ * Bypasses are used to prevent the execution of specific Trigger Actions.
+ * The `TriggerActionFlowIsBypassed` class provides a way to check if the bypass is set
+ * to `true` for a specific object, Apex action, or Flow action.
+ *
+ * To use the `TriggerActionFlowIsBypassed` class, you must first create a list of the objects,
+ * Apex actions, or Flow actions that you want to check the bypasses for.
+ * You can then call the `isBypassed` method of the `TriggerActionFlowIsBypassed` class and
+ * pass the list of objects, Apex actions, or Flow actions as the input parameter.
+ *
+ * The `isBypassed` method will return a list of booleans indicating whether the bypass is set
+ * to `true` for each of the specified objects, Apex actions, or Flow actions.
+ */
+@SuppressWarnings('PMD.CognitiveComplexity')
 public inherited sharing class TriggerActionFlowIsBypassed {
+	/**
+	 * @description This method checks if the bypass is set to `true` for the specified objects,
+	 * Apex actions, or Flow actions.
+	 *
+	 * @param requests A list of the objects, Apex actions, or Flow actions to check the bypasses for.
+	 * @return A list of booleans indicating whether the bypass is set to `true` for each of the
+	 * specified objects, Apex actions, or Flow actions.
+	 */
 	@InvocableMethod(
 		category='Trigger Action Flow'
 		label='Is Bypassed'
@@ -30,6 +55,14 @@ public inherited sharing class TriggerActionFlowIsBypassed {
 		return results;
 	}
 
+	/**
+	 * @description The `Request` class is a class that represents a request to check if the bypass is set to `true` for a specific object, Apex action, or Flow action.
+	 *
+	 * To use the `Request` class, you must specify the following properties:
+	 *
+	 * - `name`: The API name of the object, Apex action, or Flow action to check the bypass for.
+	 * - `bypassType`: The type of bypass to check. Valid values are `Apex`, `Flow`, or `Object`.
+	 */
 	public class Request {
 		@InvocableVariable
 		public String name;
@@ -40,6 +73,11 @@ public inherited sharing class TriggerActionFlowIsBypassed {
 	private class FlowIsBypassedProcesser extends TriggerActionFlowBypassProcessor {
 		private Boolean hasBeenBypassed = false;
 
+		/**
+		 * @description This method returns the value of the `hasBeenBypassed` property.
+		 *
+		 * @return The value of the `hasBeenBypassed` property.
+		 */
 		public Boolean getHasBeenBypassed() {
 			return this.hasBeenBypassed;
 		}

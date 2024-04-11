@@ -14,7 +14,9 @@
    limitations under the License.
  */
 
-@SuppressWarnings('PMD.ApexDoc')
+/**
+ * @description This class contains constants used by the TriggerAction framework.
+ */
 public class TriggerActionConstants {
 	public static final String APEX_STRING = 'Apex';
 	public static final String FLOW_STRING = 'Flow';

@@ -13,7 +13,13 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-@SuppressWarnings('PMD.ApexDoc')
+
+/**
+ * @description A flow-accessible version of the ChangeEventHeader class for use in
+ * a flow handler of a change data capture event.
+ *
+ * @see https://developer.salesforce.com/docs/atlas.en-us.change_data_capture.meta/change_data_capture/cdc_event_fields_header.htm
+ */
 public with sharing class FlowChangeEventHeader {
 	@InvocableVariable
 	@AuraEnabled
@@ -52,6 +58,12 @@ public with sharing class FlowChangeEventHeader {
 	@AuraEnabled
 	public List<String> changedFields;
 
+	/**
+	 *  @description  Constructor that takes an `EventBus.ChangeEventHeader` object and populates
+	 * the properties of this object with the values from the `EventBus.ChangeEventHeader` object.
+	 *
+	 * @param header The `EventBus.ChangeEventHeader` object to populate the properties of this object with.
+	 */
 	public FlowChangeEventHeader(EventBus.ChangeEventHeader header) {
 		this.entityName = header.entityName;
 		this.recordIds = header.recordIds;
@@ -67,6 +79,12 @@ public with sharing class FlowChangeEventHeader {
 		this.changedFields = header.changedFields;
 	}
 
+	/**
+	 * @description Compares this `FlowChangeEventHeader` object to another object.
+	 *
+	 * @param obj The object to compare this `FlowChangeEventHeader` object to.
+	 * @return `true` if the objects are equal, `false` otherwise.
+	 */
 	public Boolean equals(Object obj) {
 		if (obj != null && obj instanceof FlowChangeEventHeader) {
 			FlowChangeEventHeader other = (FlowChangeEventHeader) obj;
@@ -86,6 +104,11 @@ public with sharing class FlowChangeEventHeader {
 		return false;
 	}
 
+	/**
+	 * Returns a hash code value for this `FlowChangeEventHeader` object.
+	 *
+	 * @return A hash code value for this `FlowChangeEventHeader` object.
+	 */
 	public Integer hashCode() {
 		return JSON.serialize(this).hashCode();
 	}
