@@ -86,6 +86,7 @@ public inherited sharing class MetadataTriggerHandler extends TriggerBase implem
 	private static final String QUERY_TEMPLATE = String.join(
 		new List<String>{
 			'SELECT Apex_Class_Name__c,',
+			'Apex_Class_Namespace__c,',
 			'Order__c,',
 			'Flow_Name__c,',
 			'Bypass_Permission__c,',
@@ -385,8 +386,15 @@ public inherited sharing class MetadataTriggerHandler extends TriggerBase implem
 		for (Trigger_Action__mdt triggerMetadata : actionMetadata) {
 			Object triggerAction;
 			try {
-				triggerAction = Type.forName(triggerMetadata.Apex_Class_Name__c)
-					.newInstance();
+				String namespace = triggerMetadata.Apex_Class_Namespace__c;
+                try {
+                    triggerAction = Type.forName(namespace, triggerMetadata.Apex_Class_Name__c).newInstance();
+                } catch (Exception e) {
+                    // fallback to package namespace to not break existing implementations that are distributed in a namespace
+					String[] parts = String.valueOf(MetadataTriggerHandler.class).split('\\.', 2);
+                	namespace = parts.size() == 2 ? parts[0] : '';
+                    triggerAction = Type.forName(namespace, triggerMetadata.Apex_Class_Name__c).newInstance();
+                }
 				if (triggerMetadata.Flow_Name__c != null) {
 					((TriggerActionFlow) triggerAction)
 						.flowName = triggerMetadata.Flow_Name__c;

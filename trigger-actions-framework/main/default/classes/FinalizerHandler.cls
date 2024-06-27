@@ -127,11 +127,20 @@ public with sharing virtual class FinalizerHandler {
 	) {
 		Object dynamicInstance;
 		String className = finalizerMetadata.Apex_Class_Name__c;
+		String namespace = finalizerMetadata.Apex_Class_Namespace__c;
 		if (FinalizerHandler.isBypassed(className)) {
 			return;
 		}
+
 		try {
-			dynamicInstance = Type.forName(className).newInstance();
+			try {
+                dynamicInstance = Type.forName(namespace, className).newInstance();
+            } catch (Exception e) {
+                // fallback to package namespace to not break existing implementations that are distributed in a namespace
+				String[] parts = String.valueOf(FinalizerHandler.class).split('\\.', 2);
+				namespace = parts.size() == 2 ? parts[0] : '';
+                dynamicInstance = Type.forName(namespace, className).newInstance();
+            }
 		} catch (System.NullPointerException e) {
 			handleFinalizerException(INVALID_CLASS_ERROR_FINALIZER, className);
 		}
