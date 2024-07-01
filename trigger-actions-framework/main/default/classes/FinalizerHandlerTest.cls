@@ -74,6 +74,27 @@ private with sharing class FinalizerHandlerTest {
 	}
 
 	@IsTest
+	private static void ambiguousNamespacedFinalizerShouldExecute() {
+		// Invalid namespace is the same as a missing one.
+		// Can't have mixed namespace unit tests so using invalid to trigger the same fallback behavior
+		handler.allFinalizers = new List<DML_Finalizer__mdt>{
+			new DML_Finalizer__mdt(
+				Apex_Class_Namespace__c = 'NOT_A_NAMEPACE',
+				Apex_Class_Name__c = TEST_FOO_FINALIZER,
+				Bypass_Permission__c = BYPASS_PERMISSION
+			)
+		};
+
+		handler.handleDynamicFinalizers();
+
+		System.Assert.areEqual(
+			FOO,
+			finalizerLedger[0],
+			'The finalizer should be dynamically instantiated and executed'
+		);
+	}
+
+	@IsTest
 	private static void bypassedFinalizerShouldNotExecute() {
 		handler.allFinalizers = new List<DML_Finalizer__mdt>{
 			new DML_Finalizer__mdt(

@@ -385,16 +385,34 @@ public inherited sharing class MetadataTriggerHandler extends TriggerBase implem
 		}
 		for (Trigger_Action__mdt triggerMetadata : actionMetadata) {
 			Object triggerAction;
+			String namespace = triggerMetadata.Apex_Class_Namespace__c;
+			String className = triggerMetadata.Apex_Class_Name__c;
 			try {
-				String namespace = triggerMetadata.Apex_Class_Namespace__c;
-                try {
-                    triggerAction = Type.forName(namespace, triggerMetadata.Apex_Class_Name__c).newInstance();
-                } catch (Exception e) {
-                    // fallback to package namespace to not break existing implementations that are distributed in a namespace
+				System.Type actionType = Type.forName(namespace, className);
+				/** Type.forName(fullyQualifiedName) allowed some messyness and ambiguity in dealing with namespace
+				 *   If config does not provide the correct namespace (likely if upgrading from older versions of this framework) we need to fallback in two scenarios
+				 *     - package and class namespaced but namespace wasn't specified
+				 *     - namespace is actually in the class field in the form namespace.classname
+				 */
+				// try shared Namespace
+                if( actionType == null ) {
+					// Get the namespace of the current class.
 					String[] parts = String.valueOf(MetadataTriggerHandler.class).split('\\.', 2);
                 	namespace = parts.size() == 2 ? parts[0] : '';
-                    triggerAction = Type.forName(namespace, triggerMetadata.Apex_Class_Name__c).newInstance();
+
+					// try again with the new namespace
+                    actionType = Type.forName(namespace, className);
                 }
+				// try namespace in Class_Name field
+                if (actionType == null) {
+                    String[] parts = className.split('\\.', 2);
+					if(parts.size() == 2) {
+						namespace = parts[0];
+						className = parts[1];
+						actionType = Type.forName(namespace, className);
+					}
+				}
+				triggerAction = actionType.newInstance();
 				if (triggerMetadata.Flow_Name__c != null) {
 					((TriggerActionFlow) triggerAction)
 						.flowName = triggerMetadata.Flow_Name__c;
