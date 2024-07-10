@@ -626,7 +626,7 @@ private class MetadataTriggerHandlerTest {
 			new List<SObject>{ action }
 		);
 
-		MetadataTriggerHandler.permissionMap.clear();
+		ActionUtility.userPermissions = new Set<String>();
 
 		handler.beforeInsert(handler.triggerNew);
 
@@ -641,7 +641,7 @@ private class MetadataTriggerHandlerTest {
 			new List<SObject>{ action }
 		);
 
-		MetadataTriggerHandler.permissionMap.clear();
+		ActionUtility.userPermissions = new Set<String>();
 
 		handler.beforeInsert(handler.triggerNew);
 
@@ -654,9 +654,7 @@ private class MetadataTriggerHandlerTest {
 		MetadataTriggerHandler.selector = new FakeSelector(
 			new List<SObject>{ action }
 		);
-		MetadataTriggerHandler.permissionMap = new Map<String, Boolean>{
-			REQUIRED_PERMISSION => false
-		};
+		ActionUtility.userPermissions = new Set<String>();
 
 		handler.beforeInsert(handler.triggerNew);
 
@@ -669,9 +667,7 @@ private class MetadataTriggerHandlerTest {
 		MetadataTriggerHandler.selector = new FakeSelector(
 			new List<SObject>{ action }
 		);
-		MetadataTriggerHandler.permissionMap = new Map<String, Boolean>{
-			REQUIRED_PERMISSION => false
-		};
+		ActionUtility.userPermissions = new Set<String>();
 
 		handler.beforeInsert(handler.triggerNew);
 
@@ -684,9 +680,7 @@ private class MetadataTriggerHandlerTest {
 		MetadataTriggerHandler.selector = new FakeSelector(
 			new List<SObject>{ action }
 		);
-		MetadataTriggerHandler.permissionMap = new Map<String, Boolean>{
-			BYPASS_PERMISSION => true
-		};
+		ActionUtility.userPermissions = new Set<String>{BYPASS_PERMISSION};
 
 		handler.beforeInsert(handler.triggerNew);
 
@@ -699,9 +693,7 @@ private class MetadataTriggerHandlerTest {
 		MetadataTriggerHandler.selector = new FakeSelector(
 			new List<SObject>{ action }
 		);
-		MetadataTriggerHandler.permissionMap = new Map<String, Boolean>{
-			BYPASS_PERMISSION => true
-		};
+		ActionUtility.userPermissions = new Set<String>{BYPASS_PERMISSION};
 
 		handler.beforeInsert(handler.triggerNew);
 

@@ -58,9 +58,6 @@ public with sharing virtual class FinalizerHandler {
 	@TestVisible
 	private static Set<String> bypassedFinalizers = new Set<String>();
 
-	@TestVisible
-	private static Map<String, Boolean> permissionMap = new Map<String, Boolean>();
-
 	/**
 	 * @description Bypass the execution of a specific finalizer.
 	 * @param finalizer The name of the finalizer to bypass.
@@ -103,10 +100,8 @@ public with sharing virtual class FinalizerHandler {
 			if (finalizerMetadata.Bypass_Execution__c) {
 				return;
 			}
-			populatePermissionMap(finalizerMetadata.Bypass_Permission__c);
-			populatePermissionMap(finalizerMetadata.Required_Permission__c);
 			if (
-				isNotBypassed(
+				ActionUtility.isNotBypassed(
 					finalizerMetadata.Bypass_Permission__c,
 					finalizerMetadata.Required_Permission__c
 				)
@@ -131,7 +126,7 @@ public with sharing virtual class FinalizerHandler {
 			return;
 		}
 		try {
-			dynamicInstance = Type.forName(className).newInstance();
+			dynamicInstance = ActionUtility.getActionInstance(className);
 		} catch (System.NullPointerException e) {
 			handleFinalizerException(INVALID_CLASS_ERROR_FINALIZER, className);
 		}
@@ -169,34 +164,6 @@ public with sharing virtual class FinalizerHandler {
 		throw new FinalizerException(
 			String.format(errorFormat, new List<String>{ className })
 		);
-	}
-
-	/**
-	 * @description Check if the finalizer is not bypassed.
-	 * @param requiredPermission The required permission.
-	 * @param bypassPermission The bypass permission.
-	 * @return True if the finalizer is not bypassed, false otherwise.
-	 */
-	private boolean isNotBypassed(
-		String requiredPermission,
-		String bypassPermission
-	) {
-		return !((requiredPermission != null &&
-		permissionMap.get(requiredPermission)) ||
-		(bypassPermission != null && !permissionMap.get(bypassPermission)));
-	}
-
-	/**
-	 * @description Populate the permission map.
-	 * @param permissionName The permission name.
-	 */
-	private void populatePermissionMap(String permissionName) {
-		if (permissionName != null && !permissionMap.containsKey(permissionName)) {
-			permissionMap.put(
-				permissionName,
-				FeatureManagement.checkPermission(permissionName)
-			);
-		}
 	}
 
 	@TestVisible
