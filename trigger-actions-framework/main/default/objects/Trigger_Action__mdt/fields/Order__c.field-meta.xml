@@ -4,9 +4,9 @@
     <externalId>false</externalId>
     <fieldManageability>SubscriberControlled</fieldManageability>
     <label>Order</label>
-    <precision>6</precision>
+    <precision>7</precision>
     <required>true</required>
-    <scale>2</scale>
+    <scale>3</scale>
     <type>Number</type>
     <unique>false</unique>
 </CustomField>
