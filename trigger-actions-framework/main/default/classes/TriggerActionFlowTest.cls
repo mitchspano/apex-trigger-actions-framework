@@ -270,18 +270,16 @@ private class TriggerActionFlowTest {
 	}
 
 	@IsTest
-	private static void nulledFieldInFlowShouldBeTransferredBack() {
-		myAccount.BillingStreet = TEST;
-		oldAccount.BillingStreet = TEST;
-		myAccountAfterFlow.BillingStreet = null;
+    private static void nulledFieldInFlowShouldBeTransferredBack() {
+        myAccount.BillingStreet = TEST;
+        oldAccount.BillingStreet = TEST;
+        myAccountAfterFlow = myAccount.clone(true);
+        myAccountAfterFlow.BillingStreet = null;
 
-		actionFlow.beforeUpdate(newList, oldList);
+        actionFlow.beforeUpdate(newList, oldList);
 
-		System.Assert.isNull(
-			myAccount.BillingStreet,
-			ERROR_NOT_NULLED_AFTER_FLOW
-		);
-	}
+        System.Assert.isNull(myAccount.BillingStreet, ERROR_NOT_NULLED_AFTER_FLOW);
+    }
 
 	@IsTest
 	private static void unsuccessfulActionResultShouldBeAddedAsErrorToRecord() {
