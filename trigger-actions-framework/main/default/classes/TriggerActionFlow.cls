@@ -253,8 +253,10 @@ public virtual inherited sharing class TriggerActionFlow implements TriggerActio
 		sObject stateAfterFlow
 	) {
 		Boolean hasBeenMutated = false;
-		Map<String, Object> afterFlowMap = stateAfterFlow.getPopulatedFieldsAsMap();
-		for (String fieldName : afterFlowMap.keySet()) {
+		Set<String> recordPopulatedFields = new Set<String>();
+		recordPopulatedFields.addAll(stateAfterFlow.getPopulatedFieldsAsMap().keySet());
+		recordPopulatedFields.addAll(stateBeforeFlow.getPopulatedFieldsAsMap().keySet()); 
+		for (String fieldName : recordPopulatedFields) {
 			if (stateBeforeFlow.get(fieldName) != stateAfterFlow.get(fieldName)) {
 				stateBeforeFlow.put(fieldName, stateAfterFlow.get(fieldName));
 				hasBeenMutated = true;
