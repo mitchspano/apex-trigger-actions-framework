@@ -90,6 +90,8 @@ public inherited sharing class MetadataTriggerHandler extends TriggerBase implem
 			'Flow_Name__c,',
 			'Bypass_Permission__c,',
 			'Required_Permission__c,',
+			'Entry_Criteria__c,',
+			'{0}__r.Formula_Evaluation_Class_Name__c,',
 			'Allow_Flow_Recursion__c,',
 			'{0}__r.Bypass_Permission__c,',
 			'{0}__r.Required_Permission__c',
@@ -410,30 +412,42 @@ public inherited sharing class MetadataTriggerHandler extends TriggerBase implem
 					triggerAction,
 					triggerMetadata.Apex_Class_Name__c
 				);
+				FormulaFilter.Result filterResult = new FormulaFilter(triggerMetadata, context)
+					.filterByEntryCriteria(newList, oldList);
 				switch on context {
 					when BEFORE_INSERT {
-						((TriggerAction.BeforeInsert) triggerAction).beforeInsert(newList);
+						((TriggerAction.BeforeInsert) triggerAction)
+							.beforeInsert(filterResult.filteredNewList);
 					}
 					when AFTER_INSERT {
-						((TriggerAction.AfterInsert) triggerAction).afterInsert(newList);
+						((TriggerAction.AfterInsert) triggerAction)
+							.afterInsert(filterResult.filteredNewList);
 					}
 					when BEFORE_UPDATE {
 						((TriggerAction.BeforeUpdate) triggerAction)
-							.beforeUpdate(newList, oldList);
+							.beforeUpdate(
+								filterResult.filteredNewList,
+								filterResult.filteredOldList
+							);
 					}
 					when AFTER_UPDATE {
 						((TriggerAction.AfterUpdate) triggerAction)
-							.afterUpdate(newList, oldList);
+							.afterUpdate(
+								filterResult.filteredNewList,
+								filterResult.filteredOldList
+							);
 					}
 					when BEFORE_DELETE {
-						((TriggerAction.BeforeDelete) triggerAction).beforeDelete(oldList);
+						((TriggerAction.BeforeDelete) triggerAction)
+							.beforeDelete(filterResult.filteredOldList);
 					}
 					when AFTER_DELETE {
-						((TriggerAction.AfterDelete) triggerAction).afterDelete(oldList);
+						((TriggerAction.AfterDelete) triggerAction)
+							.afterDelete(filterResult.filteredOldList);
 					}
 					when AFTER_UNDELETE {
 						((TriggerAction.AfterUndelete) triggerAction)
-							.afterUndelete(newList);
+							.afterUndelete(filterResult.filteredNewList);
 					}
 				}
 			}
