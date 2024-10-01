@@ -119,7 +119,7 @@ private with sharing class FinalizerHandlerTest {
 			)
 		};
 
-		FinalizerHandler.permissionMap.put(BYPASS_PERMISSION, true);
+		ActionUtility.userPermissions.add(BYPASS_PERMISSION);
 		handler.handleDynamicFinalizers();
 
 		System.Assert.isTrue(
@@ -138,7 +138,7 @@ private with sharing class FinalizerHandlerTest {
 			)
 		};
 
-		FinalizerHandler.permissionMap.put(REQUIRED_PERMISSION, false);
+		ActionUtility.userPermissions = new Set<String>();
 		handler.handleDynamicFinalizers();
 
 		System.Assert.isTrue(
