@@ -195,7 +195,7 @@ Now, the automation will only execute for any records within the transaction for
 > [!IMPORTANT]
 >
 > - **Beta Feature:** The Entry Criteria Formula feature is currently in beta. While it is functional, there might be limitations or changes in future releases.
-> - **Property Limitations:** The `record` and `recordPrior` objects within the formula are limited to the properties directly available on the sObject itself. Cross-object traversal, such as `record.RecordType.DeveloperName`, is not supported.
+> - **Field Traversal Limitations:** The `record` and `recordPrior` objects within the formula are limited to the fields directly available on the record itself. Cross-object traversal, such as `record.RecordType.DeveloperName`, is not supported.
 
 ---
 
