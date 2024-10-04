@@ -17,28 +17,15 @@
 /**
  * @description An abstract class that provides a base structure for trigger context records.
  */
+@SuppressWarnings('PMD.AvoidGlobalModifier')
 global abstract class TriggerRecord {
 	/**
 	 * @description The new version of the SObject that triggered the current execution context.
 	 */
-	global SObject newSobject {
-		get {
-			return newSobject;
-		}
-		set {
-			this.newSobject = value;
-		}
-	}
+	global SObject newSobject;
 
 	/**
 	 * @description The previous version of the SObject that triggered the current execution context.
 	 */
-	global SObject oldSobject {
-		get {
-			return oldSobject;
-		}
-		set {
-			this.oldSobject = value;
-		}
-	}
+	global SObject oldSobject;
 }

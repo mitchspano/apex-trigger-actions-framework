@@ -21,16 +21,20 @@
 @SuppressWarnings('PMD.AvoidGlobalModifier')
 global class FormulaFilter {
 	private static final String ERROR_PREFIX = 'Please check the SObject_Trigger_Setting__mdt metadata for the the {0} sObject.';
+	@TestVisible
 	private static final String MISSING_CLASS_NAME =
 		ERROR_PREFIX +
 		' The record is missing the `Formula_Evaluation_Class_Name__c` field.';
+	@TestVisible
 	private static final String INVALID_CLASS =
 		ERROR_PREFIX +
 		' There is no such class named {1} which is currently the value specified in the the `Formula_Evaluation_Class_Name__c` field.';
+	@TestVisible
 	private static final String INVALID_SUBTYPE =
 		ERROR_PREFIX +
 		' The {1} class is specified in the the `Formula_Evaluation_Class_Name__c` field and does not extend the `TriggerRecord` class';
 
+	@TestVisible
 	private static final String CLASS_MUST_BE_GLOBAL =
 		ERROR_PREFIX +
 		' The {1} class is specified in the the `Formula_Evaluation_Class_Name__c` field must be global';

@@ -33,6 +33,7 @@ global class FormulaFilterTest {
 	private static Trigger_Action__mdt configuration = new Trigger_Action__mdt(
 		Before_Update__r = sobjectSetting
 	);
+	private static IllegalArgumentException caught;
 
 	@IsTest
 	private static void noFormulaShouldProcessAllRecords() {
@@ -130,7 +131,7 @@ global class FormulaFilterTest {
 		FormulaFilter filter = new FormulaFilter(
 			configuration,
 			TriggerOperation.BEFORE_UPDATE,
-            ACCOUNT_SOBJECT_NAME
+			ACCOUNT_SOBJECT_NAME
 		);
 
 		FormulaFilter.Result result = filter.filterByEntryCriteria(
@@ -143,6 +144,135 @@ global class FormulaFilterTest {
 		System.Assert.isTrue(result.oldList.isEmpty(), 'oldList should be empty');
 	}
 
+	@IsTest
+	private static void emptyClassShouldThrowException() {
+		sobjectSetting.Formula_Evaluation_Class_Name__c = '';
+		configuration.Entry_Criteria__c = 'record.Name = "FooBar"';
+		FormulaFilter filter = new FormulaFilter(
+			configuration,
+			TriggerOperation.BEFORE_UPDATE,
+			ACCOUNT_SOBJECT_NAME
+		);
+		try {
+			filter.filterByEntryCriteria(newList, oldList);
+		} catch (IllegalArgumentException e) {
+			caught = e;
+		}
+		Assert.areEqual(
+			String.format(
+				FormulaFilter.MISSING_CLASS_NAME,
+				new List<String>{ ACCOUNT_SOBJECT_NAME }
+			),
+			caught.getMessage(),
+			'The exception message should match the expected error'
+		);
+	}
+
+	@IsTest
+	private static void nullClassShouldThrowException() {
+		sobjectSetting.Formula_Evaluation_Class_Name__c = null;
+		configuration.Entry_Criteria__c = 'record.Name = "FooBar"';
+		FormulaFilter filter = new FormulaFilter(
+			configuration,
+			TriggerOperation.BEFORE_UPDATE,
+			ACCOUNT_SOBJECT_NAME
+		);
+		try {
+			filter.filterByEntryCriteria(newList, oldList);
+		} catch (IllegalArgumentException e) {
+			caught = e;
+		}
+		Assert.areEqual(
+			String.format(
+				FormulaFilter.MISSING_CLASS_NAME,
+				new List<String>{ ACCOUNT_SOBJECT_NAME }
+			),
+			caught.getMessage(),
+			'The exception message should match the expected error'
+		);
+	}
+
+	@IsTest
+	private static void nonGlobalShouldThrowException() {
+		sobjectSetting.Formula_Evaluation_Class_Name__c = 'FormulaFilterTest.AccountTriggerRecordPublic';
+		configuration.Entry_Criteria__c = 'record.Name = "FooBar"';
+		FormulaFilter filter = new FormulaFilter(
+			configuration,
+			TriggerOperation.BEFORE_UPDATE,
+			ACCOUNT_SOBJECT_NAME
+		);
+		try {
+			filter.filterByEntryCriteria(newList, oldList);
+		} catch (IllegalArgumentException e) {
+			caught = e;
+		}
+		Assert.areEqual(
+			String.format(
+				FormulaFilter.CLASS_MUST_BE_GLOBAL,
+				new List<String>{
+					ACCOUNT_SOBJECT_NAME,
+					sobjectSetting.Formula_Evaluation_Class_Name__c
+				}
+			),
+			caught.getMessage(),
+			'The exception message should match the expected error'
+		);
+	}
+
+	@IsTest
+	private static void nonTriggerRecordClassShouldThrowException() {
+		sobjectSetting.Formula_Evaluation_Class_Name__c = 'FormulaFilterTest.AccountNonTriggerRecord';
+		configuration.Entry_Criteria__c = 'record.Name = "FooBar"';
+		FormulaFilter filter = new FormulaFilter(
+			configuration,
+			TriggerOperation.BEFORE_UPDATE,
+			ACCOUNT_SOBJECT_NAME
+		);
+		try {
+			filter.filterByEntryCriteria(newList, oldList);
+		} catch (IllegalArgumentException e) {
+			caught = e;
+		}
+		Assert.areEqual(
+			String.format(
+				FormulaFilter.INVALID_SUBTYPE,
+				new List<String>{
+					ACCOUNT_SOBJECT_NAME,
+					sobjectSetting.Formula_Evaluation_Class_Name__c
+				}
+			),
+			caught.getMessage(),
+			'The exception message should match the expected error'
+		);
+	}
+
+	@IsTest
+	private static void nonExistentClassShouldThrowException() {
+		sobjectSetting.Formula_Evaluation_Class_Name__c = 'TotallyBogusClassNameWhichDoesNotExist';
+		configuration.Entry_Criteria__c = 'record.Name = "FooBar"';
+		FormulaFilter filter = new FormulaFilter(
+			configuration,
+			TriggerOperation.BEFORE_UPDATE,
+			ACCOUNT_SOBJECT_NAME
+		);
+		try {
+			filter.filterByEntryCriteria(newList, oldList);
+		} catch (IllegalArgumentException e) {
+			caught = e;
+		}
+		Assert.areEqual(
+			String.format(
+				FormulaFilter.INVALID_CLASS,
+				new List<String>{
+					ACCOUNT_SOBJECT_NAME,
+					sobjectSetting.Formula_Evaluation_Class_Name__c
+				}
+			),
+			caught.getMessage(),
+			'The exception message should match the expected error'
+		);
+	}
+
 	@SuppressWarnings('PMD.ApexDoc')
 	global class AccountTriggerRecord extends TriggerRecord {
 		global Account record {
@@ -151,6 +281,34 @@ global class FormulaFilterTest {
 			}
 		}
 		global Account recordPrior {
+			get {
+				return (Account) this.oldSObject;
+			}
+		}
+	}
+
+	@SuppressWarnings('PMD.ApexDoc')
+	global class AccountNonTriggerRecord {
+		global Account record {
+			get {
+				return new Account();
+			}
+		}
+		global Account recordPrior {
+			get {
+				return new Account();
+			}
+		}
+	}
+
+	@SuppressWarnings('PMD.ApexDoc')
+	public class AccountTriggerRecordPublic extends TriggerRecord {
+		public Account record {
+			get {
+				return (Account) this.newSObject;
+			}
+		}
+		public Account recordPrior {
 			get {
 				return (Account) this.oldSObject;
 			}
