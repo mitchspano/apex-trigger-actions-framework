@@ -24,20 +24,15 @@ global class FormulaFilter {
 	@TestVisible
 	private static final String MISSING_CLASS_NAME =
 		ERROR_PREFIX +
-		' The record is missing the `Formula_Evaluation_Class_Name__c` field.';
+		' The record is missing the `TriggerRecord_Class_Name__c` field.';
 	@TestVisible
 	private static final String INVALID_CLASS =
 		ERROR_PREFIX +
-		' There is no such class named {1} which is currently the value specified in the the `Formula_Evaluation_Class_Name__c` field.';
+		' There is no such class named {1} which is currently the value specified in the the `TriggerRecord_Class_Name__c` field.';
 	@TestVisible
 	private static final String INVALID_SUBTYPE =
 		ERROR_PREFIX +
-		' The {1} class is specified in the the `Formula_Evaluation_Class_Name__c` field and does not extend the `TriggerRecord` class.';
-
-	@TestVisible
-	private static final String CLASS_MUST_BE_GLOBAL =
-		ERROR_PREFIX +
-		' The {1} class is specified in the the `Formula_Evaluation_Class_Name__c` field must be global and it must have properties called `record` and `recordPrior`';
+		' The {1} class is specified in the the `TriggerRecord_Class_Name__c` field must be global and it must have properties called `record` and `recordPrior` and it must extend the `TriggerRecord` class.';
 
 	private final Trigger_Action__mdt triggerActionConfiguration;
 	private final TriggerOperation context;
@@ -163,7 +158,7 @@ global class FormulaFilter {
 		} catch (System.FormulaValidationException e) {
 			throw new IllegalArgumentException(
 				String.format(
-					CLASS_MUST_BE_GLOBAL,
+					INVALID_SUBTYPE,
 					new List<String>{ this.sObjectName, nameOfType }
 				)
 			);
@@ -178,7 +173,7 @@ global class FormulaFilter {
 		return ((sObject_Trigger_Setting__mdt) this.triggerActionConfiguration.getSObject(
 				this.context.name() + '__r'
 			))
-			?.Formula_Evaluation_Class_Name__c;
+			?.TriggerRecord_Class_Name__c;
 	}
 
 	/**

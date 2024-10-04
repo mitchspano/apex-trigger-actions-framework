@@ -28,7 +28,7 @@ global class FormulaFilterTest {
 		new Account(Name = 'Test Account 2')
 	};
 	private static sObject_Trigger_Setting__mdt sobjectSetting = new sObject_Trigger_Setting__mdt(
-		Formula_Evaluation_Class_Name__c = 'FormulaFilterTest.AccountTriggerRecord'
+		TriggerRecord_Class_Name__c = 'FormulaFilterTest.AccountTriggerRecord'
 	);
 	private static Trigger_Action__mdt configuration = new Trigger_Action__mdt(
 		Before_Update__r = sobjectSetting
@@ -146,7 +146,7 @@ global class FormulaFilterTest {
 
 	@IsTest
 	private static void emptyClassShouldThrowException() {
-		sobjectSetting.Formula_Evaluation_Class_Name__c = '';
+		sobjectSetting.TriggerRecord_Class_Name__c = '';
 		configuration.Entry_Criteria__c = 'record.Name = "FooBar"';
 		FormulaFilter filter = new FormulaFilter(
 			configuration,
@@ -170,7 +170,7 @@ global class FormulaFilterTest {
 
 	@IsTest
 	private static void nullClassShouldThrowException() {
-		sobjectSetting.Formula_Evaluation_Class_Name__c = null;
+		sobjectSetting.TriggerRecord_Class_Name__c = null;
 		configuration.Entry_Criteria__c = 'record.Name = "FooBar"';
 		FormulaFilter filter = new FormulaFilter(
 			configuration,
@@ -194,34 +194,7 @@ global class FormulaFilterTest {
 
 	@IsTest
 	private static void nonGlobalShouldThrowException() {
-		sobjectSetting.Formula_Evaluation_Class_Name__c = 'FormulaFilterTest.AccountTriggerRecordPublic';
-		configuration.Entry_Criteria__c = 'record.Name = "FooBar"';
-		FormulaFilter filter = new FormulaFilter(
-			configuration,
-			TriggerOperation.BEFORE_UPDATE,
-			ACCOUNT_SOBJECT_NAME
-		);
-		try {
-			filter.filterByEntryCriteria(newList, oldList);
-		} catch (IllegalArgumentException e) {
-			caught = e;
-		}
-		Assert.areEqual(
-			String.format(
-				FormulaFilter.CLASS_MUST_BE_GLOBAL,
-				new List<String>{
-					ACCOUNT_SOBJECT_NAME,
-					sobjectSetting.Formula_Evaluation_Class_Name__c
-				}
-			),
-			caught.getMessage(),
-			'The exception message should match the expected error'
-		);
-	}
-
-	@IsTest
-	private static void nonTriggerRecordClassShouldThrowException() {
-		sobjectSetting.Formula_Evaluation_Class_Name__c = 'FormulaFilterTest.AccountNonTriggerRecord';
+		sobjectSetting.TriggerRecord_Class_Name__c = 'FormulaFilterTest.AccountTriggerRecordPublic';
 		configuration.Entry_Criteria__c = 'record.Name = "FooBar"';
 		FormulaFilter filter = new FormulaFilter(
 			configuration,
@@ -238,7 +211,34 @@ global class FormulaFilterTest {
 				FormulaFilter.INVALID_SUBTYPE,
 				new List<String>{
 					ACCOUNT_SOBJECT_NAME,
-					sobjectSetting.Formula_Evaluation_Class_Name__c
+					sobjectSetting.TriggerRecord_Class_Name__c
+				}
+			),
+			caught.getMessage(),
+			'The exception message should match the expected error'
+		);
+	}
+
+	@IsTest
+	private static void nonTriggerRecordClassShouldThrowException() {
+		sobjectSetting.TriggerRecord_Class_Name__c = 'FormulaFilterTest.AccountNonTriggerRecord';
+		configuration.Entry_Criteria__c = 'record.Name = "FooBar"';
+		FormulaFilter filter = new FormulaFilter(
+			configuration,
+			TriggerOperation.BEFORE_UPDATE,
+			ACCOUNT_SOBJECT_NAME
+		);
+		try {
+			filter.filterByEntryCriteria(newList, oldList);
+		} catch (IllegalArgumentException e) {
+			caught = e;
+		}
+		Assert.areEqual(
+			String.format(
+				FormulaFilter.INVALID_SUBTYPE,
+				new List<String>{
+					ACCOUNT_SOBJECT_NAME,
+					sobjectSetting.TriggerRecord_Class_Name__c
 				}
 			),
 			caught.getMessage(),
@@ -248,7 +248,7 @@ global class FormulaFilterTest {
 
 	@IsTest
 	private static void nonExistentClassShouldThrowException() {
-		sobjectSetting.Formula_Evaluation_Class_Name__c = 'TotallyBogusClassNameWhichDoesNotExist';
+		sobjectSetting.TriggerRecord_Class_Name__c = 'TotallyBogusClassNameWhichDoesNotExist';
 		configuration.Entry_Criteria__c = 'record.Name = "FooBar"';
 		FormulaFilter filter = new FormulaFilter(
 			configuration,
@@ -265,7 +265,7 @@ global class FormulaFilterTest {
 				FormulaFilter.INVALID_CLASS,
 				new List<String>{
 					ACCOUNT_SOBJECT_NAME,
-					sobjectSetting.Formula_Evaluation_Class_Name__c
+					sobjectSetting.TriggerRecord_Class_Name__c
 				}
 			),
 			caught.getMessage(),

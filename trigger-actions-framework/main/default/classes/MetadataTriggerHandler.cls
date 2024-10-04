@@ -91,7 +91,7 @@ public inherited sharing class MetadataTriggerHandler extends TriggerBase implem
 			'Bypass_Permission__c,',
 			'Required_Permission__c,',
 			'Entry_Criteria__c,',
-			'{0}__r.Formula_Evaluation_Class_Name__c,',
+			'{0}__r.TriggerRecord_Class_Name__c,',
 			'Allow_Flow_Recursion__c,',
 			'{0}__r.Bypass_Permission__c,',
 			'{0}__r.Required_Permission__c',

@@ -160,7 +160,7 @@ global class AccountTriggerRecord extends TriggerRecord {
 }
 ```
 
-Then enter the API name of that class in the `SObject_Trigger_Setting__mdt.Formula_Evaluation_Class_Name__c` field on the `SObject_Trigger_Setting__mdt` record of interest.
+Then enter the API name of that class in the `SObject_Trigger_Setting__mdt.TriggerRecord_Class_Name__c` field on the `SObject_Trigger_Setting__mdt` record of interest.
 
 Now, you can use a formula which operates on an instance of this class at runtime to determine if a record should be processed. For example, let's say we had the following trigger action:
 
