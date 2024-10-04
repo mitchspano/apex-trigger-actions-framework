@@ -90,6 +90,8 @@ public inherited sharing class MetadataTriggerHandler extends TriggerBase implem
 			'Flow_Name__c,',
 			'Bypass_Permission__c,',
 			'Required_Permission__c,',
+			'Entry_Criteria__c,',
+			'{0}__r.TriggerRecord_Class_Name__c,',
 			'Allow_Flow_Recursion__c,',
 			'{0}__r.Bypass_Permission__c,',
 			'{0}__r.Required_Permission__c',
@@ -410,30 +412,40 @@ public inherited sharing class MetadataTriggerHandler extends TriggerBase implem
 					triggerAction,
 					triggerMetadata.Apex_Class_Name__c
 				);
+				FormulaFilter.Result filtered = new FormulaFilter(
+						triggerMetadata,
+						context,
+						this.sObjectName
+					)
+					.filterByEntryCriteria(newList, oldList);
 				switch on context {
 					when BEFORE_INSERT {
-						((TriggerAction.BeforeInsert) triggerAction).beforeInsert(newList);
+						((TriggerAction.BeforeInsert) triggerAction)
+							.beforeInsert(filtered.newList);
 					}
 					when AFTER_INSERT {
-						((TriggerAction.AfterInsert) triggerAction).afterInsert(newList);
+						((TriggerAction.AfterInsert) triggerAction)
+							.afterInsert(filtered.newList);
 					}
 					when BEFORE_UPDATE {
 						((TriggerAction.BeforeUpdate) triggerAction)
-							.beforeUpdate(newList, oldList);
+							.beforeUpdate(filtered.newList, filtered.oldList);
 					}
 					when AFTER_UPDATE {
 						((TriggerAction.AfterUpdate) triggerAction)
-							.afterUpdate(newList, oldList);
+							.afterUpdate(filtered.newList, filtered.oldList);
 					}
 					when BEFORE_DELETE {
-						((TriggerAction.BeforeDelete) triggerAction).beforeDelete(oldList);
+						((TriggerAction.BeforeDelete) triggerAction)
+							.beforeDelete(filtered.oldList);
 					}
 					when AFTER_DELETE {
-						((TriggerAction.AfterDelete) triggerAction).afterDelete(oldList);
+						((TriggerAction.AfterDelete) triggerAction)
+							.afterDelete(filtered.oldList);
 					}
 					when AFTER_UNDELETE {
 						((TriggerAction.AfterUndelete) triggerAction)
-							.afterUndelete(newList);
+							.afterUndelete(filtered.newList);
 					}
 				}
 			}

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Entry_Criteria__c</fullName>
+    <description>Formula which if evaluated to true for a given record during trigger processing, then this trigger action will be processed for that record.</description>
+    <externalId>false</externalId>
+    <fieldManageability>SubscriberControlled</fieldManageability>
+    <inlineHelpText>Formula which if evaluated to true for a given record during trigger processing, then this trigger action will be processed for that record.</inlineHelpText>
+    <label>Entry Criteria</label>
+    <length>32768</length>
+    <type>LongTextArea</type>
+    <visibleLines>3</visibleLines>
+</CustomField>

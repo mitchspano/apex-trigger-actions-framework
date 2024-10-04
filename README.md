@@ -134,6 +134,75 @@ Create a trigger action record with `Apex_Class_Name__c` equal to `TriggerAction
 
 ---
 
+## Entry Criteria Formula (Beta)
+
+Individual trigger actions can have their own dynamic entry criteria defined in a simple formula.
+This is a new feature and is built using the [`FormulaEval` namespace](https://developer.salesforce.com/docs/atlas.en-us.apexref.meta/apexref/apex_namespace_formulaeval.htm) within Apex.
+
+#### [Entry Criteria Beta Package Installation (Production)](https://login.salesforce.com/packaging/installPackage.apexp?p0=04tKY000000Pb8ZYAS)
+
+#### [Entry Criteria Beta Package Installation (Sandbox)](https://test.salesforce.com/packaging/installPackage.apexp?p0=04tKY000000Pb8ZYAS)
+
+### SObject Setup
+
+To define an entry criteria formula for a given trigger action, first define a class which extends `TriggerRecord`
+for the specific SObject type of interest.
+This class must be global and contains two global properties: `record` and `recordPrior` which get their value from `newSObject` and `oldSObject` downcast to the proper concrete SObject type. Below is an example of this class for the `Account` sObject:
+
+```java
+global class AccountTriggerRecord extends TriggerRecord {
+  global Account record {
+    get {
+      return (Account) this.newSObject;
+    }
+  }
+  global Account recordPrior {
+    get {
+      return (Account) this.oldSObject;
+    }
+  }
+}
+```
+
+Then enter the API name of that class in the `SObject_Trigger_Setting__mdt.TriggerRecord_Class_Name__c` field on the `SObject_Trigger_Setting__mdt` record of interest.
+
+Now, you can use a formula which operates on an instance of this class at runtime to determine if a record should be processed. For example, let's say we had the following trigger action:
+
+```java
+public class TA_Account_Sample implements  TriggerAction.BeforeUpdate {
+
+  public void beforeUpdate(List<Account> newList, List<Account> oldList) {
+    for (Account account : newList) {
+      account.Name = 'Triggered';
+    }
+  }
+}
+```
+
+We could define this entry criteria formula on the `Trigger_Action__mdt` record:
+
+```
+record.Name = "Bob" && recordPrior.Name = "Joe"
+```
+
+> [!NOTE]
+> If the entry criteria field is null, the system will act as if there are no entry criteria and will process all records.
+
+![Entry Criteria](images/Entry_Criteria.png)
+
+Now, the automation will only execute for any records within the transaction for which the name used to be "Joe", but it is changed to "Bob".
+
+![Entry Criteria](images/Entry_Criteria.gif)
+
+### Caveats
+
+> [!IMPORTANT]
+>
+> - **Beta Feature:** The Entry Criteria Formula feature is currently in beta. While it is functional, there might be limitations or changes in future releases.
+> - **Field Traversal Limitations:** The `record` and `recordPrior` objects within the formula are limited to the fields directly available on the record itself. Cross-object traversal, such as `record.RecordType.DeveloperName`, is not supported.
+
+---
+
 ## Compatibility with sObjects from Installed Packages
 
 The Trigger Actions Framework supports standard objects, custom objects, and objects from installed packages. To use the framework with an object from an installed package, separate the Object API Name from the Object Namespace on the sObject Trigger Setting itself. For example, if you want to use the Trigger Actions Framework on an sObject called `Acme__Explosives__c`, configure the sObject Trigger Setting like this:
