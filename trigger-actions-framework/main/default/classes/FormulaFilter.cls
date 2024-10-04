@@ -18,7 +18,7 @@
  * @description The `FormulaFilter` class provides functionality to filter lists of SObjects based on a configurable
  * entry criteria formula defined within a `Trigger_Action__mdt` configuration row.
  */
-@SuppressWarnings('PMD.AvoidGlobalModifier')
+@SuppressWarnings('PMD.AvoidGlobalModifier, PMD.FieldsSortedAlphabetically')
 global class FormulaFilter {
 	private static final String ERROR_PREFIX = 'Please check the SObject_Trigger_Setting__mdt metadata for the the {0} sObject.';
 	@TestVisible
@@ -32,12 +32,12 @@ global class FormulaFilter {
 	@TestVisible
 	private static final String INVALID_SUBTYPE =
 		ERROR_PREFIX +
-		' The {1} class is specified in the the `Formula_Evaluation_Class_Name__c` field and does not extend the `TriggerRecord` class';
+		' The {1} class is specified in the the `Formula_Evaluation_Class_Name__c` field and does not extend the `TriggerRecord` class.';
 
 	@TestVisible
 	private static final String CLASS_MUST_BE_GLOBAL =
 		ERROR_PREFIX +
-		' The {1} class is specified in the the `Formula_Evaluation_Class_Name__c` field must be global';
+		' The {1} class is specified in the the `Formula_Evaluation_Class_Name__c` field must be global and it must have properties called `record` and `recordPrior`';
 
 	private final Trigger_Action__mdt triggerActionConfiguration;
 	private final TriggerOperation context;
