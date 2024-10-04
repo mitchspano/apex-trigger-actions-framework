@@ -412,42 +412,40 @@ public inherited sharing class MetadataTriggerHandler extends TriggerBase implem
 					triggerAction,
 					triggerMetadata.Apex_Class_Name__c
 				);
-				FormulaFilter.Result filterResult = new FormulaFilter(triggerMetadata, context)
+				FormulaFilter.Result filtered = new FormulaFilter(
+						triggerMetadata,
+						context,
+						this.sObjectName
+					)
 					.filterByEntryCriteria(newList, oldList);
 				switch on context {
 					when BEFORE_INSERT {
 						((TriggerAction.BeforeInsert) triggerAction)
-							.beforeInsert(filterResult.filteredNewList);
+							.beforeInsert(filtered.newList);
 					}
 					when AFTER_INSERT {
 						((TriggerAction.AfterInsert) triggerAction)
-							.afterInsert(filterResult.filteredNewList);
+							.afterInsert(filtered.newList);
 					}
 					when BEFORE_UPDATE {
 						((TriggerAction.BeforeUpdate) triggerAction)
-							.beforeUpdate(
-								filterResult.filteredNewList,
-								filterResult.filteredOldList
-							);
+							.beforeUpdate(filtered.newList, filtered.oldList);
 					}
 					when AFTER_UPDATE {
 						((TriggerAction.AfterUpdate) triggerAction)
-							.afterUpdate(
-								filterResult.filteredNewList,
-								filterResult.filteredOldList
-							);
+							.afterUpdate(filtered.newList, filtered.oldList);
 					}
 					when BEFORE_DELETE {
 						((TriggerAction.BeforeDelete) triggerAction)
-							.beforeDelete(filterResult.filteredOldList);
+							.beforeDelete(filtered.oldList);
 					}
 					when AFTER_DELETE {
 						((TriggerAction.AfterDelete) triggerAction)
-							.afterDelete(filterResult.filteredOldList);
+							.afterDelete(filtered.oldList);
 					}
 					when AFTER_UNDELETE {
 						((TriggerAction.AfterUndelete) triggerAction)
-							.afterUndelete(filterResult.filteredNewList);
+							.afterUndelete(filtered.newList);
 					}
 				}
 			}

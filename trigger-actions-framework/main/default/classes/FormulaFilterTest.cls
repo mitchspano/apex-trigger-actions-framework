@@ -13,9 +13,12 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-@SuppressWarnings('PMD.ApexUnitTestClassShouldHaveRunAs, PMD.AvoidGlobalModifier')
+@SuppressWarnings(
+	'PMD.ApexUnitTestClassShouldHaveRunAs, PMD.AvoidGlobalModifier'
+)
 @IsTest
 global class FormulaFilterTest {
+	private static final String ACCOUNT_SOBJECT_NAME = 'Account';
 	private static List<Account> newList = new List<Account>{
 		new Account(Name = 'Test Account 1'),
 		new Account(Name = 'Test Account 2')
@@ -28,14 +31,15 @@ global class FormulaFilterTest {
 		Formula_Evaluation_Class_Name__c = 'FormulaFilterTest.AccountTriggerRecord'
 	);
 	private static Trigger_Action__mdt configuration = new Trigger_Action__mdt(
-        Before_Update__r = sobjectSetting
-    );
+		Before_Update__r = sobjectSetting
+	);
 
 	@IsTest
 	private static void noFormulaShouldProcessAllRecords() {
 		FormulaFilter filter = new FormulaFilter(
 			configuration,
-			TriggerOperation.BEFORE_UPDATE
+			TriggerOperation.BEFORE_UPDATE,
+			ACCOUNT_SOBJECT_NAME
 		);
 
 		FormulaFilter.Result result = filter.filterByEntryCriteria(
@@ -45,13 +49,40 @@ global class FormulaFilterTest {
 
 		System.assertEquals(
 			2,
-			result.filteredNewList.size(),
-			'The size of filteredNewList should be 2'
+			result.newList.size(),
+			'The size of newList should be 2'
 		);
 		System.assertEquals(
 			2,
-			result.filteredOldList.size(),
-			'The size of filteredNewList should be 2'
+			result.oldList.size(),
+			'The size of oldList should be 2'
+		);
+	}
+
+	@IsTest
+	private static void emptyStringFormulaShouldProcessAllRecords() {
+		configuration.Entry_Criteria__c = '';
+
+		FormulaFilter filter = new FormulaFilter(
+			configuration,
+			TriggerOperation.BEFORE_UPDATE,
+			ACCOUNT_SOBJECT_NAME
+		);
+
+		FormulaFilter.Result result = filter.filterByEntryCriteria(
+			newList,
+			oldList
+		);
+
+		System.assertEquals(
+			2,
+			result.newList.size(),
+			'The size of newList should be 2'
+		);
+		System.assertEquals(
+			2,
+			result.oldList.size(),
+			'The size of newList should be 2'
 		);
 	}
 
@@ -61,7 +92,8 @@ global class FormulaFilterTest {
 
 		FormulaFilter filter = new FormulaFilter(
 			configuration,
-			TriggerOperation.BEFORE_UPDATE
+			TriggerOperation.BEFORE_UPDATE,
+			ACCOUNT_SOBJECT_NAME
 		);
 
 		FormulaFilter.Result result = filter.filterByEntryCriteria(
@@ -71,22 +103,22 @@ global class FormulaFilterTest {
 
 		System.assertEquals(
 			1,
-			result.filteredNewList.size(),
-			'There should be 1 record in filteredNewList'
+			result.newList.size(),
+			'There should be 1 record in newList'
 		);
 		System.Assert.areEqual(
 			'Test Account 1',
-			((Account) result.filteredNewList[0]).Name,
+			((Account) result.newList[0]).Name,
 			'The first record newList should have a name of Test Account 1'
 		);
 		System.assertEquals(
 			1,
-			result.filteredOldList.size(),
-			'There should be 1 record in filteredNewList'
+			result.oldList.size(),
+			'There should be 1 record in newList'
 		);
 		System.Assert.areEqual(
 			'Test Account 1',
-			((Account) result.filteredOldList[0]).Name,
+			((Account) result.oldList[0]).Name,
 			'The first record newList should have a name of Test Account 1'
 		);
 	}
@@ -97,7 +129,8 @@ global class FormulaFilterTest {
 
 		FormulaFilter filter = new FormulaFilter(
 			configuration,
-			TriggerOperation.BEFORE_UPDATE
+			TriggerOperation.BEFORE_UPDATE,
+            ACCOUNT_SOBJECT_NAME
 		);
 
 		FormulaFilter.Result result = filter.filterByEntryCriteria(
@@ -106,14 +139,8 @@ global class FormulaFilterTest {
 		);
 
 		System.Assert.isNotNull(result, 'result should not be null');
-		System.Assert.isTrue(
-			result.filteredNewList.isEmpty(),
-			'filteredNewList should be empty'
-		);
-		System.Assert.isTrue(
-			result.filteredOldList.isEmpty(),
-			'filteredOldList should be empty'
-		);
+		System.Assert.isTrue(result.newList.isEmpty(), 'newList should be empty');
+		System.Assert.isTrue(result.oldList.isEmpty(), 'oldList should be empty');
 	}
 
 	@SuppressWarnings('PMD.ApexDoc')

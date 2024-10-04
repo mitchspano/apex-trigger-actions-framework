@@ -18,29 +18,41 @@
  * @description The `FormulaFilter` class provides functionality to filter lists of SObjects based on a configurable
  * entry criteria formula defined within a `Trigger_Action__mdt` configuration row.
  */
+@SuppressWarnings('PMD.AvoidGlobalModifier')
 global class FormulaFilter {
-	private String entryCriteriaFormula;
-	private System.Type typeToEvaluate;
-	private FormulaEval.FormulaInstance fx;
+	private static final String ERROR_PREFIX = 'Please check the SObject_Trigger_Setting__mdt metadata for the the {0} sObject.';
+	private static final String MISSING_CLASS_NAME =
+		ERROR_PREFIX +
+		' The record is missing the `Formula_Evaluation_Class_Name__c` field.';
+	private static final String INVALID_CLASS =
+		ERROR_PREFIX +
+		' There is no such class named {1} which is currently the value specified in the the `Formula_Evaluation_Class_Name__c` field.';
+	private static final String INVALID_SUBTYPE =
+		ERROR_PREFIX +
+		' The {1} class is specified in the the `Formula_Evaluation_Class_Name__c` field and does not extend the `TriggerRecord` class';
+
+	private static final String CLASS_MUST_BE_GLOBAL =
+		ERROR_PREFIX +
+		' The {1} class is specified in the the `Formula_Evaluation_Class_Name__c` field must be global';
+
+	private final Trigger_Action__mdt triggerActionConfiguration;
+	private final TriggerOperation context;
+	private final String sObjectName;
 
 	/**
 	 * @description Constructs a new `FormulaFilter` instance with the specified trigger action configuration.
 	 * @param triggerActionConfiguration The trigger action configuration containing the entry criteria formula.
 	 * @param context The trigger operation context.
+	 * @param sObjectName The name of the sObject.
 	 */
 	public FormulaFilter(
 		Trigger_Action__mdt triggerActionConfiguration,
-		TriggerOperation context
+		TriggerOperation context,
+		String sObjectName
 	) {
-		this.entryCriteriaFormula = triggerActionConfiguration?.Entry_Criteria__c;
-		if (this.entryCriteriaFormula != null) {
-			String nameOfTypeToEvaluate = this.getNameOfType(
-				triggerActionConfiguration,
-				context
-			);
-			this.typeToEvaluate = Type.forName(nameOfTypeToEvaluate);
-			this.setFormulaInstance();
-		}
+		this.triggerActionConfiguration = triggerActionConfiguration;
+		this.context = context;
+		this.sObjectName = sObjectName;
 	}
 
 	/**
@@ -58,48 +70,111 @@ global class FormulaFilter {
 		List<SObject> oldList
 	) {
 		FormulaFilter.Result result = new FormulaFilter.Result();
-		if (this.entryCriteriaFormula == null) {
-			result.filteredNewList = newList;
-			result.filteredOldList = oldList;
+		String entryCriteriaFormula = this.triggerActionConfiguration
+			?.Entry_Criteria__c;
+
+		if (String.isBlank(entryCriteriaFormula)) {
+			result.newList = newList;
+			result.oldList = oldList;
 			return result;
 		}
-		List<SObject> filteredNewList = new List<SObject>();
-		List<SObject> filteredOldList = new List<SObject>();
+		String nameOfType = getNameOfType(
+			this.triggerActionConfiguration,
+			this.context
+		);
+		System.Type triggerRecordSubType = getType(nameOfType);
+		FormulaEval.FormulaInstance fx = getFormulaInstance(
+			triggerRecordSubType,
+			entryCriteriaFormula,
+			nameOfType
+		);
+
 		Integer size = newList != null ? newList.size() : oldList.size();
 		for (Integer i = 0; i < size; i++) {
 			SObject record = newList?.get(i);
 			SObject recordPrior = oldList?.get(i);
-			TriggerRecord toProcess = (TriggerRecord) (this.typeToEvaluate.newInstance());
+			TriggerRecord toProcess = getTriggerRecord(
+				triggerRecordSubType,
+				nameOfType
+			);
 			toProcess.newSobject = record;
 			toProcess.oldSobject = recordPrior;
-			if ((Boolean) this.fx.evaluate(toProcess)) {
-				filteredNewList.add(record);
-				filteredOldList.add(recordPrior);
+			if ((Boolean) fx.evaluate(toProcess)) {
+				result.newList.add(record);
+				result.oldList.add(recordPrior);
 			}
 		}
-		result.filteredNewList = filteredNewList;
-		result.filteredOldList = filteredOldList;
 		return result;
 	}
 
-	private void setFormulaInstance() {
-		this.fx = Formula.builder()
-			.withReturnType(FormulaEval.FormulaReturnType.Boolean)
-			.withGlobalVariables(FormulaEval.FormulaGlobal.values())
-			.withType(this.typeToEvaluate)
-			.withFormula(this.entryCriteriaFormula)
-			.build();
+	private System.Type getType(String className) {
+		if (String.isBlank(className)) {
+			throw new IllegalArgumentException(
+				String.format(MISSING_CLASS_NAME, new List<String>{ this.sObjectName })
+			);
+		}
+		System.Type response = System.Type.forName(className);
+		if (response == null) {
+			throw new IllegalArgumentException(
+				String.format(
+					INVALID_CLASS,
+					new List<String>{ this.sObjectName, className }
+				)
+			);
+		}
+		return response;
+	}
+
+	private TriggerRecord getTriggerRecord(
+		System.Type triggerRecordSubType,
+		String nameOfType
+	) {
+		TriggerRecord dynamicInstance;
+		try {
+			dynamicInstance = (TriggerRecord) triggerRecordSubType.newInstance();
+		} catch (System.TypeException e) {
+			throw new IllegalArgumentException(
+				String.format(
+					INVALID_SUBTYPE,
+					new List<String>{ this.sObjectName, nameOfType }
+				)
+			);
+		}
+		return dynamicInstance;
+	}
+
+	private FormulaEval.FormulaInstance getFormulaInstance(
+		System.Type typeToEvaluate,
+		String entryCriteriaFormula,
+		String nameOfType
+	) {
+		FormulaEval.FormulaInstance fx;
+		try {
+			fx = Formula.builder()
+				.withReturnType(FormulaEval.FormulaReturnType.Boolean)
+				.withGlobalVariables(FormulaEval.FormulaGlobal.values())
+				.withType(typeToEvaluate)
+				.withFormula(entryCriteriaFormula)
+				.build();
+		} catch (System.FormulaValidationException e) {
+			throw new IllegalArgumentException(
+				String.format(
+					CLASS_MUST_BE_GLOBAL,
+					new List<String>{ this.sObjectName, nameOfType }
+				)
+			);
+		}
+		return fx;
 	}
 
 	private String getNameOfType(
 		Trigger_Action__mdt triggerActionConfiguration,
 		TriggerOperation context
 	) {
-		String triggerOperation = context.name();
-		sObject_Trigger_Setting__mdt triggerSetting = (sObject_Trigger_Setting__mdt) triggerActionConfiguration.getSObject(
-			triggerOperation + '__r'
-		);
-		return triggerSetting.Formula_Evaluation_Class_Name__c;
+		return ((sObject_Trigger_Setting__mdt) this.triggerActionConfiguration.getSObject(
+				this.context.name() + '__r'
+			))
+			?.Formula_Evaluation_Class_Name__c;
 	}
 
 	/**
@@ -109,10 +184,15 @@ global class FormulaFilter {
 		/**
 		 * @description The filtered list of new SObjects.
 		 */
-		public List<SObject> filteredNewList;
+		public List<SObject> newList;
 		/**
 		 * @description The filtered list of old SObjects.
 		 */
-		public List<SObject> filteredOldList;
+		public List<SObject> oldList;
+
+		private Result() {
+			this.newList = new List<SObject>();
+			this.oldList = new List<SObject>();
+		}
 	}
 }
