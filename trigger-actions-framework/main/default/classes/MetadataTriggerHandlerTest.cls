@@ -737,6 +737,26 @@ private class MetadataTriggerHandlerTest {
 		System.Assert.areEqual(null, myException, EXCEPTION_SHOULD_NOT_BE_THROWN);
 	}
 
+	@IsTest
+	private static void actionShouldFallbackIfBadNamespace() {
+		// Invalid namespace is the same as a missing one.
+		// Can't have mixed namespace unit tests so using invalid to trigger the same fallback behavior
+		handler.beforeInsertActionMetadata = new List<Trigger_Action__mdt>{
+			new Trigger_Action__mdt(
+				Apex_Class_Namespace__c = 'NOT_A_NAMEPACE',
+				Apex_Class_Name__c = TEST_BEFORE_INSERT,
+				Before_Insert__r = setting,
+				Before_Insert__c = setting.Id,
+				Order__c = 1,
+				Bypass_Execution__c = false
+			)
+		};
+
+		handler.beforeInsert(handler.triggerNew);
+
+		System.Assert.isTrue(executed, ACTION_SHOULD_EXECUTE);
+	}
+
 	public class TestBeforeInsert implements TriggerAction.BeforeInsert {
 		public void beforeInsert(List<SObject> newList) {
 			MetadataTriggerHandlerTest.executed = true;
