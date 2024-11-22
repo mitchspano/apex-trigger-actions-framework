@@ -111,8 +111,6 @@ public inherited sharing class MetadataTriggerHandler extends TriggerBase implem
 	private static Set<String> bypassedActions = new Set<String>();
 	@TestVisible
 	private static Selector selector = new Selector();
-	@TestVisible
-	private static Map<String, Boolean> permissionMap = new Map<String, Boolean>();
 	private static Map<String, Map<String, List<Trigger_Action__mdt>>> sObjectToContextToActions = new Map<String, Map<String, List<Trigger_Action__mdt>>>();
 	@TestVisible
 	private static FinalizerHandler finalizerHandler = new FinalizerHandler();
@@ -228,20 +226,6 @@ public inherited sharing class MetadataTriggerHandler extends TriggerBase implem
 	}
 
 	/**
-	 * @description Populate the permission map.
-	 *
-	 * @param permissionName The name of the permission to check.
-	 */
-	private void populatePermissionMap(String permissionName) {
-		if (permissionName != null && !permissionMap.containsKey(permissionName)) {
-			permissionMap.put(
-				permissionName,
-				FeatureManagement.checkPermission(permissionName)
-			);
-		}
-	}
-
-	/**
 	 * @description Get the Trigger Action metadata.
 	 *
 	 * @param relationshipName The name of the relationship to get the metadata for.
@@ -313,38 +297,12 @@ public inherited sharing class MetadataTriggerHandler extends TriggerBase implem
 				relationshipName + RELATIONSHIP_SUFFIX
 			))
 			.get(sObject_Trigger_Setting__mdt.Required_Permission__c);
-		for (
-			String permissionName : new List<String>{
-				actionMetadata.Bypass_Permission__c,
-				actionMetadata.Required_Permission__c,
-				sObjectBypassPermissionName,
-				sObjectRequiredPermissionName
-			}
-		) {
-			populatePermissionMap(permissionName);
-		}
 
-		return isNotBypassed(
+		return ActionUtility.isNotBypassed(
 				actionMetadata.Bypass_Permission__c,
 				actionMetadata.Required_Permission__c
 			) &&
-			isNotBypassed(sObjectBypassPermissionName, sObjectRequiredPermissionName);
-	}
-
-	/**
-	 * @description Check if the Trigger Action is not bypassed.
-	 *
-	 * @param requiredPermission The required permission for the Trigger Action.
-	 * @param bypassPermission The bypass permission for the Trigger Action.
-	 * @return True if the Trigger Action is not bypassed, false otherwise.
-	 */
-	private static boolean isNotBypassed(
-		String requiredPermission,
-		String bypassPermission
-	) {
-		return !((requiredPermission != null &&
-		permissionMap.get(requiredPermission)) ||
-		(bypassPermission != null && !permissionMap.get(bypassPermission)));
+			ActionUtility.isNotBypassed(sObjectBypassPermissionName, sObjectRequiredPermissionName);
 	}
 
 	/**
@@ -387,8 +345,7 @@ public inherited sharing class MetadataTriggerHandler extends TriggerBase implem
 		for (Trigger_Action__mdt triggerMetadata : actionMetadata) {
 			Object triggerAction;
 			try {
-				triggerAction = Type.forName(triggerMetadata.Apex_Class_Name__c)
-					.newInstance();
+				triggerAction = ActionUtility.getActionInstance(triggerMetadata.Apex_Class_Name__c);
 				if (triggerMetadata.Flow_Name__c != null) {
 					((TriggerActionFlow) triggerAction)
 						.flowName = triggerMetadata.Flow_Name__c;
