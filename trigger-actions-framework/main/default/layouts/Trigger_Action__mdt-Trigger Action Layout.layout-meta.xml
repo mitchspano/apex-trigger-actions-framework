@@ -34,6 +34,10 @@
         <label>Trigger Action Information</label>
         <layoutColumns>
             <layoutItems>
+                <behavior>Edit</behavior>
+                <field>Apex_Class_Namespace__c</field>
+            </layoutItems>
+            <layoutItems>
                 <behavior>Required</behavior>
                 <field>Apex_Class_Name__c</field>
             </layoutItems>
