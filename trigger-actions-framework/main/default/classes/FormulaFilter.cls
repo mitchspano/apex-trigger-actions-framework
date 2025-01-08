@@ -35,8 +35,8 @@ global class FormulaFilter {
 		' The {1} class is specified in the the `TriggerRecord_Class_Name__c` field must be global and it must have properties called `record` and `recordPrior` and it must extend the `TriggerRecord` class.';
 	@TestVisible
 	private static final String INVALID_FILTER =
-		'Something is wrong with the filter on the `Trigger_Action__mdt` record with DeveloperName = \'{0}\' on the  {1} sObject.' +
-		' It could be the case that the {2} class is specified in the the `TriggerRecord_Class_Name__c` referenced on the `SObject_Trigger_Setting__mdt` is not global,' +
+		'Something is wrong with the filter on the `Trigger_Action__mdt` record with DeveloperName = {0} on the  {1} sObject.' +
+		' It could be the case that the {2} class which is specified in the the `TriggerRecord_Class_Name__c` referenced on the `SObject_Trigger_Setting__mdt` is not global,' +
 		' or it could be that the formula is syntactically invalid : `{3}`';
 
 	private final Trigger_Action__mdt triggerActionConfiguration;

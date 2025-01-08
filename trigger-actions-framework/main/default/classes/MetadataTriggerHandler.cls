@@ -86,6 +86,7 @@ public inherited sharing class MetadataTriggerHandler extends TriggerBase implem
 	private static final String QUERY_TEMPLATE = String.join(
 		new List<String>{
 			'SELECT Apex_Class_Name__c,',
+			'DeveloperName,',
 			'Order__c,',
 			'Flow_Name__c,',
 			'Bypass_Permission__c,',
