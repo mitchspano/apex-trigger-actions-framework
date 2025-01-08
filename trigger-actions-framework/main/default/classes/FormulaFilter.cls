@@ -20,7 +20,7 @@
  */
 @SuppressWarnings('PMD.AvoidGlobalModifier, PMD.FieldsSortedAlphabetically')
 global class FormulaFilter {
-	private static final String ERROR_PREFIX = 'Please check the SObject_Trigger_Setting__mdt metadata for the the {0} sObject.';
+	private static final String ERROR_PREFIX = 'Please check the `SObject_Trigger_Setting__mdt` metadata for the the {0} sObject.';
 	@TestVisible
 	private static final String MISSING_CLASS_NAME =
 		ERROR_PREFIX +
@@ -33,6 +33,11 @@ global class FormulaFilter {
 	private static final String INVALID_SUBTYPE =
 		ERROR_PREFIX +
 		' The {1} class is specified in the the `TriggerRecord_Class_Name__c` field must be global and it must have properties called `record` and `recordPrior` and it must extend the `TriggerRecord` class.';
+	@TestVisible
+	private static final String INVALID_FILTER =
+		'Something is wrong with the filter on the `Trigger_Action__mdt` record with DeveloperName = \'{0}\' on the  {1} sObject.' +
+		' It could be the case that the {2} class is specified in the the `TriggerRecord_Class_Name__c` referenced on the `SObject_Trigger_Setting__mdt` is not global,' +
+		' or it could be that the formula is syntactically invalid : `{3}`';
 
 	private final Trigger_Action__mdt triggerActionConfiguration;
 	private final TriggerOperation context;
@@ -158,8 +163,13 @@ global class FormulaFilter {
 		} catch (System.FormulaValidationException e) {
 			throw new IllegalArgumentException(
 				String.format(
-					INVALID_SUBTYPE,
-					new List<String>{ this.sObjectName, nameOfType }
+					INVALID_FILTER,
+					new List<String>{
+						this.triggerActionConfiguration.DeveloperName,
+						this.sObjectName,
+						nameOfType,
+						entryCriteriaFormula
+					}
 				)
 			);
 		}

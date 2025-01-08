@@ -359,97 +359,146 @@ public inherited sharing class MetadataTriggerHandler extends TriggerBase implem
 		List<SObject> newList,
 		List<SObject> oldList
 	) {
-		List<Trigger_Action__mdt> actionMetadata;
+		for (Trigger_Action__mdt triggerMetadata : getActionMetadata(context)) {
+			Object triggerAction = getTriggerActionObject(context, triggerMetadata);
+			if (!canExecute(triggerMetadata)) {
+				continue;
+			}
+			this.validateType(
+				context,
+				triggerAction,
+				triggerMetadata.Apex_Class_Name__c
+			);
+			FormulaFilter.Result filtered = new FormulaFilter(
+					triggerMetadata,
+					context,
+					this.sObjectName
+				)
+				.filterByEntryCriteria(newList, oldList);
 
+			if (
+				Math.max(
+					(filtered.oldList == null) ? 0 : filtered.oldList.size(),
+					(filtered.newList == null) ? 0 : filtered.newList.size()
+				) == 0
+			) {
+				continue;
+			}
+
+			switch on context {
+				when BEFORE_INSERT {
+					((TriggerAction.BeforeInsert) triggerAction)
+						.beforeInsert(filtered.newList);
+				}
+				when AFTER_INSERT {
+					((TriggerAction.AfterInsert) triggerAction)
+						.afterInsert(filtered.newList);
+				}
+				when BEFORE_UPDATE {
+					((TriggerAction.BeforeUpdate) triggerAction)
+						.beforeUpdate(filtered.newList, filtered.oldList);
+				}
+				when AFTER_UPDATE {
+					((TriggerAction.AfterUpdate) triggerAction)
+						.afterUpdate(filtered.newList, filtered.oldList);
+				}
+				when BEFORE_DELETE {
+					((TriggerAction.BeforeDelete) triggerAction)
+						.beforeDelete(filtered.oldList);
+				}
+				when AFTER_DELETE {
+					((TriggerAction.AfterDelete) triggerAction)
+						.afterDelete(filtered.oldList);
+				}
+				when AFTER_UNDELETE {
+					((TriggerAction.AfterUndelete) triggerAction)
+						.afterUndelete(filtered.newList);
+				}
+			}
+		}
+	}
+
+	/**
+	 * @description Retrieves the Trigger Action metadata based on the provided TriggerOperation context.
+	 * This method uses a switch statement to determine the appropriate metadata list based on the context.
+	 *
+	 * @param context The TriggerOperation context for which to retrieve metadata.
+	 * @return A List of Trigger_Action__mdt metadata records corresponding to the given context.
+	 */
+	private List<Trigger_Action__mdt> getActionMetadata(
+		TriggerOperation context
+	) {
+		List<Trigger_Action__mdt> result;
 		switch on context {
 			when BEFORE_INSERT {
-				actionMetadata = this.beforeInsertActionMetadata;
+				result = this.beforeInsertActionMetadata;
 			}
 			when AFTER_INSERT {
-				actionMetadata = this.afterInsertActionMetadata;
+				result = this.afterInsertActionMetadata;
 			}
 			when BEFORE_UPDATE {
-				actionMetadata = this.beforeUpdateActionMetadata;
+				result = this.beforeUpdateActionMetadata;
 			}
 			when AFTER_UPDATE {
-				actionMetadata = this.afterUpdateActionMetadata;
+				result = this.afterUpdateActionMetadata;
 			}
 			when BEFORE_DELETE {
-				actionMetadata = this.beforeDeleteActionMetadata;
+				result = this.beforeDeleteActionMetadata;
 			}
 			when AFTER_DELETE {
-				actionMetadata = this.afterDeleteActionMetadata;
+				result = this.afterDeleteActionMetadata;
 			}
 			when AFTER_UNDELETE {
-				actionMetadata = this.afterUndeleteActionMetadata;
+				result = this.afterUndeleteActionMetadata;
 			}
 		}
-		for (Trigger_Action__mdt triggerMetadata : actionMetadata) {
-			Object triggerAction;
-			try {
-				triggerAction = Type.forName(triggerMetadata.Apex_Class_Name__c)
-					.newInstance();
-				if (triggerMetadata.Flow_Name__c != null) {
-					((TriggerActionFlow) triggerAction)
-						.flowName = triggerMetadata.Flow_Name__c;
-					((TriggerActionFlow) triggerAction)
-						.allowRecursion = triggerMetadata.Allow_Flow_Recursion__c;
-				}
-			} catch (System.NullPointerException e) {
-				handleException(
-					INVALID_CLASS_ERROR,
-					triggerMetadata.Apex_Class_Name__c,
-					context
-				);
+		return result;
+	}
+
+	/**
+	 * @description Gets the trigger action object based on the trigger metadata.
+	 * This method attempts to create a new instance of the Apex class specified in the trigger metadata.
+	 * If the metadata specifies a flow name, it also sets the flow name and recursion allowance on the resulting object.
+	 * If the specified Apex class does not exist or cannot be instantiated, a MetadataTriggerHandlerException is thrown.
+	 *
+	 * @param context The TriggerOperation context.
+	 * @param triggerMetadata The metadata for the trigger action.
+	 * @return An instance of the trigger action class, or null if the class does not exist.
+	 */
+	private Object getTriggerActionObject(
+		TriggerOperation context,
+		Trigger_Action__mdt triggerMetadata
+	) {
+		Object result;
+		try {
+			result = Type.forName(triggerMetadata.Apex_Class_Name__c).newInstance();
+			if (triggerMetadata.Flow_Name__c != null) {
+				((TriggerActionFlow) result).flowName = triggerMetadata.Flow_Name__c;
+				((TriggerActionFlow) result)
+					.allowRecursion = triggerMetadata.Allow_Flow_Recursion__c;
 			}
-			if (
-				!MetadataTriggerHandler.isBypassed(
-					triggerMetadata.Apex_Class_Name__c
-				) && !TriggerBase.isBypassed(this.sObjectName)
-			) {
-				this.validateType(
-					context,
-					triggerAction,
-					triggerMetadata.Apex_Class_Name__c
-				);
-				FormulaFilter.Result filtered = new FormulaFilter(
-						triggerMetadata,
-						context,
-						this.sObjectName
-					)
-					.filterByEntryCriteria(newList, oldList);
-				switch on context {
-					when BEFORE_INSERT {
-						((TriggerAction.BeforeInsert) triggerAction)
-							.beforeInsert(filtered.newList);
-					}
-					when AFTER_INSERT {
-						((TriggerAction.AfterInsert) triggerAction)
-							.afterInsert(filtered.newList);
-					}
-					when BEFORE_UPDATE {
-						((TriggerAction.BeforeUpdate) triggerAction)
-							.beforeUpdate(filtered.newList, filtered.oldList);
-					}
-					when AFTER_UPDATE {
-						((TriggerAction.AfterUpdate) triggerAction)
-							.afterUpdate(filtered.newList, filtered.oldList);
-					}
-					when BEFORE_DELETE {
-						((TriggerAction.BeforeDelete) triggerAction)
-							.beforeDelete(filtered.oldList);
-					}
-					when AFTER_DELETE {
-						((TriggerAction.AfterDelete) triggerAction)
-							.afterDelete(filtered.oldList);
-					}
-					when AFTER_UNDELETE {
-						((TriggerAction.AfterUndelete) triggerAction)
-							.afterUndelete(filtered.newList);
-					}
-				}
-			}
+		} catch (System.NullPointerException e) {
+			handleException(
+				INVALID_CLASS_ERROR,
+				triggerMetadata.Apex_Class_Name__c,
+				context
+			);
 		}
+		return result;
+	}
+
+	/**
+	 * @description Checks if the trigger action can be executed.
+	 * The action can execute if it is not bypassed specifically by its class name
+	 * and the entire trigger handler is not bypassed for the current sObject.
+	 *
+	 * @param triggerMetadata The metadata for the trigger action.
+	 * @return True if the trigger action can be executed, false otherwise.
+	 */
+	private Boolean canExecute(Trigger_Action__mdt triggerMetadata) {
+		return !MetadataTriggerHandler.isBypassed(
+				triggerMetadata.Apex_Class_Name__c
+			) && !TriggerBase.isBypassed(this.sObjectName);
 	}
 
 	/**
