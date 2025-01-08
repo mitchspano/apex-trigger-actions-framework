@@ -31,10 +31,6 @@
  * - `DmlFinalizer`: This interface defines the logic that should be executed after all DML operations have completed.
  * ---
  * To implement a Trigger Action, you must create a class that implements one or more of the `TriggerAction` interfaces.
- * The class must also be annotated with the `@AuraEnabled` annotation.
- *
- * Once you have created a Trigger Action class, you can register it with the `TriggerActionRegistry` class.
- * The `TriggerActionRegistry` class is responsible for managing the execution of Trigger Actions.
  */
 @SuppressWarnings('PMD.CyclomaticComplexity')
 public class TriggerAction {

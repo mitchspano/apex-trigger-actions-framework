@@ -31,6 +31,7 @@ global class FormulaFilterTest {
 		TriggerRecord_Class_Name__c = 'FormulaFilterTest.AccountTriggerRecord'
 	);
 	private static Trigger_Action__mdt configuration = new Trigger_Action__mdt(
+		DeveloperName = 'TA_Test',
 		Before_Update__r = sobjectSetting
 	);
 	private static IllegalArgumentException caught;
@@ -208,10 +209,12 @@ global class FormulaFilterTest {
 		}
 		Assert.areEqual(
 			String.format(
-				FormulaFilter.INVALID_SUBTYPE,
+				FormulaFilter.INVALID_FILTER,
 				new List<String>{
+					configuration.DeveloperName,
 					ACCOUNT_SOBJECT_NAME,
-					sobjectSetting.TriggerRecord_Class_Name__c
+					sobjectSetting.TriggerRecord_Class_Name__c,
+					configuration.Entry_Criteria__c
 				}
 			),
 			caught.getMessage(),
@@ -266,6 +269,35 @@ global class FormulaFilterTest {
 				new List<String>{
 					ACCOUNT_SOBJECT_NAME,
 					sobjectSetting.TriggerRecord_Class_Name__c
+				}
+			),
+			caught.getMessage(),
+			'The exception message should match the expected error'
+		);
+	}
+
+	@IsTest
+	private static void invalidFormulaSyntaxShouldThrowException() {
+		String fx = 'This will not compile!!!';
+		configuration.Entry_Criteria__c = fx;
+		FormulaFilter filter = new FormulaFilter(
+			configuration,
+			TriggerOperation.BEFORE_UPDATE,
+			ACCOUNT_SOBJECT_NAME
+		);
+		try {
+			filter.filterByEntryCriteria(newList, oldList);
+		} catch (IllegalArgumentException e) {
+			caught = e;
+		}
+		Assert.areEqual(
+			String.format(
+				FormulaFilter.INVALID_FILTER,
+				new List<String>{
+					configuration.DeveloperName,
+					ACCOUNT_SOBJECT_NAME,
+					sobjectSetting.TriggerRecord_Class_Name__c,
+					fx
 				}
 			),
 			caught.getMessage(),
