@@ -1,14 +1,15 @@
 {
-  "trailingComma": "none",
-  "useTabs": true,
-  "overrides": [
-    {
-      "files": "**/lwc/**/*.html",
-      "options": { "parser": "lwc" }
-    },
-    {
-      "files": "*.{cmp,page,component}",
-      "options": { "parser": "html" }
-    }
-  ]
+	"plugins": ["prettier-plugin-apex"],
+	"trailingComma": "none",
+	"useTabs": true,
+	"overrides": [
+		{
+			"files": "**/lwc/**/*.html",
+			"options": { "parser": "lwc" }
+		},
+		{
+			"files": "*.{cmp,page,component}",
+			"options": { "parser": "html" }
+		}
+	]
 }

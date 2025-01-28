@@ -325,27 +325,26 @@ public inherited sharing class MetadataTriggerHandler extends TriggerBase implem
 			populatePermissionMap(permissionName);
 		}
 
-		return isNotBypassed(
+		return !isBypassed(
 				actionMetadata.Bypass_Permission__c,
 				actionMetadata.Required_Permission__c
 			) &&
-			isNotBypassed(sObjectBypassPermissionName, sObjectRequiredPermissionName);
+			!isBypassed(sObjectBypassPermissionName, sObjectRequiredPermissionName);
 	}
 
 	/**
-	 * @description Check if the Trigger Action is not bypassed.
+	 * @description Check if the Trigger Action or SObject is bypassed.
 	 *
-	 * @param requiredPermission The required permission for the Trigger Action.
 	 * @param bypassPermission The bypass permission for the Trigger Action.
-	 * @return True if the Trigger Action is not bypassed, false otherwise.
+	 * @param requiredPermission The required permission for the Trigger Action.
+	 * @return True if bypassed, false otherwise.
 	 */
-	private static boolean isNotBypassed(
-		String requiredPermission,
-		String bypassPermission
+	private static boolean isBypassed(
+		String bypassPermission,
+		String requiredPermission
 	) {
-		return !((requiredPermission != null &&
-		permissionMap.get(requiredPermission)) ||
-		(bypassPermission != null && !permissionMap.get(bypassPermission)));
+		return (bypassPermission != null && permissionMap.get(bypassPermission)) ||
+			(requiredPermission != null && !permissionMap.get(requiredPermission));
 	}
 
 	/**
