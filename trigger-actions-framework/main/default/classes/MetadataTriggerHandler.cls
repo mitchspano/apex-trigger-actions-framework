@@ -326,10 +326,10 @@ public inherited sharing class MetadataTriggerHandler extends TriggerBase implem
 		}
 
 		return isNotBypassed(
-				actionMetadata.Bypass_Permission__c,
-				actionMetadata.Required_Permission__c
+				actionMetadata.Required_Permission__c,
+				actionMetadata.Bypass_Permission__c
 			) &&
-			isNotBypassed(sObjectBypassPermissionName, sObjectRequiredPermissionName);
+			isNotBypassed(sObjectRequiredPermissionName, sObjectBypassPermissionName);
 	}
 
 	/**
@@ -343,9 +343,8 @@ public inherited sharing class MetadataTriggerHandler extends TriggerBase implem
 		String requiredPermission,
 		String bypassPermission
 	) {
-		return !((requiredPermission != null &&
-		permissionMap.get(requiredPermission)) ||
-		(bypassPermission != null && !permissionMap.get(bypassPermission)));
+		return (requiredPermission == null || permissionMap.get(requiredPermission))
+			&& !(bypassPermission != null && permissionMap.get(bypassPermission));
 	}
 
 	/**
