@@ -139,9 +139,9 @@ Create a trigger action record with `Apex_Class_Name__c` equal to `TriggerAction
 Individual trigger actions can have their own dynamic entry criteria defined in a simple formula.
 This is a new feature and is built using the [`FormulaEval` namespace](https://developer.salesforce.com/docs/atlas.en-us.apexref.meta/apexref/apex_namespace_formulaeval.htm) within Apex.
 
-#### [Entry Criteria Beta Package Installation (Production)](https://login.salesforce.com/packaging/installPackage.apexp?p0=04tKY000000Pd9AYAS)
+#### [Entry Criteria Beta Package Installation (Production)](https://login.salesforce.com/packaging/installPackage.apexp?p0=08cKY000000XZBUYA4)
 
-#### [Entry Criteria Beta Package Installation (Sandbox)](https://test.salesforce.com/packaging/installPackage.apexp?p0=04tKY000000Pd9AYAS)
+#### [Entry Criteria Beta Package Installation (Sandbox)](https://test.salesforce.com/packaging/installPackage.apexp?p0=08cKY000000XZBUYA4)
 
 ### SObject Setup
 

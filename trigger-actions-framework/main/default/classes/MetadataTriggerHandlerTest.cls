@@ -529,6 +529,17 @@ private class MetadataTriggerHandlerTest {
 	}
 
 	@IsTest
+	private static void nothingToProcessShouldExitEarly() {
+		handler.beforeInsertActionMetadata = new List<Trigger_Action__mdt>{
+			action
+		};
+
+		handler.beforeInsert(new List<Account>());
+
+		System.Assert.isFalse(executed, ACTION_SHOULD_NOT_EXECUTE);
+	}
+
+	@IsTest
 	private static void finalizerShouldSucceed() {
 		MetadataTriggerHandler.finalizerHandler = new TestFinalizerHandler();
 
