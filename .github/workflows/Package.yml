@@ -34,4 +34,4 @@ jobs:
       - name: Create package version
         id: create
         run: |
-          sf package version create --definition-file config/project-scratch-def.json --package "Trigger Actions Framework" --package-version ${{ inputs.packageVersion }} --tag ${{ github.sha }} --wait 120 --code-coverage --installation-key-bypass --json
+          sf package version create --definition-file config/project-scratch-def.json --package "Trigger Actions Framework" --version-number ${{ inputs.packageVersion }} --tag ${{ github.sha }} --wait 120 --code-coverage --installation-key-bypass --json
