@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  workflow_dispatch:
+    inputs:
+      packageVersion:
+        required: true
+        type: string
+    outputs:
+      packageId:
+        description: 04t package version id created
+        value: ${{ jobs.create-package-version.outputs.packageId }}
+
+jobs:
+  create-package-version:
+    runs-on: ubuntu-latest
+    outputs:
+      packageId: ${{ steps.create.outputs.packageId }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ">=20"
+          cache: "npm"
+
+      - name: Install sf cli
+        run: |
+          npm install --global @salesforce/cli
+
+      - name: Authenticate into DevHub
+        run: |
+          echo "${SALESFORCE_JWT_SECRET_KEY}" > server.key
+          sf org login jwt --client-id ${{ secrets.SALESFORCE_CONSUMER_KEY }} --jwt-key-file server.key --username ${{ secrets.SALESFORCE_DEVHUB_USERNAME}} --set-default-dev-hub --alias devhub
+        env:
+          SALESFORCE_JWT_SECRET_KEY: ${{ secrets.SALESFORCE_JWT_SECRET_KEY }}
+
+      - name: Create package version
+        id: create
+        run: |
+          packageId=$(sf package version create --definition-file config/project-scratch-def.json --package "Trigger Actions Framework" --package-version ${{ inputs.packageVersion }} --tag ${{ github.sha }} --wait 120 --code-coverage --installation-key-bypass --json | jq -e -r ".result.SubscriberPackageVersionId")
+          echo "packageId=$packageId" >> $GITHUB_OUTPUT
