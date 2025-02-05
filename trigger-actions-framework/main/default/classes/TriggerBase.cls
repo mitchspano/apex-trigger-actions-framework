@@ -290,7 +290,7 @@ public inherited sharing virtual class TriggerBase {
 	}
 
 	@TestVisible
-	private virtual Integer getDmlRows() {
+	protected virtual Integer getDmlRows() {
 		return Limits.getDmlRows();
 	}
 
