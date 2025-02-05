@@ -6,10 +6,6 @@ on:
       packageVersion:
         required: true
         type: string
-    outputs:
-      packageId:
-        description: 04t package version id created
-        value: ${{ jobs.create-package-version.outputs.packageId }}
 
 jobs:
   create-package-version:
@@ -40,4 +36,4 @@ jobs:
         id: create
         run: |
           packageId=$(sf package version create --definition-file config/project-scratch-def.json --package "Trigger Actions Framework" --package-version ${{ inputs.packageVersion }} --tag ${{ github.sha }} --wait 120 --code-coverage --installation-key-bypass --json | jq -e -r ".result.SubscriberPackageVersionId")
-          echo "packageId=$packageId" >> $GITHUB_OUTPUT
+          echo "packageId=$packageId"
