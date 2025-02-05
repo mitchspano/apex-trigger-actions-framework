@@ -471,7 +471,7 @@ private class TriggerBaseTest {
 			super.finalizeDmlOperation();
 			finalized = true;
 		}
-		private override Integer getDmlRows() {
+		protected override Integer getDmlRows() {
 			if (dmlRows != null) {
 				return dmlRows;
 			}
