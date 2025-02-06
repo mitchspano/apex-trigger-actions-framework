@@ -1,166 +1,271 @@
-# virtual TriggerActionFlow
+# TriggerActionFlow Class
+`virtual`
 
 `SUPPRESSWARNINGS`
 
-This class implements the TriggerAction interface and provides a framework for
+This class implements the TriggerAction interface and provides a framework for 
 executing Flows before or after the insert, update, delete, or undelete of records.
-
-
-**Implemented types**
-
-[TriggerAction.BeforeInsert](TriggerAction.BeforeInsert)
-, 
-[TriggerAction.AfterInsert](TriggerAction.AfterInsert)
-, 
-[TriggerAction.BeforeUpdate](TriggerAction.BeforeUpdate)
-, 
-[TriggerAction.AfterUpdate](TriggerAction.AfterUpdate)
-, 
-[TriggerAction.BeforeDelete](TriggerAction.BeforeDelete)
-, 
-[TriggerAction.AfterDelete](TriggerAction.AfterDelete)
-, 
-[TriggerAction.AfterUndelete](TriggerAction.AfterUndelete)
-
 
 **Group** Trigger Actions Framework
 
+**Implements**
+
+TriggerAction.BeforeInsert, 
+TriggerAction.AfterInsert, 
+TriggerAction.BeforeUpdate, 
+TriggerAction.AfterUpdate, 
+TriggerAction.BeforeDelete, 
+TriggerAction.AfterDelete, 
+TriggerAction.AfterUndelete
+
 ## Fields
+### `flowName`
 
-### `public allowRecursion` → `Boolean`
+#### Signature
+```apex
+public flowName
+```
 
-
-### `public flowName` → `String`
-
+#### Type
+String
 
 ---
+
+### `allowRecursion`
+
+#### Signature
+```apex
+public allowRecursion
+```
+
+#### Type
+Boolean
+
 ## Methods
-### `public static void bypass(String flowName)`
+### `bypass(flowName)`
 
 This method bypasses the execution of the Flow for the specified list of records.
 
+#### Signature
+```apex
+public static void bypass(String flowName)
+```
+
 #### Parameters
+| Name | Type | Description |
+|------|------|-------------|
+| flowName | String | The API name of the Flow to bypass. |
 
-|Param|Description|
-|---|---|
-|`flowName`|The API name of the Flow to bypass.|
+#### Return Type
+**void**
 
-### `public static void clearBypass(String flowName)`
+---
+
+### `clearBypass(flowName)`
 
 This method clears the bypass for the specified list of records.
 
+#### Signature
+```apex
+public static void clearBypass(String flowName)
+```
+
 #### Parameters
+| Name | Type | Description |
+|------|------|-------------|
+| flowName | String | The API name of the Flow to clear the bypass for. |
 
-|Param|Description|
-|---|---|
-|`flowName`|The API name of the Flow to clear the bypass for.|
+#### Return Type
+**void**
 
-### `public static Boolean isBypassed(String flowName)`
+---
+
+### `isBypassed(flowName)`
 
 This method checks if the Flow is bypassed for the specified list of records.
 
+#### Signature
+```apex
+public static Boolean isBypassed(String flowName)
+```
+
 #### Parameters
+| Name | Type | Description |
+|------|------|-------------|
+| flowName | String | The API name of the Flow to check the bypass for. |
 
-|Param|Description|
-|---|---|
-|`flowName`|The API name of the Flow to check the bypass for.|
+#### Return Type
+**Boolean**
 
-#### Returns
+,[object Object], if the Flow is bypassed for the specified list of records, ,[object Object], otherwise.
 
-|Type|Description|
-|---|---|
-|`Boolean`|`true` if the Flow is bypassed for the specified list of records, `false` otherwise.|
+---
 
-### `public static void clearAllBypasses()`
+### `clearAllBypasses()`
 
 This method clears all bypasses for all Flows.
 
-### `public static void validateType(String bypassType)`
+#### Signature
+```apex
+public static void clearAllBypasses()
+```
+
+#### Return Type
+**void**
+
+---
+
+### `validateType(bypassType)`
 
 This method validates the specified bypass type.
 
-#### Parameters
+#### Signature
+```apex
+public static void validateType(String bypassType)
+```
 
-|Param|Description|
-|---|---|
-|`bypassType`|The bypass type to validate.|
+#### Parameters
+| Name | Type | Description |
+|------|------|-------------|
+| bypassType | String | The bypass type to validate. |
+
+#### Return Type
+**void**
 
 #### Throws
+IllegalArgumentException: if the bypass type is not valid.
 
-|Exception|Description|
-|---|---|
-|`IllegalArgumentException`|if the bypass type is not valid.|
+---
 
-### `public void beforeInsert(List<SObject> newList)`
+### `beforeInsert(newList)`
 
 This method executes the Flow for the specified list of records before the insert of the records.
 
+#### Signature
+```apex
+public void beforeInsert(List<SObject> newList)
+```
+
 #### Parameters
+| Name | Type | Description |
+|------|------|-------------|
+| newList | List&lt;SObject&gt; | The list of records to execute the Flow for. |
 
-|Param|Description|
-|---|---|
-|`newList`|The list of records to execute the Flow for.|
+#### Return Type
+**void**
 
-### `public void afterInsert(List<SObject> newList)`
+---
+
+### `afterInsert(newList)`
 
 This method executes the Flow for the specified list of records after the insert of the records.
 
+#### Signature
+```apex
+public void afterInsert(List<SObject> newList)
+```
+
 #### Parameters
+| Name | Type | Description |
+|------|------|-------------|
+| newList | List&lt;SObject&gt; | The list of records to execute the Flow for. |
 
-|Param|Description|
-|---|---|
-|`newList`|The list of records to execute the Flow for.|
+#### Return Type
+**void**
 
-### `public void beforeUpdate(List<SObject> newList, List<SObject> oldList)`
+---
+
+### `beforeUpdate(newList, oldList)`
 
 This method executes the Flow for the specified list of records before the update of the records.
 
+#### Signature
+```apex
+public void beforeUpdate(List<SObject> newList, List<SObject> oldList)
+```
+
 #### Parameters
+| Name | Type | Description |
+|------|------|-------------|
+| newList | List&lt;SObject&gt; | The list of new records that are being updated. |
+| oldList | List&lt;SObject&gt; | The list of old records that are being updated. |
 
-|Param|Description|
-|---|---|
-|`newList`|The list of new records that are being updated.|
-|`oldList`|The list of old records that are being updated.|
+#### Return Type
+**void**
 
-### `public void afterUpdate(List<SObject> newList, List<SObject> oldList)`
+---
+
+### `afterUpdate(newList, oldList)`
 
 This method executes the Flow for the specified list of records after the update of the records.
 
+#### Signature
+```apex
+public void afterUpdate(List<SObject> newList, List<SObject> oldList)
+```
+
 #### Parameters
+| Name | Type | Description |
+|------|------|-------------|
+| newList | List&lt;SObject&gt; | The list of new records that are being updated. |
+| oldList | List&lt;SObject&gt; | The list of old records that are being updated. |
 
-|Param|Description|
-|---|---|
-|`newList`|The list of new records that are being updated.|
-|`oldList`|The list of old records that are being updated.|
+#### Return Type
+**void**
 
-### `public void beforeDelete(List<SObject> oldList)`
+---
+
+### `beforeDelete(oldList)`
 
 This method executes the Flow for the specified list of records before the delete of the records.
 
+#### Signature
+```apex
+public void beforeDelete(List<SObject> oldList)
+```
+
 #### Parameters
+| Name | Type | Description |
+|------|------|-------------|
+| oldList | List&lt;SObject&gt; | The list of old records that are being deleted. |
 
-|Param|Description|
-|---|---|
-|`oldList`|The list of old records that are being deleted.|
+#### Return Type
+**void**
 
-### `public void afterDelete(List<SObject> oldList)`
+---
+
+### `afterDelete(oldList)`
 
 This method executes the Flow for the specified list of records after the delete of the records.
 
+#### Signature
+```apex
+public void afterDelete(List<SObject> oldList)
+```
+
 #### Parameters
+| Name | Type | Description |
+|------|------|-------------|
+| oldList | List&lt;SObject&gt; | The list of old records that are being deleted. |
 
-|Param|Description|
-|---|---|
-|`oldList`|The list of old records that are being deleted.|
+#### Return Type
+**void**
 
-### `public void afterUndelete(List<SObject> newList)`
+---
+
+### `afterUndelete(newList)`
 
 This method executes the Flow for the specified list of records before the undelete of the records.
 
+#### Signature
+```apex
+public void afterUndelete(List<SObject> newList)
+```
+
 #### Parameters
+| Name | Type | Description |
+|------|------|-------------|
+| newList | List&lt;SObject&gt; | The list of records that are being restored. |
 
-|Param|Description|
-|---|---|
-|`newList`|The list of records that are being restored.|
-
----
+#### Return Type
+**void**
