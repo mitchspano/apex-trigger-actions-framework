@@ -110,7 +110,7 @@ public static void clearAllBypasses()
 
 ### `handleDynamicFinalizers()`
 
-Handle dynamic finalizers.nstantiates and executes finalizers based on metadata.
+Handle dynamic finalizers. Instantiates and executes finalizers based on metadata.
 
 #### Signature
 ```apex

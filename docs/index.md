@@ -101,7 +101,7 @@ trigger AccountTrigger on Account (
   after delete,
   after undelete
 ) {
-    new MetadataTriggerHandler.execute();
+    new MetadataTriggerHandler.run();
 }
 ```
 

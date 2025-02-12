@@ -19,6 +19,7 @@
 @IsTest
 global class FormulaFilterTest {
 	private static final String ACCOUNT_SOBJECT_NAME = 'Account';
+	private static final String EXCEPTION_SHOULD_BE_THROWN = 'An exception should be thrown';
 	private static List<Account> newList = new List<Account>{
 		new Account(Name = 'Test Account 1'),
 		new Account(Name = 'Test Account 2')
@@ -49,12 +50,12 @@ global class FormulaFilterTest {
 			oldList
 		);
 
-		System.assertEquals(
+		System.Assert.areEqual(
 			2,
 			result.newList.size(),
 			'The size of newList should be 2'
 		);
-		System.assertEquals(
+		System.Assert.areEqual(
 			2,
 			result.oldList.size(),
 			'The size of oldList should be 2'
@@ -76,12 +77,12 @@ global class FormulaFilterTest {
 			oldList
 		);
 
-		System.assertEquals(
+		System.Assert.areEqual(
 			2,
 			result.newList.size(),
 			'The size of newList should be 2'
 		);
-		System.assertEquals(
+		System.Assert.areEqual(
 			2,
 			result.oldList.size(),
 			'The size of newList should be 2'
@@ -91,7 +92,6 @@ global class FormulaFilterTest {
 	@IsTest
 	private static void validFormulaShouldFilterContentsOfNewList() {
 		configuration.Entry_Criteria__c = 'record.Name = "Test Account 1"';
-
 		FormulaFilter filter = new FormulaFilter(
 			configuration,
 			TriggerOperation.BEFORE_UPDATE,
@@ -103,7 +103,7 @@ global class FormulaFilterTest {
 			oldList
 		);
 
-		System.assertEquals(
+		System.Assert.areEqual(
 			1,
 			result.newList.size(),
 			'There should be 1 record in newList'
@@ -113,7 +113,7 @@ global class FormulaFilterTest {
 			((Account) result.newList[0]).Name,
 			'The first record newList should have a name of Test Account 1'
 		);
-		System.assertEquals(
+		System.Assert.areEqual(
 			1,
 			result.oldList.size(),
 			'There should be 1 record in newList'
@@ -128,7 +128,6 @@ global class FormulaFilterTest {
 	@IsTest
 	private static void validFormulaWithNoMatchingRecordsShouldProcessNoRecords() {
 		configuration.Entry_Criteria__c = 'record.Name = "FooBar"';
-
 		FormulaFilter filter = new FormulaFilter(
 			configuration,
 			TriggerOperation.BEFORE_UPDATE,
@@ -154,12 +153,15 @@ global class FormulaFilterTest {
 			TriggerOperation.BEFORE_UPDATE,
 			ACCOUNT_SOBJECT_NAME
 		);
+
 		try {
 			filter.filterByEntryCriteria(newList, oldList);
 		} catch (IllegalArgumentException e) {
 			caught = e;
 		}
-		Assert.areEqual(
+
+		System.Assert.isNotNull(caught, EXCEPTION_SHOULD_BE_THROWN);
+		System.Assert.areEqual(
 			String.format(
 				FormulaFilter.MISSING_CLASS_NAME,
 				new List<String>{ ACCOUNT_SOBJECT_NAME }
@@ -178,12 +180,15 @@ global class FormulaFilterTest {
 			TriggerOperation.BEFORE_UPDATE,
 			ACCOUNT_SOBJECT_NAME
 		);
+
 		try {
 			filter.filterByEntryCriteria(newList, oldList);
 		} catch (IllegalArgumentException e) {
 			caught = e;
 		}
-		Assert.areEqual(
+
+		System.Assert.isNotNull(caught, EXCEPTION_SHOULD_BE_THROWN);
+		System.Assert.areEqual(
 			String.format(
 				FormulaFilter.MISSING_CLASS_NAME,
 				new List<String>{ ACCOUNT_SOBJECT_NAME }
@@ -202,12 +207,15 @@ global class FormulaFilterTest {
 			TriggerOperation.BEFORE_UPDATE,
 			ACCOUNT_SOBJECT_NAME
 		);
+
 		try {
 			filter.filterByEntryCriteria(newList, oldList);
 		} catch (IllegalArgumentException e) {
 			caught = e;
 		}
-		Assert.areEqual(
+
+		System.Assert.isNotNull(caught, EXCEPTION_SHOULD_BE_THROWN);
+		System.Assert.areEqual(
 			String.format(
 				FormulaFilter.INVALID_FILTER,
 				new List<String>{
@@ -231,12 +239,15 @@ global class FormulaFilterTest {
 			TriggerOperation.BEFORE_UPDATE,
 			ACCOUNT_SOBJECT_NAME
 		);
+
 		try {
 			filter.filterByEntryCriteria(newList, oldList);
 		} catch (IllegalArgumentException e) {
 			caught = e;
 		}
-		Assert.areEqual(
+
+		System.Assert.isNotNull(caught, EXCEPTION_SHOULD_BE_THROWN);
+		System.Assert.areEqual(
 			String.format(
 				FormulaFilter.INVALID_SUBTYPE,
 				new List<String>{
@@ -263,7 +274,9 @@ global class FormulaFilterTest {
 		} catch (IllegalArgumentException e) {
 			caught = e;
 		}
-		Assert.areEqual(
+
+		System.Assert.isNotNull(caught, EXCEPTION_SHOULD_BE_THROWN);
+		System.Assert.areEqual(
 			String.format(
 				FormulaFilter.INVALID_CLASS,
 				new List<String>{
@@ -285,12 +298,15 @@ global class FormulaFilterTest {
 			TriggerOperation.BEFORE_UPDATE,
 			ACCOUNT_SOBJECT_NAME
 		);
+
 		try {
 			filter.filterByEntryCriteria(newList, oldList);
 		} catch (IllegalArgumentException e) {
 			caught = e;
 		}
-		Assert.areEqual(
+
+		System.Assert.isNotNull(caught, EXCEPTION_SHOULD_BE_THROWN);
+		System.Assert.areEqual(
 			String.format(
 				FormulaFilter.INVALID_FILTER,
 				new List<String>{

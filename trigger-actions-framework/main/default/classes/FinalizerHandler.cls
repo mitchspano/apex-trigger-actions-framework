@@ -94,7 +94,7 @@ public with sharing virtual class FinalizerHandler {
 	}
 
 	/**
-	 * @description Handle dynamic finalizers.nstantiates and executes finalizers based on metadata.
+	 * @description Handle dynamic finalizers. Instantiates and executes finalizers based on metadata.
 	 */
 	public virtual void handleDynamicFinalizers() {
 		Context context = new Context();
@@ -106,7 +106,7 @@ public with sharing virtual class FinalizerHandler {
 			populatePermissionMap(finalizerMetadata.Bypass_Permission__c);
 			populatePermissionMap(finalizerMetadata.Required_Permission__c);
 			if (
-				isNotBypassed(
+				!isBypassed(
 					finalizerMetadata.Bypass_Permission__c,
 					finalizerMetadata.Required_Permission__c
 				)
@@ -172,18 +172,18 @@ public with sharing virtual class FinalizerHandler {
 	}
 
 	/**
-	 * @description Check if the finalizer is not bypassed.
-	 * @param requiredPermission The required permission.
-	 * @param bypassPermission The bypass permission.
-	 * @return True if the finalizer is not bypassed, false otherwise.
+	 * @description Check if the finalizer is bypassed.
+	 *
+	 * @param bypassPermission The bypass permission for the finalizer.
+	 * @param requiredPermission The required permission for the finalizer.
+	 * @return True if bypassed, false otherwise.
 	 */
-	private boolean isNotBypassed(
-		String requiredPermission,
-		String bypassPermission
+	private boolean isBypassed(
+		String bypassPermission,
+		String requiredPermission
 	) {
-		return !((requiredPermission != null &&
-		permissionMap.get(requiredPermission)) ||
-		(bypassPermission != null && !permissionMap.get(bypassPermission)));
+		return (bypassPermission != null && permissionMap.get(bypassPermission)) ||
+			(requiredPermission != null && !permissionMap.get(requiredPermission));
 	}
 
 	/**

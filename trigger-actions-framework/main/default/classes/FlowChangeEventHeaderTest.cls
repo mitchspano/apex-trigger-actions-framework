@@ -23,12 +23,15 @@ private with sharing class FlowChangeEventHeaderTest {
 
 	@IsTest
 	private static void shouldBeAbleToConstruct() {
-		Assert.isNotNull(header, 'Unable to construct a FlowChangeEventHeader');
+		System.Assert.isNotNull(
+			header,
+			'Unable to construct a FlowChangeEventHeader'
+		);
 	}
 
 	@IsTest
 	private static void shouldBeAbleToGenerateHashCode() {
-		Assert.isNotNull(header.hashCode(), 'Hash code was not generated');
+		System.Assert.isNotNull(header.hashCode(), 'Hash code was not generated');
 	}
 
 	@IsTest
@@ -38,17 +41,17 @@ private with sharing class FlowChangeEventHeaderTest {
 		);
 		other.changeType = 'CREATE';
 
-		Assert.areEqual(
+		System.Assert.areEqual(
 			new FlowChangeEventHeader(new EventBus.ChangeEventHeader()),
 			header,
 			'Unable to detect identical FlowChangeEventHeader objects'
 		);
-		Assert.areNotEqual(
+		System.Assert.areNotEqual(
 			header,
 			other,
 			'Unable to detect different FlowChangeEventHeader objects'
 		);
-		Assert.areNotEqual(
+		System.Assert.areNotEqual(
 			header,
 			null,
 			'Unable to detect difference between FlowChangeEventHeader and null'
