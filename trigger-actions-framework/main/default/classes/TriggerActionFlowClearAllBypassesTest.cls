@@ -78,7 +78,7 @@ private class TriggerActionFlowClearAllBypassesTest {
 			myException,
 			'We should have an exception thrown in this scenario'
 		);
-		Assert.isInstanceOfType(
+		System.Assert.isInstanceOfType(
 			myException,
 			IllegalArgumentException.class,
 			'The exception should be of the correct type'

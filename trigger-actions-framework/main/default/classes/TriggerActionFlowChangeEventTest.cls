@@ -36,7 +36,7 @@ private with sharing class TriggerActionFlowChangeEventTest {
 			caught = e;
 		}
 
-		Assert.isNotNull(
+		System.Assert.isNotNull(
 			caught,
 			'The system failed to add an exception when we are expecting one'
 		);
@@ -49,11 +49,11 @@ private with sharing class TriggerActionFlowChangeEventTest {
 			TriggerActionConstants.RECORD_VARIABLE
 		);
 
-		Assert.isNotNull(
+		System.Assert.isNotNull(
 			response,
 			'The system produced a null input to be passed into the invocable flows'
 		);
-		Assert.areEqual(
+		System.Assert.areEqual(
 			0,
 			response.size(),
 			'There should be exactly zero maps in the produced invocable inputs'
@@ -67,29 +67,29 @@ private with sharing class TriggerActionFlowChangeEventTest {
 			TriggerActionConstants.RECORD_VARIABLE
 		);
 
-		Assert.isNotNull(
+		System.Assert.isNotNull(
 			response,
 			'The system produced a null input to be passed into the invocable flows'
 		);
-		Assert.areEqual(
+		System.Assert.areEqual(
 			1,
 			response.size(),
 			'There should be exactly one map in the produced invocable inputs'
 		);
-		Assert.isTrue(
+		System.Assert.isTrue(
 			response[0].containsKey(TriggerActionConstants.RECORD_VARIABLE),
 			'The map should have a key of "record"'
 		);
-		Assert.areEqual(
+		System.Assert.areEqual(
 			changeEvent,
 			response[0].get(TriggerActionConstants.RECORD_VARIABLE),
 			'The value for "record" is constructed improperly'
 		);
-		Assert.isTrue(
+		System.Assert.isTrue(
 			response[0].containsKey(TriggerActionFlowChangeEvent.HEADER),
 			'The map should have a key of "header"'
 		);
-		Assert.areEqual(
+		System.Assert.areEqual(
 			new FlowChangeEventHeader(changeEvent.ChangeEventHeader),
 			response[0].get(TriggerActionFlowChangeEvent.HEADER),
 			'The value for "header" is constructed improperly'
