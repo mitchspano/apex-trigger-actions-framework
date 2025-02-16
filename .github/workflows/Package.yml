@@ -35,3 +35,4 @@ jobs:
         id: create
         run: |
           sf package version create --definition-file config/project-scratch-def.json --package "Trigger Actions Framework" --version-number ${{ inputs.packageVersion }} --wait 120 --code-coverage --installation-key-bypass
+          cat sfdx-project.json
