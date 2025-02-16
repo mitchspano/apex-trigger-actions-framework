@@ -44,8 +44,8 @@ private class TriggerActionFlowTest {
 		Id = myAccount.Id
 	);
 	private static Account myAccountAfterFlow = myAccount.clone(true);
-	private static List<SObject> newList = new List<SObject>{ myAccount };
-	private static List<SObject> oldList = new List<SObject>{ oldAccount };
+	private static List<SObject> triggerNew = new List<SObject>{ myAccount };
+	private static List<SObject> triggerOld = new List<SObject>{ oldAccount };
 	private static TriggerActionFlow actionFlow;
 	private static Exception myException;
 
@@ -74,13 +74,13 @@ private class TriggerActionFlowTest {
 		TriggerActionFlow.bypass(SAMPLE_FLOW_NAME);
 
 		try {
-			actionFlow.beforeInsert(newList);
-			actionFlow.afterInsert(newList);
-			actionFlow.beforeUpdate(newList, oldList);
-			actionFlow.afterUpdate(newList, oldList);
-			actionFlow.beforeDelete(oldList);
-			actionFlow.afterDelete(oldList);
-			actionFlow.afterUndelete(oldList);
+			actionFlow.beforeInsert(triggerNew);
+			actionFlow.afterInsert(triggerNew);
+			actionFlow.beforeUpdate(triggerNew, triggerOld);
+			actionFlow.afterUpdate(triggerNew, triggerOld);
+			actionFlow.beforeDelete(triggerOld);
+			actionFlow.afterDelete(triggerOld);
+			actionFlow.afterUndelete(triggerOld);
 		} catch (Exception e) {
 			myException = e;
 		}
@@ -114,7 +114,7 @@ private class TriggerActionFlowTest {
 		actionFlow.flowName = null;
 
 		try {
-			actionFlow.beforeInsert(newList);
+			actionFlow.beforeInsert(triggerNew);
 		} catch (Exception e) {
 			myException = e;
 		}
@@ -130,7 +130,7 @@ private class TriggerActionFlowTest {
 
 	@IsTest
 	private static void beforeInsertShouldSucceed() {
-		actionFlow.beforeInsert(newList);
+		actionFlow.beforeInsert(triggerNew);
 
 		System.Assert.areEqual(FOO, myAccount.Name, NAME_SET_FROM_FLOW);
 		System.Assert.areEqual(true, myAccount.hasErrors(), ERROR_SHOULD_BE_ADDED);
@@ -144,7 +144,7 @@ private class TriggerActionFlowTest {
 
 	@IsTest
 	private static void afterInsertShouldSucceed() {
-		actionFlow.afterInsert(newList);
+		actionFlow.afterInsert(triggerNew);
 
 		System.Assert.areEqual(
 			false,
@@ -155,7 +155,7 @@ private class TriggerActionFlowTest {
 
 	@IsTest
 	private static void beforeUpdateShouldSucceed() {
-		actionFlow.beforeUpdate(newList, oldList);
+		actionFlow.beforeUpdate(triggerNew, triggerOld);
 
 		System.Assert.areEqual(FOO, myAccount.Name, NAME_SET_FROM_FLOW);
 		System.Assert.areEqual(true, myAccount.hasErrors(), ERROR_SHOULD_BE_ADDED);
@@ -169,17 +169,17 @@ private class TriggerActionFlowTest {
 
 	@IsTest
 	private static void beforeUpdateWithNoRecordsToProcessShouldSucceed() {
-		newList.clear();
-		oldList.clear();
+		triggerNew.clear();
+		triggerOld.clear();
 
-		actionFlow.beforeUpdate(newList, oldList);
+		actionFlow.beforeUpdate(triggerNew, triggerOld);
 
 		System.Assert.areEqual(MY_ACCOUNT, myAccount.Name, NAME_SHOULD_REMAIN_SAME);
 	}
 
 	@IsTest
 	private static void afterUpdateShouldSucceed() {
-		actionFlow.afterUpdate(newList, oldList);
+		actionFlow.afterUpdate(triggerNew, triggerOld);
 
 		System.Assert.areEqual(
 			false,
@@ -190,10 +190,10 @@ private class TriggerActionFlowTest {
 
 	@IsTest
 	private static void afterUpdateWithNoRecordsToProcessShouldSucceed() {
-		newList.clear();
-		oldList.clear();
+		triggerNew.clear();
+		triggerOld.clear();
 
-		actionFlow.afterUpdate(newList, oldList);
+		actionFlow.afterUpdate(triggerNew, triggerOld);
 
 		System.Assert.areEqual(
 			false,
@@ -204,7 +204,7 @@ private class TriggerActionFlowTest {
 
 	@IsTest
 	private static void beforeDeleteShouldSucceed() {
-		actionFlow.beforeDelete(oldList);
+		actionFlow.beforeDelete(triggerOld);
 
 		System.Assert.areEqual(
 			false,
@@ -215,7 +215,7 @@ private class TriggerActionFlowTest {
 
 	@IsTest
 	private static void afterDeleteShouldSucceed() {
-		actionFlow.afterDelete(oldList);
+		actionFlow.afterDelete(triggerOld);
 
 		System.Assert.areEqual(
 			false,
@@ -226,7 +226,7 @@ private class TriggerActionFlowTest {
 
 	@IsTest
 	private static void afterUndeleteShouldSucceed() {
-		actionFlow.afterUndelete(oldList);
+		actionFlow.afterUndelete(triggerOld);
 
 		System.Assert.areEqual(
 			false,
@@ -240,7 +240,7 @@ private class TriggerActionFlowTest {
 		successResult.getOutputParameters().clear();
 
 		try {
-			actionFlow.beforeInsert(newList);
+			actionFlow.beforeInsert(triggerNew);
 		} catch (IllegalArgumentException e) {
 			myException = e;
 		}
@@ -260,7 +260,7 @@ private class TriggerActionFlowTest {
 		successResult.getOutputParameters()
 			.put(TriggerActionConstants.RECORD_VARIABLE, myAccount);
 
-		actionFlow.beforeInsert(newList);
+		actionFlow.beforeInsert(triggerNew);
 
 		System.Assert.areEqual(
 			false,
@@ -270,16 +270,16 @@ private class TriggerActionFlowTest {
 	}
 
 	@IsTest
-    private static void nulledFieldInFlowShouldBeTransferredBack() {
-        myAccount.BillingStreet = TEST;
-        oldAccount.BillingStreet = TEST;
-        myAccountAfterFlow = myAccount.clone(true);
-        myAccountAfterFlow.BillingStreet = null;
+	private static void nulledFieldInFlowShouldBeTransferredBack() {
+		myAccount.BillingStreet = TEST;
+		oldAccount.BillingStreet = TEST;
+		myAccountAfterFlow = myAccount.clone(true);
+		myAccountAfterFlow.BillingStreet = null;
 
-        actionFlow.beforeUpdate(newList, oldList);
+		actionFlow.beforeUpdate(triggerNew, triggerOld);
 
-        System.Assert.isNull(myAccount.BillingStreet, ERROR_NOT_NULLED_AFTER_FLOW);
-    }
+		System.Assert.isNull(myAccount.BillingStreet, ERROR_NOT_NULLED_AFTER_FLOW);
+	}
 
 	@IsTest
 	private static void unsuccessfulActionResultShouldBeAddedAsErrorToRecord() {
@@ -304,7 +304,7 @@ private class TriggerActionFlowTest {
 			}
 		);
 
-		actionFlow.beforeInsert(newList);
+		actionFlow.beforeInsert(triggerNew);
 
 		System.Assert.areEqual(true, myAccount.hasErrors(), ERROR_SHOULD_BE_ADDED);
 		System.Assert.areEqual(1, myAccount.getErrors().size(), ONE_ERROR);
