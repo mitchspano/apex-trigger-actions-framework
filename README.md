@@ -1,8 +1,8 @@
 # Apex Trigger Actions Framework
 
-#### [Unlocked Package Installation (Production)](https://login.salesforce.com/packaging/installPackage.apexp?p0=04tKY000000PdZJYA0)
+#### [Unlocked Package Installation (Production)](https://login.salesforce.com/packaging/installPackage.apexp?p0=04tKY000000PdZOYA0)
 
-#### [Unlocked Package Installation (Sandbox)](https://test.salesforce.com/packaging/installPackage.apexp?p0=04tKY000000PdZJYA0)
+#### [Unlocked Package Installation (Sandbox)](https://test.salesforce.com/packaging/installPackage.apexp?p0=04tKY000000PdZOYA0)
 
 ---
 
