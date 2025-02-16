@@ -115,7 +115,7 @@ To enable this flow, simply insert a trigger action record with `Apex_Class_Name
 > - **Why It Matters:** This limit can be reached when Trigger Action Flows perform DML operations that cascade across multiple objects with their own Trigger Action Flows.
 > - **When to Be Careful:** Exercise caution when using Trigger Action Flows in scenarios involving multiple DML operations or complex trigger chains.
 > - **Safe Use Cases:** Same-record updates, using the `addError` action to add a custom error message, and actions like workflow email alerts are generally safe.
-> - **Potential Solution (Developer Preview):** [This idea](https://github.com/mitchspano/apex-trigger-actions-framework/issues/135) aims to reduce the likelihood of hitting the limit, but the technology is still under development.
+> - **How to Avoid Issues:** Implementing [Entry Criteria Formula](#Entry-Criteria-Formula) will reduce the likelihood of hitting the limit. Define entry criteria on all Flow actions whenever possible.
 
 ### Flow Actions for Change Data Capture Events
 
@@ -134,14 +134,10 @@ Create a trigger action record with `Apex_Class_Name__c` equal to `TriggerAction
 
 ---
 
-## Entry Criteria Formula (Beta)
+## Entry Criteria Formula
 
 Individual trigger actions can have their own dynamic entry criteria defined in a simple formula.
 This is a new feature and is built using the [`FormulaEval` namespace](https://developer.salesforce.com/docs/atlas.en-us.apexref.meta/apexref/apex_namespace_formulaeval.htm) within Apex.
-
-#### [Entry Criteria Beta Package Installation (Production)](https://login.salesforce.com/packaging/installPackage.apexp?p0=04tKY000000PdZ9YAK)
-
-#### [Entry Criteria Beta Package Installation (Sandbox)](https://test.salesforce.com/packaging/installPackage.apexp?p0=04tKY000000PdZ9YAK)
 
 ### SObject Setup
 
@@ -192,13 +188,10 @@ record.Name = "Bob" && recordPrior.Name = "Joe"
 
 Now, the automation will only execute for any records within the transaction for which the name used to be "Joe", but it is changed to "Bob".
 
-![Entry Criteria](images/Entry_Criteria.gif)
-
 ### Caveats
 
 > [!IMPORTANT]
 >
-> - **Beta Feature:** The Entry Criteria Formula feature is currently in beta. While it is functional, there might be limitations or changes in future releases.
 > - **Field Traversal Limitations:** The `record` and `recordPrior` objects within the formula are limited to the fields directly available on the record itself. Cross-object traversal, such as `record.RecordType.DeveloperName`, is not supported.
 
 ---
