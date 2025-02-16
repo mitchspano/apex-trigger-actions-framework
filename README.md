@@ -158,20 +158,7 @@ global class AccountTriggerRecord extends TriggerRecord {
 
 Then enter the API name of that class in the `SObject_Trigger_Setting__mdt.TriggerRecord_Class_Name__c` field on the `SObject_Trigger_Setting__mdt` record of interest.
 
-Now, you can use a formula which operates on an instance of this class at runtime to determine if a record should be processed. For example, let's say we had the following trigger action:
-
-```java
-public class TA_Account_Sample implements  TriggerAction.BeforeUpdate {
-
-  public void beforeUpdate(List<Account> newList, List<Account> oldList) {
-    for (Account account : newList) {
-      account.Name = 'Triggered';
-    }
-  }
-}
-```
-
-We could define this entry criteria formula on the `Trigger_Action__mdt` record:
+Now, you can define a formula on the `Trigger_Action__mdt` record which operates on an instance of this class at runtime to determine if a record should be processed
 
 ```
 record.Name = "Bob" && recordPrior.Name = "Joe"
