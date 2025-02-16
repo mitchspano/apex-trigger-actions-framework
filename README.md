@@ -1,8 +1,8 @@
 # Apex Trigger Actions Framework
 
-#### [Unlocked Package Installation (Production)](https://login.salesforce.com/packaging/installPackage.apexp?p0=04tKY000000PdZJYA0)
+#### [Unlocked Package Installation (Production)](https://login.salesforce.com/packaging/installPackage.apexp?p0=04tKY000000PdZOYA0)
 
-#### [Unlocked Package Installation (Sandbox)](https://test.salesforce.com/packaging/installPackage.apexp?p0=04tKY000000PdZJYA0)
+#### [Unlocked Package Installation (Sandbox)](https://test.salesforce.com/packaging/installPackage.apexp?p0=04tKY000000PdZOYA0)
 
 ---
 
@@ -68,8 +68,8 @@ public class TA_Opportunity_StageInsertRules implements TriggerAction.BeforeInse
   @TestVisible
   private static final String INVALID_STAGE_INSERT_ERROR = 'The Stage must be \'Prospecting\' when an Opportunity is created';
 
-  public void beforeInsert(List<Opportunity> newList){
-    for (Opportunity opp : newList) {
+  public void beforeInsert(List<Opportunity> triggerNew){
+    for (Opportunity opp : triggerNew) {
       if (opp.StageName != PROSPECTING) {
         opp.addError(INVALID_STAGE_INSERT_ERROR);
       }
@@ -196,10 +196,10 @@ Use the `TriggerBase.idToNumberOfTimesSeenBeforeUpdate` and `TriggerBase.idToNum
 ```java
 public class TA_Opportunity_RecalculateCategory implements TriggerAction.AfterUpdate {
 
-  public void afterUpdate(List<Opportunity> newList, List<Opportunity> oldList) {
-    Map<Id,Opportunity> oldMap = new Map<Id,Opportunity>(oldList);
+  public void afterUpdate(List<Opportunity> triggerNew, List<Opportunity> triggerOld) {
+    Map<Id,Opportunity> oldMap = new Map<Id,Opportunity>(triggerOld);
     List<Opportunity> oppsToBeUpdated = new List<Opportunity>();
-    for (Opportunity opp : newList) {
+    for (Opportunity opp : triggerNew) {
       if (
         TriggerBase.idToNumberOfTimesSeenAfterUpdate.get(opp.id) == 1 &&
         opp.StageName != oldMap.get(opp.id).StageName
@@ -315,17 +315,17 @@ public class TA_Opportunity_Queries {
   public Map<Id, Account> beforeAccountMap { get; private set; }
 
   public class Service implements TriggerAction.BeforeInsert {
-    public void beforeInsert(List<Opportunity> newList) {
+    public void beforeInsert(List<Opportunity> triggerNew) {
       TA_Opportunity_Queries.getInstance().beforeAccountMap = getAccountMapFromOpportunities(
-        newList
+        triggerNew
       );
     }
 
     private Map<Id, Account> getAccountMapFromOpportunities(
-      List<Opportunity> newList
+      List<Opportunity> triggerNew
     ) {
       Set<Id> accountIds = new Set<Id>();
-      for (Opportunity myOpp : newList) {
+      for (Opportunity myOpp : triggerNew) {
         accountIds.add(myOpp.AccountId);
       }
       return new Map<Id, Account>(
@@ -344,10 +344,10 @@ With the `TA_Opportunity_Queries` class configured as the first action, all subs
 
 ```java
 public class TA_Opportunity_StandardizeName implements TriggerAction.BeforeInsert {
-  public void beforeInsert(List<Opportunity> newList) {
+  public void beforeInsert(List<Opportunity> triggerNew) {
     Map<Id, Account> accountIdToAccount = TA_Opportunity_Queries.getInstance()
       .beforeAccountMap;
-    for (Opportunity myOpp : newList) {
+    for (Opportunity myOpp : triggerNew) {
       String accountName = accountIdToAccount.get(myOpp.AccountId)?.Name;
       myOpp.Name = accountName != null
         ? accountName + ' | ' + myOpp.Name
@@ -366,12 +366,12 @@ In the example above, the top-level class is the implementation of the Singleton
 
 ## Use of Trigger Maps
 
-To avoid having to downcast from `Map<Id,sObject>`, we simply construct a new map out of our `newList` and `oldList` variables:
+To avoid having to downcast from `Map<Id,sObject>`, we simply construct a new map out of our `triggerNew` and `triggerOld` variables:
 
 ```java
-public void beforeUpdate(List<Opportunity> newList, List<Opportunity> oldList) {
-  Map<Id,Opportunity> newMap = new Map<Id,Opportunity>(newList);
-  Map<Id,Opportunity> oldMap = new Map<Id,Opportunity>(oldList);
+public void beforeUpdate(List<Opportunity> triggerNew, List<Opportunity> triggerOld) {
+  Map<Id,Opportunity> newMap = new Map<Id,Opportunity>(triggerNew);
+  Map<Id,Opportunity> oldMap = new Map<Id,Opportunity>(triggerOld);
   ...
 }
 ```
@@ -405,38 +405,38 @@ Take a look at how both of these are used in the `TA_Opportunity_StageChangeRule
 ```java
 @IsTest
 private static void invalidStageChangeShouldPreventSave() {
-  List<Opportunity> newList = new List<Opportunity>();
-  List<Opportunity> oldList = new List<Opportunity>();
+  List<Opportunity> triggerNew = new List<Opportunity>();
+  List<Opportunity> triggerOld = new List<Opportunity>();
   //generate fake Id
   Id myRecordId = TriggerTestUtility.getFakeId(Opportunity.SObjectType);
-  newList.add(
+  triggerNew.add(
     new Opportunity(
       Id = myRecordId,
       StageName = Constants.OPPORTUNITY_STAGENAME_CLOSED_WON
     )
   );
-  oldList.add(
+  triggerOld.add(
     new Opportunity(
       Id = myRecordId,
       StageName = Constants.OPPORTUNITY_STAGENAME_QUALIFICATION
     )
   );
 
-  new TA_Opportunity_StageChangeRules().beforeUpdate(newList, oldList);
+  new TA_Opportunity_StageChangeRules().beforeUpdate(triggerNew, triggerOld);
 
   //Use getErrors() SObject method to get errors from addError without performing DML
   System.assertEquals(
     true,
-    newList[0].hasErrors(),
+    triggerNew[0].hasErrors(),
     'The record should have errors'
   );
   System.assertEquals(
     1,
-    newList[0].getErrors().size(),
+    triggerNew[0].getErrors().size(),
     'There should be exactly one error'
   );
   System.assertEquals(
-    newList[0].getErrors()[0].getMessage(),
+    triggerNew[0].getErrors()[0].getMessage(),
     String.format(
       TA_Opportunity_StageChangeRules.INVALID_STAGE_CHANGE_ERROR,
       new List<String>{
@@ -499,12 +499,12 @@ Finally, use the static variables/methods of the finalizer within your trigger a
 public with sharing class TA_Opportunity_RecalculateCategory implements TriggerAction.AfterUpdate {
 
   public void afterUpdate(
-    List<Opportunity> newList,
-    List<Opportunity> oldList
+    List<Opportunity> triggerNew,
+    List<Opportunity> triggerOld
   ) {
-    Map<Id, Opportunity> oldMap = new Map<Id, Opportunity>(oldList);
+    Map<Id, Opportunity> oldMap = new Map<Id, Opportunity>(triggerOld);
     List<Opportunity> toRecalculate = new List<Opportunity>();
-    for (Opportunity opp : newList) {
+    for (Opportunity opp : triggerNew) {
       if (opp.Amount != oldMap.get(opp.Id).Amount) {
         toRecalculate.add(opp);
       }

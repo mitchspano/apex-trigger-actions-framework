@@ -446,25 +446,31 @@ private class TriggerBaseTest {
 		public Boolean executed = false;
 		public Boolean finalized = false;
 		public Integer dmlRows;
-		public void beforeInsert(List<SObject> newList) {
+		public void beforeInsert(List<SObject> triggerNew) {
 			this.executed = true;
 		}
-		public void afterInsert(List<SObject> newList) {
+		public void afterInsert(List<SObject> triggerNew) {
 			this.executed = true;
 		}
-		public void beforeUpdate(List<SObject> newList, List<SObject> oldList) {
+		public void beforeUpdate(
+			List<SObject> triggerNew,
+			List<SObject> triggerOld
+		) {
 			this.executed = true;
 		}
-		public void afterUpdate(List<SObject> newList, List<SObject> oldList) {
+		public void afterUpdate(
+			List<SObject> triggerNew,
+			List<SObject> triggerOld
+		) {
 			this.executed = true;
 		}
-		public void beforeDelete(List<SObject> oldList) {
+		public void beforeDelete(List<SObject> triggerOld) {
 			this.executed = true;
 		}
-		public void afterDelete(List<SObject> newList) {
+		public void afterDelete(List<SObject> triggerNew) {
 			this.executed = true;
 		}
-		public void afterUndelete(List<SObject> newList) {
+		public void afterUndelete(List<SObject> triggerNew) {
 			this.executed = true;
 		}
 		public override void finalizeDmlOperation() {

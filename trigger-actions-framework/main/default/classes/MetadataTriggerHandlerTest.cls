@@ -749,37 +749,43 @@ private class MetadataTriggerHandlerTest {
 	}
 
 	public class TestBeforeInsert implements TriggerAction.BeforeInsert {
-		public void beforeInsert(List<SObject> newList) {
+		public void beforeInsert(List<SObject> triggerNew) {
 			MetadataTriggerHandlerTest.executed = true;
 		}
 	}
 	public class TestAfterInsert implements TriggerAction.AfterInsert {
-		public void afterInsert(List<SObject> newList) {
+		public void afterInsert(List<SObject> triggerNew) {
 			MetadataTriggerHandlerTest.executed = true;
 		}
 	}
 	public class TestBeforeUpdate implements TriggerAction.BeforeUpdate {
-		public void beforeUpdate(List<SObject> newList, List<SObject> oldList) {
+		public void beforeUpdate(
+			List<SObject> triggerNew,
+			List<SObject> triggerOld
+		) {
 			MetadataTriggerHandlerTest.executed = true;
 		}
 	}
 	public class TestAfterUpdate implements TriggerAction.AfterUpdate {
-		public void afterUpdate(List<SObject> newList, List<SObject> oldList) {
+		public void afterUpdate(
+			List<SObject> triggerNew,
+			List<SObject> triggerOld
+		) {
 			MetadataTriggerHandlerTest.executed = true;
 		}
 	}
 	public class TestBeforeDelete implements TriggerAction.BeforeDelete {
-		public void beforeDelete(List<SObject> oldList) {
+		public void beforeDelete(List<SObject> triggerOld) {
 			MetadataTriggerHandlerTest.executed = true;
 		}
 	}
 	public class TestAfterDelete implements TriggerAction.AfterDelete {
-		public void afterDelete(List<SObject> newList) {
+		public void afterDelete(List<SObject> triggerNew) {
 			MetadataTriggerHandlerTest.executed = true;
 		}
 	}
 	public class TestAfterUndelete implements TriggerAction.AfterUndelete {
-		public void afterUndelete(List<SObject> newList) {
+		public void afterUndelete(List<SObject> triggerNew) {
 			MetadataTriggerHandlerTest.executed = true;
 		}
 	}

@@ -156,66 +156,66 @@ public inherited sharing class MetadataTriggerHandler extends TriggerBase implem
 	/**
 	 * @description Execute the Before Insert Trigger Actions.
 	 *
-	 * @param newList The list of new records being inserted.
+	 * @param triggerNew The list of new records being inserted.
 	 */
-	public void beforeInsert(List<SObject> newList) {
-		this.executeActions(TriggerOperation.BEFORE_INSERT, newList, null);
+	public void beforeInsert(List<SObject> triggerNew) {
+		this.executeActions(TriggerOperation.BEFORE_INSERT, triggerNew, null);
 	}
 
 	/**
 	 * @description Execute the After Insert Trigger Actions.
 	 *
-	 * @param newList The list of new records that were inserted.
+	 * @param triggerNew The list of new records that were inserted.
 	 */
-	public void afterInsert(List<SObject> newList) {
-		this.executeActions(TriggerOperation.AFTER_INSERT, newList, null);
+	public void afterInsert(List<SObject> triggerNew) {
+		this.executeActions(TriggerOperation.AFTER_INSERT, triggerNew, null);
 	}
 
 	/**
 	 * @description Execute the Before Update Trigger Actions.
 	 *
-	 * @param newList The list of updated records.
-	 * @param oldList The list of old records before the update.
+	 * @param triggerNew The list of updated records.
+	 * @param triggerOld The list of old records before the update.
 	 */
-	public void beforeUpdate(List<SObject> newList, List<SObject> oldList) {
-		this.executeActions(TriggerOperation.BEFORE_UPDATE, newList, oldList);
+	public void beforeUpdate(List<SObject> triggerNew, List<SObject> triggerOld) {
+		this.executeActions(TriggerOperation.BEFORE_UPDATE, triggerNew, triggerOld);
 	}
 
 	/**
 	 * @description Execute the After Update Trigger Actions.
 	 *
-	 * @param newList The list of updated records.
-	 * @param oldList The list of old records before the update.
+	 * @param triggerNew The list of updated records.
+	 * @param triggerOld The list of old records before the update.
 	 */
-	public void afterUpdate(List<SObject> newList, List<SObject> oldList) {
-		this.executeActions(TriggerOperation.AFTER_UPDATE, newList, oldList);
+	public void afterUpdate(List<SObject> triggerNew, List<SObject> triggerOld) {
+		this.executeActions(TriggerOperation.AFTER_UPDATE, triggerNew, triggerOld);
 	}
 
 	/**
 	 * @description Execute the Before Delete Trigger Actions.
 	 *
-	 * @param oldList The list of records being deleted.
+	 * @param triggerOld The list of records being deleted.
 	 */
-	public void beforeDelete(List<SObject> oldList) {
-		this.executeActions(TriggerOperation.BEFORE_DELETE, null, oldList);
+	public void beforeDelete(List<SObject> triggerOld) {
+		this.executeActions(TriggerOperation.BEFORE_DELETE, null, triggerOld);
 	}
 
 	/**
 	 * @description Execute the After Delete Trigger Actions.
 	 *
-	 * @param oldList The list of records that were deleted.
+	 * @param triggerOld The list of records that were deleted.
 	 */
-	public void afterDelete(List<SObject> oldList) {
-		this.executeActions(TriggerOperation.AFTER_DELETE, null, oldList);
+	public void afterDelete(List<SObject> triggerOld) {
+		this.executeActions(TriggerOperation.AFTER_DELETE, null, triggerOld);
 	}
 
 	/**
 	 * @description Execute the After Undelete Trigger Actions.
 	 *
-	 * @param newList The list of records that were undeleted.
+	 * @param triggerNew The list of records that were undeleted.
 	 */
-	public void afterUndelete(List<SObject> newList) {
-		this.executeActions(TriggerOperation.AFTER_UNDELETE, newList, null);
+	public void afterUndelete(List<SObject> triggerNew) {
+		this.executeActions(TriggerOperation.AFTER_UNDELETE, triggerNew, null);
 	}
 
 	/**
@@ -351,13 +351,13 @@ public inherited sharing class MetadataTriggerHandler extends TriggerBase implem
 	 * @description Execute the Trigger Actions.
 	 *
 	 * @param context The Trigger Operation context.
-	 * @param newList The list of new records.
-	 * @param oldList The list of old records.
+	 * @param triggerNew The list of new records.
+	 * @param triggerOld The list of old records.
 	 */
 	private void executeActions(
 		TriggerOperation context,
-		List<SObject> newList,
-		List<SObject> oldList
+		List<SObject> triggerNew,
+		List<SObject> triggerOld
 	) {
 		for (Trigger_Action__mdt triggerMetadata : getActionMetadata(context)) {
 			Object triggerAction = getTriggerActionObject(context, triggerMetadata);
@@ -374,12 +374,12 @@ public inherited sharing class MetadataTriggerHandler extends TriggerBase implem
 					context,
 					this.sObjectName
 				)
-				.filterByEntryCriteria(newList, oldList);
+				.filterByEntryCriteria(triggerNew, triggerOld);
 
 			if (
 				Math.max(
-					(filtered.oldList == null) ? 0 : filtered.oldList.size(),
-					(filtered.newList == null) ? 0 : filtered.newList.size()
+					(filtered.triggerOld == null) ? 0 : filtered.triggerOld.size(),
+					(filtered.triggerNew == null) ? 0 : filtered.triggerNew.size()
 				) == 0
 			) {
 				continue;
@@ -388,31 +388,31 @@ public inherited sharing class MetadataTriggerHandler extends TriggerBase implem
 			switch on context {
 				when BEFORE_INSERT {
 					((TriggerAction.BeforeInsert) triggerAction)
-						.beforeInsert(filtered.newList);
+						.beforeInsert(filtered.triggerNew);
 				}
 				when AFTER_INSERT {
 					((TriggerAction.AfterInsert) triggerAction)
-						.afterInsert(filtered.newList);
+						.afterInsert(filtered.triggerNew);
 				}
 				when BEFORE_UPDATE {
 					((TriggerAction.BeforeUpdate) triggerAction)
-						.beforeUpdate(filtered.newList, filtered.oldList);
+						.beforeUpdate(filtered.triggerNew, filtered.triggerOld);
 				}
 				when AFTER_UPDATE {
 					((TriggerAction.AfterUpdate) triggerAction)
-						.afterUpdate(filtered.newList, filtered.oldList);
+						.afterUpdate(filtered.triggerNew, filtered.triggerOld);
 				}
 				when BEFORE_DELETE {
 					((TriggerAction.BeforeDelete) triggerAction)
-						.beforeDelete(filtered.oldList);
+						.beforeDelete(filtered.triggerOld);
 				}
 				when AFTER_DELETE {
 					((TriggerAction.AfterDelete) triggerAction)
-						.afterDelete(filtered.oldList);
+						.afterDelete(filtered.triggerOld);
 				}
 				when AFTER_UNDELETE {
 					((TriggerAction.AfterUndelete) triggerAction)
-						.afterUndelete(filtered.newList);
+						.afterUndelete(filtered.triggerNew);
 				}
 			}
 		}

@@ -42,9 +42,9 @@ public class TriggerAction {
 		/**
 		 * @description This method is called before a new record is inserted.
 		 *
-		 * @param newList The list of new records that are being inserted.
+		 * @param triggerNew The list of new records that are being inserted.
 		 */
-		void beforeInsert(List<SObject> newList);
+		void beforeInsert(List<SObject> triggerNew);
 	}
 
 	/**
@@ -54,9 +54,9 @@ public class TriggerAction {
 		/**
 		 * @description This method is called after a new record is inserted.
 		 *
-		 * @param newList The list of new records that were inserted.
+		 * @param triggerNew The list of new records that were inserted.
 		 */
-		void afterInsert(List<SObject> newList);
+		void afterInsert(List<SObject> triggerNew);
 	}
 
 	/**
@@ -66,10 +66,10 @@ public class TriggerAction {
 		/**
 		 * @description This method is called before a record is updated.
 		 *
-		 * @param newList The list of new records that are being updated.
-		 * @param oldList The list of old records that are being updated.
+		 * @param triggerNew The list of new records that are being updated.
+		 * @param triggerOld The list of old records that are being updated.
 		 */
-		void beforeUpdate(List<SObject> newList, List<SObject> oldList);
+		void beforeUpdate(List<SObject> triggerNew, List<SObject> triggerOld);
 	}
 
 	/**
@@ -79,10 +79,10 @@ public class TriggerAction {
 		/**
 		 * @description This method is called after a record is updated.
 		 *
-		 * @param newList The list of new records that were updated.
-		 * @param oldList The list of old records that were updated.
+		 * @param triggerNew The list of new records that were updated.
+		 * @param triggerOld The list of old records that were updated.
 		 */
-		void afterUpdate(List<SObject> newList, List<SObject> oldList);
+		void afterUpdate(List<SObject> triggerNew, List<SObject> triggerOld);
 	}
 
 	/**
@@ -92,9 +92,9 @@ public class TriggerAction {
 		/**
 		 * @description This method is called before a record is deleted.
 		 *
-		 * @param oldList The list of old records that are being deleted.
+		 * @param triggerOld The list of old records that are being deleted.
 		 */
-		void beforeDelete(List<SObject> oldList);
+		void beforeDelete(List<SObject> triggerOld);
 	}
 
 	/**
@@ -104,9 +104,9 @@ public class TriggerAction {
 		/**
 		 * @description This method is called after a record is deleted.
 		 *
-		 * @param oldList The list of old records that were deleted.
+		 * @param triggerOld The list of old records that were deleted.
 		 */
-		void afterDelete(List<SObject> oldList);
+		void afterDelete(List<SObject> triggerOld);
 	}
 
 	/**
@@ -116,9 +116,9 @@ public class TriggerAction {
 		/**
 		 * @description This method is called after a record is undeleted.
 		 *
-		 * @param newList The list of new records that were undeleted.
+		 * @param triggerNew The list of new records that were undeleted.
 		 */
-		void afterUndelete(List<SObject> newList);
+		void afterUndelete(List<SObject> triggerNew);
 	}
 
 	/**

@@ -151,7 +151,7 @@ IllegalArgumentException: if the bypass type is not valid.
 
 ---
 
-### `beforeInsert(newList)`
+### `beforeInsert(triggerNew)`
 
 *Inherited*
 
@@ -159,20 +159,20 @@ This method executes the Flow for the specified list of records before the inser
 
 #### Signature
 ```apex
-public void beforeInsert(List<SObject> newList)
+public void beforeInsert(List<SObject> triggerNew)
 ```
 
 #### Parameters
 | Name | Type | Description |
 |------|------|-------------|
-| newList | List&lt;SObject&gt; | The list of records to execute the Flow for. |
+| triggerNew | List&lt;SObject&gt; | The list of records to execute the Flow for. |
 
 #### Return Type
 **void**
 
 ---
 
-### `afterInsert(newList)`
+### `afterInsert(triggerNew)`
 
 *Inherited*
 
@@ -180,20 +180,20 @@ This method executes the Flow for the specified list of records after the insert
 
 #### Signature
 ```apex
-public void afterInsert(List<SObject> newList)
+public void afterInsert(List<SObject> triggerNew)
 ```
 
 #### Parameters
 | Name | Type | Description |
 |------|------|-------------|
-| newList | List&lt;SObject&gt; | The list of records to execute the Flow for. |
+| triggerNew | List&lt;SObject&gt; | The list of records to execute the Flow for. |
 
 #### Return Type
 **void**
 
 ---
 
-### `beforeUpdate(newList, oldList)`
+### `beforeUpdate(triggerNew, triggerOld)`
 
 *Inherited*
 
@@ -201,21 +201,21 @@ This method executes the Flow for the specified list of records before the updat
 
 #### Signature
 ```apex
-public void beforeUpdate(List<SObject> newList, List<SObject> oldList)
+public void beforeUpdate(List<SObject> triggerNew, List<SObject> triggerOld)
 ```
 
 #### Parameters
 | Name | Type | Description |
 |------|------|-------------|
-| newList | List&lt;SObject&gt; | The list of new records that are being updated. |
-| oldList | List&lt;SObject&gt; | The list of old records that are being updated. |
+| triggerNew | List&lt;SObject&gt; | The list of new records that are being updated. |
+| triggerOld | List&lt;SObject&gt; | The list of old records that are being updated. |
 
 #### Return Type
 **void**
 
 ---
 
-### `afterUpdate(newList, oldList)`
+### `afterUpdate(triggerNew, triggerOld)`
 
 *Inherited*
 
@@ -223,21 +223,21 @@ This method executes the Flow for the specified list of records after the update
 
 #### Signature
 ```apex
-public void afterUpdate(List<SObject> newList, List<SObject> oldList)
+public void afterUpdate(List<SObject> triggerNew, List<SObject> triggerOld)
 ```
 
 #### Parameters
 | Name | Type | Description |
 |------|------|-------------|
-| newList | List&lt;SObject&gt; | The list of new records that are being updated. |
-| oldList | List&lt;SObject&gt; | The list of old records that are being updated. |
+| triggerNew | List&lt;SObject&gt; | The list of new records that are being updated. |
+| triggerOld | List&lt;SObject&gt; | The list of old records that are being updated. |
 
 #### Return Type
 **void**
 
 ---
 
-### `beforeDelete(oldList)`
+### `beforeDelete(triggerOld)`
 
 *Inherited*
 
@@ -245,20 +245,20 @@ This method executes the Flow for the specified list of records before the delet
 
 #### Signature
 ```apex
-public void beforeDelete(List<SObject> oldList)
+public void beforeDelete(List<SObject> triggerOld)
 ```
 
 #### Parameters
 | Name | Type | Description |
 |------|------|-------------|
-| oldList | List&lt;SObject&gt; | The list of old records that are being deleted. |
+| triggerOld | List&lt;SObject&gt; | The list of old records that are being deleted. |
 
 #### Return Type
 **void**
 
 ---
 
-### `afterDelete(oldList)`
+### `afterDelete(triggerOld)`
 
 *Inherited*
 
@@ -266,20 +266,20 @@ This method executes the Flow for the specified list of records after the delete
 
 #### Signature
 ```apex
-public void afterDelete(List<SObject> oldList)
+public void afterDelete(List<SObject> triggerOld)
 ```
 
 #### Parameters
 | Name | Type | Description |
 |------|------|-------------|
-| oldList | List&lt;SObject&gt; | The list of old records that are being deleted. |
+| triggerOld | List&lt;SObject&gt; | The list of old records that are being deleted. |
 
 #### Return Type
 **void**
 
 ---
 
-### `afterUndelete(newList)`
+### `afterUndelete(triggerNew)`
 
 *Inherited*
 
@@ -287,13 +287,13 @@ This method executes the Flow for the specified list of records before the undel
 
 #### Signature
 ```apex
-public void afterUndelete(List<SObject> newList)
+public void afterUndelete(List<SObject> triggerNew)
 ```
 
 #### Parameters
 | Name | Type | Description |
 |------|------|-------------|
-| newList | List&lt;SObject&gt; | The list of records that are being restored. |
+| triggerNew | List&lt;SObject&gt; | The list of records that are being restored. |
 
 #### Return Type
 **void**

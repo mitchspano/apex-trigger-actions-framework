@@ -81,56 +81,56 @@ public virtual inherited sharing class TriggerActionFlow implements TriggerActio
 	/**
 	 * @description This method executes the Flow for the specified list of records before the insert of the records.
 	 *
-	 * @param newList The list of records to execute the Flow for.
+	 * @param triggerNew The list of records to execute the Flow for.
 	 */
-	public void beforeInsert(List<SObject> newList) {
+	public void beforeInsert(List<SObject> triggerNew) {
 		if (flowIsBypassed()) {
 			return;
 		}
 		List<Invocable.Action.Result> results = invokeAction(
-			getInterviewInputs(newList, TriggerActionConstants.RECORD_VARIABLE)
+			getInterviewInputs(triggerNew, TriggerActionConstants.RECORD_VARIABLE)
 		);
-		handleInvocableResults(results, newList);
-		applyFieldValuesDuringBefore(results, newList);
+		handleInvocableResults(results, triggerNew);
+		applyFieldValuesDuringBefore(results, triggerNew);
 	}
 
 	/**
 	 * @description This method executes the Flow for the specified list of records after the insert of the records.
 	 *
-	 * @param newList The list of records to execute the Flow for.
+	 * @param triggerNew The list of records to execute the Flow for.
 	 */
-	public void afterInsert(List<SObject> newList) {
+	public void afterInsert(List<SObject> triggerNew) {
 		if (flowIsBypassed()) {
 			return;
 		}
 		handleInvocableResults(
 			invokeAction(
-				getInterviewInputs(newList, TriggerActionConstants.RECORD_VARIABLE)
+				getInterviewInputs(triggerNew, TriggerActionConstants.RECORD_VARIABLE)
 			),
-			newList
+			triggerNew
 		);
 	}
 
 	/**
 	 * @description This method executes the Flow for the specified list of records before the update of the records.
 	 *
-	 * @param newList The list of new records that are being updated.
-	 * @param oldList The list of old records that are being updated.
+	 * @param triggerNew The list of new records that are being updated.
+	 * @param triggerOld The list of old records that are being updated.
 	 */
-	public void beforeUpdate(List<SObject> newList, List<SObject> oldList) {
+	public void beforeUpdate(List<SObject> triggerNew, List<SObject> triggerOld) {
 		if (flowIsBypassed()) {
 			return;
 		}
 		List<sObject> recordsNotYetProcessed = new List<sObject>();
 		List<sObject> oldRecordsNotYetProcessed = new List<sObject>();
-		for (Integer i = 0; i < newList.size(); i++) {
-			sObject record = newList[i];
+		for (Integer i = 0; i < triggerNew.size(); i++) {
+			sObject record = triggerNew[i];
 			if (
 				TriggerBase.idToNumberOfTimesSeenBeforeUpdate.get(record.id) == 1 ||
 				(allowRecursion == true)
 			) {
 				recordsNotYetProcessed.add(record);
-				oldRecordsNotYetProcessed.add(oldList[i]);
+				oldRecordsNotYetProcessed.add(triggerOld[i]);
 			}
 		}
 		if (recordsNotYetProcessed.isEmpty()) {
@@ -146,23 +146,23 @@ public virtual inherited sharing class TriggerActionFlow implements TriggerActio
 	/**
 	 * @description This method executes the Flow for the specified list of records after the update of the records.
 	 *
-	 * @param newList The list of new records that are being updated.
-	 * @param oldList The list of old records that are being updated.
+	 * @param triggerNew The list of new records that are being updated.
+	 * @param triggerOld The list of old records that are being updated.
 	 */
-	public void afterUpdate(List<SObject> newList, List<SObject> oldList) {
+	public void afterUpdate(List<SObject> triggerNew, List<SObject> triggerOld) {
 		if (flowIsBypassed()) {
 			return;
 		}
 		List<sObject> recordsNotYetProcessed = new List<sObject>();
 		List<sObject> oldRecordsNotYetProcessed = new List<sObject>();
-		for (Integer i = 0; i < newList.size(); i++) {
-			sObject record = newList[i];
+		for (Integer i = 0; i < triggerNew.size(); i++) {
+			sObject record = triggerNew[i];
 			if (
 				TriggerBase.idToNumberOfTimesSeenAfterUpdate.get(record.id) == 1 ||
 				(allowRecursion == true)
 			) {
 				recordsNotYetProcessed.add(record);
-				oldRecordsNotYetProcessed.add(oldList[i]);
+				oldRecordsNotYetProcessed.add(triggerOld[i]);
 			}
 		}
 		if (recordsNotYetProcessed.isEmpty()) {
@@ -179,57 +179,57 @@ public virtual inherited sharing class TriggerActionFlow implements TriggerActio
 	/**
 	 * @description This method executes the Flow for the specified list of records before the delete of the records.
 	 *
-	 * @param oldList The list of old records that are being deleted.
+	 * @param triggerOld The list of old records that are being deleted.
 	 */
-	public void beforeDelete(List<SObject> oldList) {
+	public void beforeDelete(List<SObject> triggerOld) {
 		if (flowIsBypassed()) {
 			return;
 		}
 		handleInvocableResults(
 			invokeAction(
 				getInterviewInputs(
-					oldList,
+					triggerOld,
 					TriggerActionConstants.RECORD_PRIOR_VARIABLE
 				)
 			),
-			oldList
+			triggerOld
 		);
 	}
 
 	/**
 	 * @description This method executes the Flow for the specified list of records after the delete of the records.
 	 *
-	 * @param oldList The list of old records that are being deleted.
+	 * @param triggerOld The list of old records that are being deleted.
 	 */
-	public void afterDelete(List<SObject> oldList) {
+	public void afterDelete(List<SObject> triggerOld) {
 		if (flowIsBypassed()) {
 			return;
 		}
 		handleInvocableResults(
 			invokeAction(
 				getInterviewInputs(
-					oldList,
+					triggerOld,
 					TriggerActionConstants.RECORD_PRIOR_VARIABLE
 				)
 			),
-			oldList
+			triggerOld
 		);
 	}
 
 	/**
 	 * @description This method executes the Flow for the specified list of records before the undelete of the records.
 	 *
-	 * @param newList The list of records that are being restored.
+	 * @param triggerNew The list of records that are being restored.
 	 */
-	public void afterUndelete(List<SObject> newList) {
+	public void afterUndelete(List<SObject> triggerNew) {
 		if (flowIsBypassed()) {
 			return;
 		}
 		handleInvocableResults(
 			invokeAction(
-				getInterviewInputs(newList, TriggerActionConstants.RECORD_VARIABLE)
+				getInterviewInputs(triggerNew, TriggerActionConstants.RECORD_VARIABLE)
 			),
-			newList
+			triggerNew
 		);
 	}
 
@@ -254,8 +254,12 @@ public virtual inherited sharing class TriggerActionFlow implements TriggerActio
 	) {
 		Boolean hasBeenMutated = false;
 		Set<String> recordPopulatedFields = new Set<String>();
-		recordPopulatedFields.addAll(stateAfterFlow.getPopulatedFieldsAsMap().keySet());
-		recordPopulatedFields.addAll(stateBeforeFlow.getPopulatedFieldsAsMap().keySet()); 
+		recordPopulatedFields.addAll(
+			stateAfterFlow.getPopulatedFieldsAsMap().keySet()
+		);
+		recordPopulatedFields.addAll(
+			stateBeforeFlow.getPopulatedFieldsAsMap().keySet()
+		);
 		for (String fieldName : recordPopulatedFields) {
 			if (stateBeforeFlow.get(fieldName) != stateAfterFlow.get(fieldName)) {
 				stateBeforeFlow.put(fieldName, stateAfterFlow.get(fieldName));
@@ -283,18 +287,18 @@ public virtual inherited sharing class TriggerActionFlow implements TriggerActio
 	/**
 	 * @description This method gets the interview inputs for the specified list of new and old records.
 	 *
-	 * @param newList The list of new records.
-	 * @param oldList The list of old records.
+	 * @param triggerNew The list of new records.
+	 * @param triggerOld The list of old records.
 	 * @return A list of interview inputs.
 	 */
 	private List<Map<String, Object>> getInterviewInputs(
-		List<SObject> newList,
-		List<SObject> oldList
+		List<SObject> triggerNew,
+		List<SObject> triggerOld
 	) {
 		List<Map<String, Object>> result = new List<Map<String, Object>>();
-		for (Integer i = 0; i < newList.size(); i++) {
-			SObject oldRecord = oldList[i];
-			SObject newRecord = newList[i];
+		for (Integer i = 0; i < triggerNew.size(); i++) {
+			SObject oldRecord = triggerOld[i];
+			SObject newRecord = triggerNew[i];
 			result.add(
 				new Map<String, Object>{
 					TriggerActionConstants.RECORD_PRIOR_VARIABLE => oldRecord,
@@ -318,7 +322,7 @@ public virtual inherited sharing class TriggerActionFlow implements TriggerActio
 
 	private void applyFieldValuesDuringBefore(
 		List<Invocable.Action.Result> results,
-		List<SObject> newList
+		List<SObject> triggerNew
 	) {
 		for (Integer i = 0; i < results.size(); i++) {
 			Invocable.Action.Result result = results[i];
@@ -330,7 +334,7 @@ public virtual inherited sharing class TriggerActionFlow implements TriggerActio
 						this.flowName + ': ' + RECORD_VARIABLE_NOT_FOUND_ERROR
 					);
 				}
-				applyFlowValues(newList[i], newRecordWhenFlowIsComplete);
+				applyFlowValues(triggerNew[i], newRecordWhenFlowIsComplete);
 			}
 		}
 	}

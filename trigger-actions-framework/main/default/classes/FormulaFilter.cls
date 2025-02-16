@@ -62,24 +62,24 @@ global class FormulaFilter {
 	/**
 	 * @description Filters the given lists of new and old SObjects based on the entry criteria formula.
 	 *
-	 * This method evaluates the entry criteria formula for each record in the `newList` and `oldList`.
+	 * This method evaluates the entry criteria formula for each record in the `triggerNew` and `triggerOld`.
 	 * If the formula evaluates to true for a record, it is included in the filtered lists.
 	 *
-	 * @param newList The list of new SObjects to filter.
-	 * @param oldList The list of old SObjects to filter.
+	 * @param triggerNew The list of new SObjects to filter.
+	 * @param triggerOld The list of old SObjects to filter.
 	 * @return A `FormulaFilter.Result` object containing the filtered lists of new and old SObjects.
 	 */
 	public FormulaFilter.Result filterByEntryCriteria(
-		List<SObject> newList,
-		List<SObject> oldList
+		List<SObject> triggerNew,
+		List<SObject> triggerOld
 	) {
 		FormulaFilter.Result result = new FormulaFilter.Result();
 		String entryCriteriaFormula = this.triggerActionConfiguration
 			?.Entry_Criteria__c;
 
 		if (String.isBlank(entryCriteriaFormula)) {
-			result.newList = newList;
-			result.oldList = oldList;
+			result.triggerNew = triggerNew;
+			result.triggerOld = triggerOld;
 			return result;
 		}
 		String nameOfType = getNameOfType(
@@ -93,10 +93,10 @@ global class FormulaFilter {
 			nameOfType
 		);
 
-		Integer size = newList != null ? newList.size() : oldList.size();
+		Integer size = triggerNew != null ? triggerNew.size() : triggerOld.size();
 		for (Integer i = 0; i < size; i++) {
-			SObject record = newList?.get(i);
-			SObject recordPrior = oldList?.get(i);
+			SObject record = triggerNew?.get(i);
+			SObject recordPrior = triggerOld?.get(i);
 			TriggerRecord toProcess = getTriggerRecord(
 				triggerRecordSubType,
 				nameOfType
@@ -104,8 +104,8 @@ global class FormulaFilter {
 			toProcess.newSobject = record;
 			toProcess.oldSobject = recordPrior;
 			if ((Boolean) fx.evaluate(toProcess)) {
-				result.newList.add(record);
-				result.oldList.add(recordPrior);
+				result.triggerNew.add(record);
+				result.triggerOld.add(recordPrior);
 			}
 		}
 		return result;
@@ -193,15 +193,15 @@ global class FormulaFilter {
 		/**
 		 * @description The filtered list of new SObjects.
 		 */
-		public List<SObject> newList;
+		public List<SObject> triggerNew;
 		/**
 		 * @description The filtered list of old SObjects.
 		 */
-		public List<SObject> oldList;
+		public List<SObject> triggerOld;
 
 		private Result() {
-			this.newList = new List<SObject>();
-			this.oldList = new List<SObject>();
+			this.triggerNew = new List<SObject>();
+			this.triggerOld = new List<SObject>();
 		}
 	}
 }

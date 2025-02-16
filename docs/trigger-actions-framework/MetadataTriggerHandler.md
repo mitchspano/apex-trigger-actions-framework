@@ -183,135 +183,135 @@ public static void clearAllBypasses()
 
 ---
 
-### `beforeInsert(newList)`
+### `beforeInsert(triggerNew)`
 
 Execute the Before Insert Trigger Actions.
 
 #### Signature
 ```apex
-public void beforeInsert(List<SObject> newList)
+public void beforeInsert(List<SObject> triggerNew)
 ```
 
 #### Parameters
 | Name | Type | Description |
 |------|------|-------------|
-| newList | List&lt;SObject&gt; | The list of new records being inserted. |
+| triggerNew | List&lt;SObject&gt; | The list of new records being inserted. |
 
 #### Return Type
 **void**
 
 ---
 
-### `afterInsert(newList)`
+### `afterInsert(triggerNew)`
 
 Execute the After Insert Trigger Actions.
 
 #### Signature
 ```apex
-public void afterInsert(List<SObject> newList)
+public void afterInsert(List<SObject> triggerNew)
 ```
 
 #### Parameters
 | Name | Type | Description |
 |------|------|-------------|
-| newList | List&lt;SObject&gt; | The list of new records that were inserted. |
+| triggerNew | List&lt;SObject&gt; | The list of new records that were inserted. |
 
 #### Return Type
 **void**
 
 ---
 
-### `beforeUpdate(newList, oldList)`
+### `beforeUpdate(triggerNew, triggerOld)`
 
 Execute the Before Update Trigger Actions.
 
 #### Signature
 ```apex
-public void beforeUpdate(List<SObject> newList, List<SObject> oldList)
+public void beforeUpdate(List<SObject> triggerNew, List<SObject> triggerOld)
 ```
 
 #### Parameters
 | Name | Type | Description |
 |------|------|-------------|
-| newList | List&lt;SObject&gt; | The list of updated records. |
-| oldList | List&lt;SObject&gt; | The list of old records before the update. |
+| triggerNew | List&lt;SObject&gt; | The list of updated records. |
+| triggerOld | List&lt;SObject&gt; | The list of old records before the update. |
 
 #### Return Type
 **void**
 
 ---
 
-### `afterUpdate(newList, oldList)`
+### `afterUpdate(triggerNew, triggerOld)`
 
 Execute the After Update Trigger Actions.
 
 #### Signature
 ```apex
-public void afterUpdate(List<SObject> newList, List<SObject> oldList)
+public void afterUpdate(List<SObject> triggerNew, List<SObject> triggerOld)
 ```
 
 #### Parameters
 | Name | Type | Description |
 |------|------|-------------|
-| newList | List&lt;SObject&gt; | The list of updated records. |
-| oldList | List&lt;SObject&gt; | The list of old records before the update. |
+| triggerNew | List&lt;SObject&gt; | The list of updated records. |
+| triggerOld | List&lt;SObject&gt; | The list of old records before the update. |
 
 #### Return Type
 **void**
 
 ---
 
-### `beforeDelete(oldList)`
+### `beforeDelete(triggerOld)`
 
 Execute the Before Delete Trigger Actions.
 
 #### Signature
 ```apex
-public void beforeDelete(List<SObject> oldList)
+public void beforeDelete(List<SObject> triggerOld)
 ```
 
 #### Parameters
 | Name | Type | Description |
 |------|------|-------------|
-| oldList | List&lt;SObject&gt; | The list of records being deleted. |
+| triggerOld | List&lt;SObject&gt; | The list of records being deleted. |
 
 #### Return Type
 **void**
 
 ---
 
-### `afterDelete(oldList)`
+### `afterDelete(triggerOld)`
 
 Execute the After Delete Trigger Actions.
 
 #### Signature
 ```apex
-public void afterDelete(List<SObject> oldList)
+public void afterDelete(List<SObject> triggerOld)
 ```
 
 #### Parameters
 | Name | Type | Description |
 |------|------|-------------|
-| oldList | List&lt;SObject&gt; | The list of records that were deleted. |
+| triggerOld | List&lt;SObject&gt; | The list of records that were deleted. |
 
 #### Return Type
 **void**
 
 ---
 
-### `afterUndelete(newList)`
+### `afterUndelete(triggerNew)`
 
 Execute the After Undelete Trigger Actions.
 
 #### Signature
 ```apex
-public void afterUndelete(List<SObject> newList)
+public void afterUndelete(List<SObject> triggerNew)
 ```
 
 #### Parameters
 | Name | Type | Description |
 |------|------|-------------|
-| newList | List&lt;SObject&gt; | The list of records that were undeleted. |
+| triggerNew | List&lt;SObject&gt; | The list of records that were undeleted. |
 
 #### Return Type
 **void**

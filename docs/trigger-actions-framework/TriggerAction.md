@@ -27,19 +27,19 @@ This interface defines the logic that should be executed before
 a new record is inserted.
 
 #### Methods
-##### `beforeInsert(newList)`
+##### `beforeInsert(triggerNew)`
 
 This method is called before a new record is inserted.
 
 ###### Signature
 ```apex
-public void beforeInsert(List<SObject> newList)
+public void beforeInsert(List<SObject> triggerNew)
 ```
 
 ###### Parameters
 | Name | Type | Description |
 |------|------|-------------|
-| newList | List&lt;SObject&gt; | The list of new records that are being inserted. |
+| triggerNew | List&lt;SObject&gt; | The list of new records that are being inserted. |
 
 ###### Return Type
 **void**
@@ -49,19 +49,19 @@ public void beforeInsert(List<SObject> newList)
 This interface defines the logic that should be executed after a new record is inserted.
 
 #### Methods
-##### `afterInsert(newList)`
+##### `afterInsert(triggerNew)`
 
 This method is called after a new record is inserted.
 
 ###### Signature
 ```apex
-public void afterInsert(List<SObject> newList)
+public void afterInsert(List<SObject> triggerNew)
 ```
 
 ###### Parameters
 | Name | Type | Description |
 |------|------|-------------|
-| newList | List&lt;SObject&gt; | The list of new records that were inserted. |
+| triggerNew | List&lt;SObject&gt; | The list of new records that were inserted. |
 
 ###### Return Type
 **void**
@@ -71,20 +71,20 @@ public void afterInsert(List<SObject> newList)
 This interface defines the logic that should be executed before a record is updated.
 
 #### Methods
-##### `beforeUpdate(newList, oldList)`
+##### `beforeUpdate(triggerNew, triggerOld)`
 
 This method is called before a record is updated.
 
 ###### Signature
 ```apex
-public void beforeUpdate(List<SObject> newList, List<SObject> oldList)
+public void beforeUpdate(List<SObject> triggerNew, List<SObject> triggerOld)
 ```
 
 ###### Parameters
 | Name | Type | Description |
 |------|------|-------------|
-| newList | List&lt;SObject&gt; | The list of new records that are being updated. |
-| oldList | List&lt;SObject&gt; | The list of old records that are being updated. |
+| triggerNew | List&lt;SObject&gt; | The list of new records that are being updated. |
+| triggerOld | List&lt;SObject&gt; | The list of old records that are being updated. |
 
 ###### Return Type
 **void**
@@ -94,20 +94,20 @@ public void beforeUpdate(List<SObject> newList, List<SObject> oldList)
 This interface defines the logic that should be executed after a record is updated.
 
 #### Methods
-##### `afterUpdate(newList, oldList)`
+##### `afterUpdate(triggerNew, triggerOld)`
 
 This method is called after a record is updated.
 
 ###### Signature
 ```apex
-public void afterUpdate(List<SObject> newList, List<SObject> oldList)
+public void afterUpdate(List<SObject> triggerNew, List<SObject> triggerOld)
 ```
 
 ###### Parameters
 | Name | Type | Description |
 |------|------|-------------|
-| newList | List&lt;SObject&gt; | The list of new records that were updated. |
-| oldList | List&lt;SObject&gt; | The list of old records that were updated. |
+| triggerNew | List&lt;SObject&gt; | The list of new records that were updated. |
+| triggerOld | List&lt;SObject&gt; | The list of old records that were updated. |
 
 ###### Return Type
 **void**
@@ -117,19 +117,19 @@ public void afterUpdate(List<SObject> newList, List<SObject> oldList)
 This interface defines the logic that should be executed before a record is deleted.
 
 #### Methods
-##### `beforeDelete(oldList)`
+##### `beforeDelete(triggerOld)`
 
 This method is called before a record is deleted.
 
 ###### Signature
 ```apex
-public void beforeDelete(List<SObject> oldList)
+public void beforeDelete(List<SObject> triggerOld)
 ```
 
 ###### Parameters
 | Name | Type | Description |
 |------|------|-------------|
-| oldList | List&lt;SObject&gt; | The list of old records that are being deleted. |
+| triggerOld | List&lt;SObject&gt; | The list of old records that are being deleted. |
 
 ###### Return Type
 **void**
@@ -139,19 +139,19 @@ public void beforeDelete(List<SObject> oldList)
 This interface defines the logic that should be executed after a record is deleted.
 
 #### Methods
-##### `afterDelete(oldList)`
+##### `afterDelete(triggerOld)`
 
 This method is called after a record is deleted.
 
 ###### Signature
 ```apex
-public void afterDelete(List<SObject> oldList)
+public void afterDelete(List<SObject> triggerOld)
 ```
 
 ###### Parameters
 | Name | Type | Description |
 |------|------|-------------|
-| oldList | List&lt;SObject&gt; | The list of old records that were deleted. |
+| triggerOld | List&lt;SObject&gt; | The list of old records that were deleted. |
 
 ###### Return Type
 **void**
@@ -161,19 +161,19 @@ public void afterDelete(List<SObject> oldList)
 This interface defines the logic that should be executed after a record is undeleted.
 
 #### Methods
-##### `afterUndelete(newList)`
+##### `afterUndelete(triggerNew)`
 
 This method is called after a record is undeleted.
 
 ###### Signature
 ```apex
-public void afterUndelete(List<SObject> newList)
+public void afterUndelete(List<SObject> triggerNew)
 ```
 
 ###### Parameters
 | Name | Type | Description |
 |------|------|-------------|
-| newList | List&lt;SObject&gt; | The list of new records that were undeleted. |
+| triggerNew | List&lt;SObject&gt; | The list of new records that were undeleted. |
 
 ###### Return Type
 **void**

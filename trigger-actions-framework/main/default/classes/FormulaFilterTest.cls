@@ -20,11 +20,11 @@
 global class FormulaFilterTest {
 	private static final String ACCOUNT_SOBJECT_NAME = 'Account';
 	private static final String EXCEPTION_SHOULD_BE_THROWN = 'An exception should be thrown';
-	private static List<Account> newList = new List<Account>{
+	private static List<Account> triggerNew = new List<Account>{
 		new Account(Name = 'Test Account 1'),
 		new Account(Name = 'Test Account 2')
 	};
-	private static List<Account> oldList = new List<Account>{
+	private static List<Account> triggerOld = new List<Account>{
 		new Account(Name = 'Test Account 1'),
 		new Account(Name = 'Test Account 2')
 	};
@@ -46,19 +46,19 @@ global class FormulaFilterTest {
 		);
 
 		FormulaFilter.Result result = filter.filterByEntryCriteria(
-			newList,
-			oldList
+			triggerNew,
+			triggerOld
 		);
 
 		System.Assert.areEqual(
 			2,
-			result.newList.size(),
-			'The size of newList should be 2'
+			result.triggerNew.size(),
+			'The size of triggerNew should be 2'
 		);
 		System.Assert.areEqual(
 			2,
-			result.oldList.size(),
-			'The size of oldList should be 2'
+			result.triggerOld.size(),
+			'The size of triggerOld should be 2'
 		);
 	}
 
@@ -73,24 +73,24 @@ global class FormulaFilterTest {
 		);
 
 		FormulaFilter.Result result = filter.filterByEntryCriteria(
-			newList,
-			oldList
+			triggerNew,
+			triggerOld
 		);
 
 		System.Assert.areEqual(
 			2,
-			result.newList.size(),
-			'The size of newList should be 2'
+			result.triggerNew.size(),
+			'The size of triggerNew should be 2'
 		);
 		System.Assert.areEqual(
 			2,
-			result.oldList.size(),
-			'The size of newList should be 2'
+			result.triggerOld.size(),
+			'The size of triggerNew should be 2'
 		);
 	}
 
 	@IsTest
-	private static void validFormulaShouldFilterContentsOfNewList() {
+	private static void validFormulaShouldFilterContentsOftriggerNew() {
 		configuration.Entry_Criteria__c = 'record.Name = "Test Account 1"';
 		FormulaFilter filter = new FormulaFilter(
 			configuration,
@@ -99,29 +99,29 @@ global class FormulaFilterTest {
 		);
 
 		FormulaFilter.Result result = filter.filterByEntryCriteria(
-			newList,
-			oldList
+			triggerNew,
+			triggerOld
 		);
 
 		System.Assert.areEqual(
 			1,
-			result.newList.size(),
-			'There should be 1 record in newList'
+			result.triggerNew.size(),
+			'There should be 1 record in triggerNew'
 		);
 		System.Assert.areEqual(
 			'Test Account 1',
-			((Account) result.newList[0]).Name,
-			'The first record newList should have a name of Test Account 1'
+			((Account) result.triggerNew[0]).Name,
+			'The first record triggerNew should have a name of Test Account 1'
 		);
 		System.Assert.areEqual(
 			1,
-			result.oldList.size(),
-			'There should be 1 record in newList'
+			result.triggerOld.size(),
+			'There should be 1 record in triggerNew'
 		);
 		System.Assert.areEqual(
 			'Test Account 1',
-			((Account) result.oldList[0]).Name,
-			'The first record newList should have a name of Test Account 1'
+			((Account) result.triggerOld[0]).Name,
+			'The first record triggerNew should have a name of Test Account 1'
 		);
 	}
 
@@ -135,13 +135,19 @@ global class FormulaFilterTest {
 		);
 
 		FormulaFilter.Result result = filter.filterByEntryCriteria(
-			newList,
-			oldList
+			triggerNew,
+			triggerOld
 		);
 
 		System.Assert.isNotNull(result, 'result should not be null');
-		System.Assert.isTrue(result.newList.isEmpty(), 'newList should be empty');
-		System.Assert.isTrue(result.oldList.isEmpty(), 'oldList should be empty');
+		System.Assert.isTrue(
+			result.triggerNew.isEmpty(),
+			'triggerNew should be empty'
+		);
+		System.Assert.isTrue(
+			result.triggerOld.isEmpty(),
+			'triggerOld should be empty'
+		);
 	}
 
 	@IsTest
@@ -155,7 +161,7 @@ global class FormulaFilterTest {
 		);
 
 		try {
-			filter.filterByEntryCriteria(newList, oldList);
+			filter.filterByEntryCriteria(triggerNew, triggerOld);
 		} catch (IllegalArgumentException e) {
 			caught = e;
 		}
@@ -182,7 +188,7 @@ global class FormulaFilterTest {
 		);
 
 		try {
-			filter.filterByEntryCriteria(newList, oldList);
+			filter.filterByEntryCriteria(triggerNew, triggerOld);
 		} catch (IllegalArgumentException e) {
 			caught = e;
 		}
@@ -209,7 +215,7 @@ global class FormulaFilterTest {
 		);
 
 		try {
-			filter.filterByEntryCriteria(newList, oldList);
+			filter.filterByEntryCriteria(triggerNew, triggerOld);
 		} catch (IllegalArgumentException e) {
 			caught = e;
 		}
@@ -241,7 +247,7 @@ global class FormulaFilterTest {
 		);
 
 		try {
-			filter.filterByEntryCriteria(newList, oldList);
+			filter.filterByEntryCriteria(triggerNew, triggerOld);
 		} catch (IllegalArgumentException e) {
 			caught = e;
 		}
@@ -270,7 +276,7 @@ global class FormulaFilterTest {
 			ACCOUNT_SOBJECT_NAME
 		);
 		try {
-			filter.filterByEntryCriteria(newList, oldList);
+			filter.filterByEntryCriteria(triggerNew, triggerOld);
 		} catch (IllegalArgumentException e) {
 			caught = e;
 		}
@@ -300,7 +306,7 @@ global class FormulaFilterTest {
 		);
 
 		try {
-			filter.filterByEntryCriteria(newList, oldList);
+			filter.filterByEntryCriteria(triggerNew, triggerOld);
 		} catch (IllegalArgumentException e) {
 			caught = e;
 		}
